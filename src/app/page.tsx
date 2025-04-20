@@ -2,14 +2,90 @@
 "use client"; 
 
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ArrowRight, Calendar, Clock, Search, Sparkles } from "lucide-react";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { div } from "framer-motion/client";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Home() {
+
+  
+// Mock data for blog posts
+const blogPosts = [
+  {
+    id: 1,
+    title: "Mastering Next.js 15: Advanced Techniques",
+    description: "Explore the latest features and optimization strategies for Next.js 15 applications.",
+    category: "Technology",
+    date: "May 15, 2024",
+    readTime: "8 min read",
+    image: "/images/tech.png"
+  },
+  {
+    id: 2,
+    title: "The Art of UI Animation with Framer Motion",
+    description: "Learn how to create smooth, engaging animations that enhance user experience.",
+    category: "Design",
+    date: "June 2, 2024",
+    readTime: "12 min read",
+    image: "/images/tech.png"
+  },
+  {
+    id: 3,
+    title: "Building Scalable CSS with Tailwind",
+    description: "Strategies for maintaining large-scale CSS architectures using Tailwind.",
+    category: "Development",
+    date: "June 10, 2024",
+    readTime: "6 min read",
+    image: "/images/tech.png"
+  },
+  {
+    id: 4,
+    title: "Modern Authentication Patterns",
+    description: "Implementing secure auth with NextAuth.js and OAuth providers.",
+    category: "Security",
+    date: "June 18, 2024",
+    readTime: "10 min read",
+    image: "/images/tech.png"
+  },
+  {
+    id: 5,
+    title: "Optimizing React Performance",
+    description: "Advanced techniques to make your React applications blazing fast.",
+    category: "Performance",
+    date: "June 25, 2024",
+    readTime: "14 min read",
+    image: "/images/tech.png"
+  },
+  {
+    id: 6,
+    title: "The Future of Web Development",
+    description: "Emerging trends and technologies shaping the web of tomorrow.",
+    category: "Technology",
+    date: "July 3, 2024",
+    readTime: "9 min read",
+    image: "/images/tech.png"
+  }
+];
+
+const categories = [
+  { id: "technology", label: "Technology" },
+  { id: "design", label: "Design" },
+  { id: "development", label: "Development" },
+  { id: "security", label: "Security" },
+  { id: "performance", label: "Performance" }
+];
+
+
   return (
-    <section className="relative overflow-hidden bg-background">
+<div>
+    <section className="relative overflow-hidden ">
       {/* Animated gradient background */}
       <div className="absolute inset-0 -z-10 overflow-hidden">
         <motion.div 
@@ -165,5 +241,159 @@ export default function Home() {
         </motion.div>
       </div>
     </section>
+
+{/* Main Content Area */}
+<div className="container mx-auto px-4 py-16">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+          className="flex flex-col lg:flex-row gap-8"
+        >
+          {/* Sidebar Filters */}
+          <aside className="lg:w-1/4 space-y-6">
+            {/* Search Bar */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.3 }}
+              className="relative"
+            >
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search articles..."
+                className="pl-10 bg-background"
+              />
+            </motion.div>
+
+            {/* Categories Filter */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 }}
+              className="space-y-4"
+            >
+              <h3 className="text-lg font-semibold text-secondary dark:text-dark-text">Categories</h3>
+              <div className="space-y-2">
+                {categories.map((category) => (
+                  <div key={category.id} className="flex items-center space-x-2">
+                    <Checkbox id={category.id} />
+                    <Label htmlFor={category.id} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                      {category.label}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </motion.div>
+
+            {/* Popular Tags */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.5 }}
+              className="space-y-4"
+            >
+              <h3 className="text-lg font-semibold text-secondary dark:text-dark-text">Popular Tags</h3>
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="outline" className="cursor-pointer hover:bg-accent/20">
+                  #NextJS
+                </Badge>
+                <Badge variant="outline" className="cursor-pointer hover:bg-accent/20">
+                  #React
+                </Badge>
+                <Badge variant="outline" className="cursor-pointer hover:bg-accent/20">
+                  #Tailwind
+                </Badge>
+                <Badge variant="outline" className="cursor-pointer hover:bg-accent/20">
+                  #Animation
+                </Badge>
+                <Badge variant="outline" className="cursor-pointer hover:bg-accent/20">
+                  #UI/UX
+                </Badge>
+                <Badge variant="outline" className="cursor-pointer hover:bg-accent/20">
+                  #Performance
+                </Badge>
+              </div>
+            </motion.div>
+          </aside>
+
+          {/* Blog Posts Grid */}
+          <div className="lg:w-3/4">
+            <motion.h2
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="text-2xl font-bold mb-8 text-secondary dark:text-dark-text"
+            >
+              Latest Articles
+            </motion.h2>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {blogPosts.map((post, index) => (
+                <motion.div
+                  key={post.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.3 + index * 0.1 }}
+                >
+                  <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 border-secondary/20 dark:border-dark-text/20 pt-0">
+                    <div className="relative h-48">
+                      <Image
+                        src={post.image}
+                        alt={post.title}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <CardHeader>
+                      <Badge variant="secondary" className="mb-2 w-fit">
+                        {post.category}
+                      </Badge>
+                      <CardTitle className="text-secondary dark:text-dark-text">
+                        {post.title}
+                      </CardTitle>
+                      <CardDescription className="text-secondary/80 dark:text-dark-text/80">
+                        {post.description}
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="flex items-center gap-4 text-sm text-secondary/60 dark:text-dark-text/60">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4" />
+                          <span>{post.date}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Clock className="h-4 w-4" />
+                          <span>{post.readTime}</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                    <CardFooter>
+                      <Button variant="outline" className="group gap-1">
+                        Read More
+                        <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                      </Button>
+                    </CardFooter>
+                  </Card>
+                </motion.div>
+              ))}
+            </div>
+
+            {/* Load More Button */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+              className="mt-12 text-center"
+            >
+              <Button variant="outline" size="lg" className="px-8">
+                Load More Articles
+              </Button>
+            </motion.div>
+          </div>
+        </motion.div>
+      </div>
+
+    </div>
   );
 }
