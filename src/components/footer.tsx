@@ -27,7 +27,7 @@ export default function Footer() {
             className="space-y-4"
           >
             <h3 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Safia Ahmed
+              Safia Ahmed 
             </h3>
             <p className="text-sm text-muted-foreground">
               Sharing knowledge about technology, design, and development through articles, courses, and tutorials.
@@ -135,7 +135,7 @@ export default function Footer() {
           className="mt-12 border-t pt-6 text-center text-sm text-muted-foreground"
         >
           <p>
-            © {new Date().getFullYear()} Safia Ahmed. All rights reserved.
+            © {new Date().getFullYear()} Safia Ahmed . All rights reserved.
           </p>
         </motion.div>
       </div>

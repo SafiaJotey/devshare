@@ -35,7 +35,7 @@ export default function NavigationBar() {
   }, []);
 
   return (
-    <header className={`sticky top-0 z-50 w-full transition-all ${isScrolled ? 'bg-background/90 border-b border-border/40' : 'bg-background/95'} backdrop-blur supports-[backdrop-filter]:bg-background/60`}>
+    <header className={`sticky top-0 z-50 w-full transition-all ${isScrolled ? 'bg-background/90 ' : 'bg-background/95'} backdrop-blur supports-[backdrop-filter]:bg-background/60`}>
   
       <div className="container-box flex h-16 items-center justify-between px-4">
         {/* Left side - Name */}
@@ -68,8 +68,10 @@ export default function NavigationBar() {
                 <Button
                   asChild
                   variant="link"
-                  className={`text-sm gap-1 ${pathname === item.path ? 'text-accent' : 'text-foreground/60 hover:text-foreground'}`}
+                  className={`text-sm gap-1 ${pathname === item.path ? 'text-accent' : `${isScrolled ? 'text-foreground/60 hover:text-foreground' : 'text-foreground'}`}`}
                 >
+
+                    
                   <Link href={item.path}>
                     {item.icon}
                     <span>{item.name}</span>
