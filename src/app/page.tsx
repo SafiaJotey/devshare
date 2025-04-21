@@ -123,7 +123,7 @@ const categories = [
         />
       </div>
 
-      <div className="container relative mx-auto flex min-h-[90vh] flex-col items-center justify-center px-6 py-24 md:flex-row md:py-32">
+      <div className="container-box relative flex min-h-[90vh] flex-col items-center justify-center px-6 py-24 md:flex-row md:py-32">
         {/* Text content */}
         <div className="flex-1 space-y-8 text-center md:space-y-10 md:text-left">
           <motion.span 
@@ -188,20 +188,20 @@ const categories = [
             transition={{ delay: 0.8 }}
             className="flex flex-col items-center gap-4 sm:flex-row md:justify-start"
           >
-            <Button size="lg" className="group gap-2 shadow-lg hover:shadow-primary/20">
+            <Button size="lg" className="group gap-2 shadow-lg hover:shadow-primary/20 cursor-pointer">
               Explore Articles
               <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
             </Button>
             <Button 
               variant="outline" 
               size="lg" 
-              className="border-secondary/30 dark:border-dark-text/30"
+              className="border-secondary/30 dark:border-dark-text/30 cursor-pointer"
             >
               <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent dark:from-dark-accent dark:to-dark-primary">
                 Meet The Authors
               </span>
             </Button>
-            <ThemeToggle/>
+           
           </motion.div>
         </div>
 
@@ -369,7 +369,7 @@ const categories = [
                       </div>
                     </CardContent>
                     <CardFooter>
-                      <Button variant="outline" className="group gap-1">
+                      <Button variant="outline" className="group gap-1 cursor-pointer">
                         Read More
                         <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                       </Button>
@@ -386,7 +386,7 @@ const categories = [
               transition={{ delay: 0.8 }}
               className="mt-12 text-center"
             >
-              <Button variant="outline" size="lg" className="px-8">
+              <Button variant="outline" size="lg" className="px-8 cursor-pointer">
                 Load More Articles
               </Button>
             </motion.div>
