@@ -9,8 +9,10 @@ import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { useState } from "react";
 
 export default function Home() {
+
   // Mock data for blog posts
   const blogPosts = [
     {
@@ -132,6 +134,16 @@ export default function Home() {
     { id: "security", label: "Security" },
     { id: "performance", label: "Performance" }
   ];
+  const [visiblePosts, setVisiblePosts] = useState(6);
+ 
+ const loadMorePosts = () => {
+  setVisiblePosts(prev => prev + 6);
+};
+const displayedPosts = blogPosts.slice(0, visiblePosts);
+
+
+const hasMorePosts = visiblePosts < blogPosts.length;
+  
 
   return (
     <div className="overflow-x-hidden">
@@ -430,7 +442,7 @@ export default function Home() {
 
 
       {/* Main Content Area */}
-      <div className="container mx-auto px-4 py-22 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 py-22 sm:px-6 lg:px-8 ">
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
@@ -439,7 +451,7 @@ export default function Home() {
     className="flex flex-col lg:flex-row gap-8"
   >
     {/* Sidebar Filters - Sticky on large screens */}
-    <aside className="lg:w-1/4 space-y-6 lg:sticky lg:top-28 self-start h-fit">
+    <aside className="  lg:w-1/4 space-y-6 lg:sticky lg:top-36 self-start h-fit">
       {/* Search Bar */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
@@ -512,14 +524,14 @@ export default function Home() {
       </motion.h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {blogPosts.map((post, index) => (
-          <motion.div
-            key={post.id}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "0px 0px -100px 0px" }}
-            transition={{ delay: index * 0.1 }}
-          >
+      {displayedPosts.map((post, index) => (
+                <motion.div
+                  key={post.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "0px 0px -100px 0px" }}
+                  transition={{ delay: index * 0.1 }}
+                >
             <Card className="h-full overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 border-secondary/20 dark:border-dark-text/20 group">
               <div className="relative h-40 overflow-hidden">
                 <Image
@@ -532,7 +544,7 @@ export default function Home() {
               </div>
               <CardHeader>
                 <Badge variant="secondary" className="mb-2 w-fit">
-                  {post.category}
+                  {post.category}{post.id}
                 </Badge>
                 <CardTitle className="text-secondary dark:text-dark-text group-hover:text-primary dark:group-hover:text-dark-primary transition-colors duration-300">
                   {post.title}
@@ -568,22 +580,25 @@ export default function Home() {
       </div>
 
       {/* Load More Button */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ delay: 0.3 }}
-        className="mt-12 text-center"
-      >
-        <Button 
-          variant="outline" 
-          size="lg" 
-          className="px-8 group hover:bg-primary hover:text-white transition-colors duration-300"
-        >
-          Load More Articles
-          <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-        </Button>
-      </motion.div>
+      {hasMorePosts && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.3 }}
+                className="mt-12 text-center"
+              >
+                <Button 
+                  variant="outline" 
+                  size="lg" 
+                  className="px-8 group hover:bg-primary hover:text-white transition-colors duration-300"
+                  onClick={loadMorePosts}
+                >
+                  Load More Articles
+                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Button>
+              </motion.div>
+            )}
     </div>
   </motion.div>
 </div>
