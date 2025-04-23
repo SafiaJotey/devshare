@@ -1,6 +1,6 @@
 
 "use client";
-import {  useState } from "react";
+
 import { motion } from "framer-motion";
 
 import { Button } from "@/components/ui/button";
@@ -21,13 +21,13 @@ export default function ComingSoon() {
       >
         <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">🚧 Coming Soon</h1>
         <p className="text-lg text-foreground">
-          We&aposre working hard to bring you something amazing. Stay tuned — we're almost there!
+          We &apos; re working hard to bring you something amazing. Stay tuned — we &apos; re almost there!
         </p>
 
 
       
 
-        <p className="text-xs text-foreground mt-4">We&aposll notify you when we launch 🚀</p>
+        <p className="text-xs text-foreground mt-4">We &apos; ll notify you when we launch 🚀</p>
       </motion.div>
       <motion.div
         className="mt-6"
