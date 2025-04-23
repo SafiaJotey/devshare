@@ -3,13 +3,14 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Calendar, Clock, Search, Sparkles } from "lucide-react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
+import { Motion } from "./lib/motion";
 
 export default function Home() {
 
@@ -146,7 +147,7 @@ const hasMorePosts = visiblePosts < blogPosts.length;
   
 
   return (
-    <div className="overflow-x-hidden">
+    <div className="">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
         {/* Animated background elements */}
@@ -155,7 +156,7 @@ const hasMorePosts = visiblePosts < blogPosts.length;
           <div className="absolute inset-0 bg-gradient-to-br from-light/20 via-transparent to-light/10 dark:from-dark-bg/30 dark:via-dark-bg/10 dark:to-dark-bg/20" />
           
           {/* Floating blobs */}
-          <motion.div
+          <Motion.div
             animate={{
               y: [0, -20, 0],
               x: [0, 15, 0],
@@ -167,7 +168,7 @@ const hasMorePosts = visiblePosts < blogPosts.length;
             }}
             className="absolute right-10 top-1/4 h-32 w-32 rounded-full bg-accent/10 blur-3xl dark:bg-dark-accent/10"
           />
-          <motion.div
+          <Motion.div
             animate={{
               y: [0, 30, 0],
               x: [0, -20, 0],
@@ -190,7 +191,7 @@ const hasMorePosts = visiblePosts < blogPosts.length;
         <div className="container relative mx-auto flex min-h-[90vh] flex-col items-center justify-center px-4 py-24 md:flex-row md:py-22 lg:px-8">
           {/* Text content */}
           <div className="flex-1 space-y-8 text-center md:space-y-10 md:text-left">
-            <motion.span 
+            <Motion.span 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
@@ -198,9 +199,9 @@ const hasMorePosts = visiblePosts < blogPosts.length;
             >
               <Sparkles className="h-4 w-4" />
               New Article Every Week
-            </motion.span>
+            </Motion.span>
 
-            <motion.h1 
+            <Motion.h1 
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
@@ -225,9 +226,9 @@ const hasMorePosts = visiblePosts < blogPosts.length;
                 </span>
               </span>{" "}
               Skills With Expert Insights
-            </motion.h1>
+            </Motion.h1>
 
-            <motion.p
+            <Motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.6 }}
@@ -244,9 +245,9 @@ const hasMorePosts = visiblePosts < blogPosts.length;
                 <span className="absolute -bottom-0.5 left-0 h-0.5 w-full bg-primary/30 dark:bg-dark-primary/30" />
               </span>
               . Transform your workflow today.
-            </motion.p>
+            </Motion.p>
 
-            <motion.div
+            <Motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.8 }}
@@ -268,10 +269,10 @@ const hasMorePosts = visiblePosts < blogPosts.length;
                   Meet The Authors
                 </span>
               </Button>
-            </motion.div>
+            </Motion.div>
 
             {/* Trust indicators */}
-            <motion.div
+            <Motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1 }}
@@ -288,16 +289,25 @@ const hasMorePosts = visiblePosts < blogPosts.length;
               <div className="hidden sm:flex items-center gap-2">
                 <div className="flex items-center gap-1">
                   {[1, 2, 3, 4, 5].map((i) => (
-                    <StarIcon key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400" />
+                  
+                    <svg
+                  key={i} className="h-4 w-4 fill-yellow-400 text-yellow-400"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    viewBox="0 0 24 24"
+                  >
+                    <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                  </svg>
                   ))}
                 </div>
                 <span>5.0 Rating</span>
               </div>
-            </motion.div>
+            </Motion.div>
           </div>
 
           {/* Image with fancy frame */}
-          <motion.div 
+          <Motion.div 
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 1 }}
@@ -381,7 +391,7 @@ const hasMorePosts = visiblePosts < blogPosts.length;
                   bg: "bg-primary text-white"
                 }
               ].map((badge, idx) => (
-                <motion.div
+                <Motion.div
                   key={idx}
                   className={`absolute ${badge.position} rounded-full px-3 py-1 text-xs font-semibold shadow-md ${badge.bg}`}
                   initial={{ opacity: 0 }}
@@ -394,11 +404,11 @@ const hasMorePosts = visiblePosts < blogPosts.length;
                   }}
                 >
                   {badge.text}
-                </motion.div>
+                </Motion.div>
               ))}
 
               {/* Article count badge */}
-              <motion.div
+              <Motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 1.4 }}
@@ -408,20 +418,20 @@ const hasMorePosts = visiblePosts < blogPosts.length;
                 <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent dark:from-dark-accent dark:to-dark-primary">
                   50+ Articles
                 </span>
-              </motion.div>
+              </Motion.div>
             </div>
-          </motion.div>
+          </Motion.div>
         </div>
 
         {/* Scrolling indicator */}
-        <motion.div
+        <Motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.6 }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2 cursor-pointer"
         >
           <div className="flex flex-col items-center">
-            <motion.div
+            <Motion.div
               animate={{
                 y: [0, 10, 0],
               }}
@@ -434,7 +444,7 @@ const hasMorePosts = visiblePosts < blogPosts.length;
             />
             <span className="mt-2 text-xs text-secondary/60 dark:text-dark-text/60">Scroll Down</span>
           </div>
-        </motion.div>
+        </Motion.div>
       </section>
 
 
@@ -443,7 +453,7 @@ const hasMorePosts = visiblePosts < blogPosts.length;
 
       {/* Main Content Area */}
       <div className="container mx-auto px-4 py-22 sm:px-6 lg:px-8 ">
-  <motion.div
+  <Motion.div
     initial={{ opacity: 0, y: 20 }}
     whileInView={{ opacity: 1, y: 0 }}
     viewport={{ once: true }}
@@ -453,7 +463,7 @@ const hasMorePosts = visiblePosts < blogPosts.length;
     {/* Sidebar Filters - Sticky on large screens */}
     <aside className="  lg:w-1/4 space-y-6 lg:sticky lg:top-36 self-start h-fit">
       {/* Search Bar */}
-      <motion.div
+      <Motion.div
         initial={{ opacity: 0, x: -20 }}
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
@@ -465,10 +475,10 @@ const hasMorePosts = visiblePosts < blogPosts.length;
           placeholder="Search articles..."
           className="pl-10 bg-background"
         />
-      </motion.div>
+      </Motion.div>
 
       {/* Categories Filter */}
-      <motion.div
+      <Motion.div
         initial={{ opacity: 0, x: -20 }}
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
@@ -486,10 +496,10 @@ const hasMorePosts = visiblePosts < blogPosts.length;
             </div>
           ))}
         </div>
-      </motion.div>
+      </Motion.div>
 
       {/* Popular Tags */}
-      <motion.div
+      <Motion.div
         initial={{ opacity: 0, x: -20 }}
         whileInView={{ opacity: 1, x: 0 }}
         viewport={{ once: true }}
@@ -508,12 +518,12 @@ const hasMorePosts = visiblePosts < blogPosts.length;
             </Badge>
           ))}
         </div>
-      </motion.div>
+      </Motion.div>
     </aside>
 
     {/* Blog Posts Grid */}
     <div className="lg:w-3/4">
-      <motion.h2
+      <Motion.h2
         initial={{ opacity: 0, y: 10 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
@@ -521,11 +531,11 @@ const hasMorePosts = visiblePosts < blogPosts.length;
         className="text-3xl font-bold mb-8 text-secondary dark:text-dark-text"
       >
         Latest Articles
-      </motion.h2>
+      </Motion.h2>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {displayedPosts.map((post, index) => (
-                <motion.div
+                <Motion.div
                   key={post.id}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
@@ -543,8 +553,8 @@ const hasMorePosts = visiblePosts < blogPosts.length;
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-70" />
               </div>
               <CardHeader>
-                <Badge variant="secondary" className="mb-2 w-fit">
-                  {post.category}{post.id}
+                <Badge variant="secondary" className="mb-2 w-fit px-0">
+                  {post.category}
                 </Badge>
                 <CardTitle className="text-secondary dark:text-dark-text group-hover:text-primary dark:group-hover:text-dark-primary transition-colors duration-300">
                   {post.title}
@@ -575,13 +585,13 @@ const hasMorePosts = visiblePosts < blogPosts.length;
                 </Button>
               </CardFooter>
             </Card>
-          </motion.div>
+          </Motion.div>
         ))}
       </div>
 
       {/* Load More Button */}
       {hasMorePosts && (
-              <motion.div
+              <Motion.div
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -597,27 +607,13 @@ const hasMorePosts = visiblePosts < blogPosts.length;
                   Load More Articles
                   <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Button>
-              </motion.div>
+              </Motion.div>
             )}
     </div>
-  </motion.div>
+  </Motion.div>
 </div>
 
 
     </div>
-  );
-}
-
-function StarIcon(props) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-    >
-      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
-    </svg>
   );
 }
