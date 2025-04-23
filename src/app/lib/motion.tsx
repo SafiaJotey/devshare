@@ -8,7 +8,7 @@ import type { MotionProps } from 'framer-motion';
 /** Proxy wrapper so you can use `Motion.div`, `Motion.h1`, … inside server files. */
 export const Motion = new Proxy(motion, {
   get(target, prop: string) {
-    // @ts-ignore – dynamic property
+    // @ts-expect-error – dynamic property
     return target[prop] as ForwardRefExoticComponent<
       MotionProps & RefAttributes<HTMLElement>
     >;

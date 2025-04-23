@@ -7,9 +7,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 export default function ComingSoon() {
-  const [timeLeft, setTimeLeft] = useState<{ days: number; hours: number; minutes: number; seconds: number }>({
-    days: 0, hours: 0, minutes: 0, seconds: 0,
-  });
+
 
 
 
@@ -23,13 +21,13 @@ export default function ComingSoon() {
       >
         <h1 className="text-4xl sm:text-5xl font-bold tracking-tight">🚧 Coming Soon</h1>
         <p className="text-lg text-foreground">
-          We’re working hard to bring you something amazing. Stay tuned — we're almost there!
+          We&aposre working hard to bring you something amazing. Stay tuned — we're almost there!
         </p>
 
 
       
 
-        <p className="text-xs text-foreground mt-4">We’ll notify you when we launch 🚀</p>
+        <p className="text-xs text-foreground mt-4">We&aposll notify you when we launch 🚀</p>
       </motion.div>
       <motion.div
         className="mt-6"
