@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion } from "framer-motion";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Github, Twitter, Linkedin, Youtube, Mail } from "lucide-react";
@@ -19,11 +19,8 @@ export default function Footer() {
       <div className="container-box px-4 py-12 md:py-16">
         <div className="grid grid-cols-1 gap-12 md:grid-cols-4">
           {/* Brand info */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            viewport={{ once: true }}
+          <div
+           
             className="space-y-4"
           >
             <h3 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
@@ -34,34 +31,31 @@ export default function Footer() {
             </p>
             <div className="flex gap-4">
               {socialLinks.map((social, index) => (
-                <motion.a
+                <a
                   key={index}
                   href={social.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  whileHover={{ y: -3 }}
+            
                   className="text-muted-foreground hover:text-accent"
                 >
                   {social.icon}
-                </motion.a>
+                </a>
               ))}
             </div>
-          </motion.div>
+          </div>
 
           {/* Quick Links */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            viewport={{ once: true }}
+          <div
+           
             className="space-y-4"
           >
             <h4 className="text-sm font-semibold uppercase tracking-wider">Explore</h4>
             <ul className="space-y-2">
               {['About', 'Blogs', 'Courses', 'Tutorials'].map((item, index) => (
-                <motion.li
+                <li
                   key={index}
-                  whileHover={{ x: 5 }}
+                
                 >
                   <Link
                     href={`/${item.toLowerCase()}`}
@@ -69,25 +63,25 @@ export default function Footer() {
                   >
                     {item}
                   </Link>
-                </motion.li>
+                </li>
               ))}
             </ul>
-          </motion.div>
+          </div>
 
           {/* Resources */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            viewport={{ once: true }}
+          <div
+          
+           
+          
+           
             className="space-y-4"
           >
             <h4 className="text-sm font-semibold uppercase tracking-wider">Resources</h4>
             <ul className="space-y-2">
               {['Documentation', 'Guides', 'Examples', 'Community'].map((item, index) => (
-                <motion.li
+                <li
                   key={index}
-                  whileHover={{ x: 5 }}
+                
                 >
                   <Link
                     href={`/${item.toLowerCase()}`}
@@ -95,17 +89,14 @@ export default function Footer() {
                   >
                     {item}
                   </Link>
-                </motion.li>
+                </li>
               ))}
             </ul>
-          </motion.div>
+          </div>
 
           {/* Newsletter */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 }}
-            viewport={{ once: true }}
+          <div
+          
             className="space-y-4"
           >
             <h4 className="text-sm font-semibold uppercase tracking-wider">Stay Updated</h4>
@@ -123,21 +114,18 @@ export default function Footer() {
                 Subscribe
               </Button>
             </div>
-          </motion.div>
+          </div>
         </div>
 
         {/* Copyright */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          viewport={{ once: true }}
+        <div
+         
           className="mt-12 border-t pt-6 text-center text-sm text-muted-foreground"
         >
           <p>
             © {new Date().getFullYear()} Safia Ahmed . All rights reserved.
           </p>
-        </motion.div>
+        </div>
       </div>
     </footer>
   );
