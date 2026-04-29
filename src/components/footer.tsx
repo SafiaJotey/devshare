@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Github, Twitter, Linkedin, Youtube, Mail } from "lucide-react";
+import { Logo } from "./ui/Logo";
 
 export default function Footer() {
   const socialLinks = [
@@ -23,9 +24,7 @@ export default function Footer() {
            
             className="space-y-4"
           >
-            <h3 className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Safia Ahmed 
-            </h3>
+           <Logo className="text-primary dark:text-accent" />
             <p className="text-sm text-muted-foreground">
               Sharing knowledge about technology, design, and development through articles, courses, and tutorials.
             </p>

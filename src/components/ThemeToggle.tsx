@@ -2,7 +2,10 @@
 
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { Sun, Moon } from "lucide-react";
+
+
+import { DarkModeIcon } from "./ui/icons/DarkModeIcon";
+import { LightModeIcon } from "./ui/icons/LightmodeIcon";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -22,9 +25,9 @@ export function ThemeToggle() {
       aria-label="Toggle Theme"
     >
       {theme === "dark" ? (
-        <Sun className="w-5 h-5 text-accent" />
+         <LightModeIcon className="text-accent " />
       ) : (
-        <Moon className="w-5 h-5 text-primary" />
+        <DarkModeIcon className=" text-primary " />
       )}
     </button>
   );

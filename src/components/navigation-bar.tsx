@@ -4,15 +4,18 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { usePathname } from "next/navigation";
-import { User, BookOpen, GraduationCap, Video, LogIn, Menu, X } from "lucide-react";
+import {  LogIn, Menu, X } from "lucide-react";
 import { ThemeToggle } from "./ThemeToggle";
 import { useState, useEffect } from "react";
+import { Logo } from "./ui/Logo";
+import { AboutIcon } from "./ui/icons/AboutIcon";
+import { BlogIcon } from "./ui/icons/BlogIcon";
 
 const navItems = [
-  { name: "About", path: "/about", icon: <User className="h-4 w-4" /> },
-  { name: "Blogs", path: "/blogs", icon: <BookOpen className="h-4 w-4" /> },
-  { name: "Courses", path: "/courses", icon: <GraduationCap className="h-4 w-4" /> },
-  { name: "Tutorials", path: "/tutorials", icon: <Video className="h-4 w-4" /> },
+  { name: "About", path: "/about", icon: <AboutIcon className="text-foreground" /> },
+  { name: "Blogs", path: "/blogs", icon: <BlogIcon className="text-foreground" /> },
+  // { name: "Courses", path: "/courses", icon: <GraduationCap className="h-4 w-4" /> },
+  // { name: "Tutorials", path: "/tutorials", icon: <Video className="h-4 w-4" /> },
 ];
 
 export default function NavigationBar() {
@@ -43,9 +46,10 @@ export default function NavigationBar() {
          
         >
           <Link href="/" className="flex items-center gap-2">
-            <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            {/* <span className="text-xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
               Safia Ahmed
-            </span>
+            </span> */}
+       <Logo className="text-primary dark:text-accent" />
           </Link>
         </div>
 
@@ -63,7 +67,7 @@ export default function NavigationBar() {
                 <Button
                   asChild
                   variant="link"
-                  className={`text-sm gap-1 ${pathname === item.path ? 'text-accent' : `${isScrolled ? 'text-foreground/60 hover:text-foreground' : 'text-foreground'}`}`}
+                  className={`text-sm gap-1 ${pathname === item.path ? 'text-primary ' : `${isScrolled ? 'text-foreground/60 hover:text-foreground' : 'text-foreground'}`}`}
                 >
 
                     
