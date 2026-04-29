@@ -1,25 +1,31 @@
 "use client";
 
-import { Moon, Sun } from "lucide-react";
-import { useTheme } from "@/providers/theme-provider";
+import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
+import { Sun, Moon } from "lucide-react";
 
 export function ThemeToggle() {
-  const {  toggleTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-//   if (!isMounted) {
-//     return (
-//       <div className="h-9 w-9"></div> // Placeholder to prevent layout shift
-//     );
-//   }
+  // Prevent hydration mismatch (Industry standard trick)
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return <div className="w-9 h-9" />;
 
   return (
     <button
-      onClick={toggleTheme}
-      className="relative inline-flex h-9 w-9 items-center justify-center rounded-md  p-1  hover:text-accent-foreground cursor-pointer focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
-      aria-label="Toggle theme"
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      className="p-2 rounded-full hover:bg-foreground/10 transition-colors"
+      aria-label="Toggle Theme"
     >
-      <Sun className="h-5 w-5 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-      <Moon className="absolute h-5 w-5 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+      {theme === "dark" ? (
+        <Sun className="w-5 h-5 text-accent" />
+      ) : (
+        <Moon className="w-5 h-5 text-primary" />
+      )}
     </button>
   );
 }
