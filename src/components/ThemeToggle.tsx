@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 
 
 import { DarkModeIcon } from "./ui/icons/DarkModeIcon";
-import { LightModeIcon } from "./ui/icons/LightmodeIcon";
+import { LightModeIcon } from "./ui/icons/LightModeIcon";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
