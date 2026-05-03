@@ -4,16 +4,11 @@ import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Github, Twitter, Linkedin, Youtube, Mail } from "lucide-react";
+ import { Mail } from "lucide-react";
 import { Logo } from "../shared/Logo";
-
+import {socialLinks} from "@/constants/footer"
 export default function Footer() {
-  const socialLinks = [
-    { icon: <Github className="h-5 w-5" />, url: "https://github.com" },
-    { icon: <Twitter className="h-5 w-5" />, url: "https://twitter.com" },
-    { icon: <Linkedin className="h-5 w-5" />, url: "https://linkedin.com" },
-    { icon: <Youtube className="h-5 w-5" />, url: "https://youtube.com" },
-  ];
+ 
 
   return (
     <footer className=" bg-gradient-to-b from-background to-muted/20">
