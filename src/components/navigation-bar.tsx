@@ -16,9 +16,10 @@ import { HomeIcon } from "./ui/icons/HomeIcon";
 import { MenuIcon } from "./ui/icons/MenuIcon";
 
 const navItems = [
-    {  name: "Home", path: "/", icon: <HomeIcon className="text-foreground" /> },
-  { name: "About", path: "/about", icon: <AboutIcon className="text-foreground" /> },
-  { name: "Blogs", path: "/blogs", icon: <BlogIcon className="text-foreground" /> },
+  { name: "Home", path: "/", icon: HomeIcon }, // No < /> and no hardcoded class
+  { name: "About", path: "/about", icon: AboutIcon },
+  { name: "Blogs", path: "/blogs", icon: BlogIcon },
+
 
 
   // { name: "Courses", path: "/courses", icon: <GraduationCap className="h-4 w-4" /> },
@@ -68,25 +69,31 @@ export default function NavigationBar() {
             className="flex items-center gap-1"
            
           >
-            {navItems.map((item) => (
-              <li 
-                key={item.path}
-               
-              >
-                <Button
-                  asChild
-                  variant="link"
-                  className={`text-sm gap-1 ${pathname === item.path ? 'text-primary ' : `${isScrolled ? 'text-foreground/60 hover:text-foreground' : 'text-foreground'}`}`}
-                >
+           {navItems.map((item) => {
+  const isActive = pathname === item.path;
+  // Determine color logic once to keep code clean
+  const activeClass = isActive 
+    ? 'text-primary' 
+    : isScrolled 
+      ? 'text-foreground/60 hover:text-foreground' 
+      : 'text-foreground';
 
-                    
-                  <Link href={item.path}>
-                    {item.icon}
-                    <span>{item.name}</span>
-                  </Link>
-                </Button>
-              </li>
-            ))}
+  return (
+    <li key={item.path}>
+      <Button
+        asChild
+        variant="link"
+        className={`text-sm gap-1 ${activeClass}`}
+      >
+        <Link href={item.path}>
+          {/* Render the icon component and pass the color class */}
+          <item.icon className={activeClass} /> 
+          <span>{item.name}</span>
+        </Link>
+      </Button>
+    </li>
+  );
+})}
           </ul>
 
           <div className="ml-2 flex items-center gap-2">
@@ -133,25 +140,31 @@ export default function NavigationBar() {
                 className="flex flex-col gap-1"
               
               >
-                {navItems.map((item) => (
-                  <li 
-                    key={item.path}
-                    
-                  >
-                    <Button
-                      asChild
-                      variant="ghost"
-                      className={`w-full justify-start gap-2 ${pathname === item.path ? 'text-primary ' : `${isScrolled ? 'text-foreground/60 hover:text-foreground' : 'text-foreground'}`}`}
-                
+                {navItems.map((item) => {
 
-                    >
-                      <Link href={item.path}>
-                        {item.icon}
-                        <span>{item.name}</span>
-                      </Link>
-                    </Button>
-                  </li>
-                ))}
+                   const isActive = pathname === item.path;
+  // Determine color logic once to keep code clean
+  const activeClass = isActive 
+    ? 'text-primary' 
+    : isScrolled 
+      ? 'text-foreground/60 hover:text-foreground' 
+      : 'text-foreground';
+                  return (
+                 <li key={item.path}>
+      <Button
+        asChild
+        variant="link"
+        className={`text-sm gap-1 ${activeClass}`}
+      >
+        <Link href={item.path}>
+          {/* Render the icon component and pass the color class */}
+          <item.icon className={activeClass} /> 
+          <span>{item.name}</span>
+        </Link>
+      </Button>
+    </li>
+                )
+                })}
                 <li
                  
                   className="mt-2"
