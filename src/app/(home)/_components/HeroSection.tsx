@@ -22,7 +22,7 @@ export default function HeroSection() {
           </div>
         </div>
 
-        {/* Added max-w-7xl to the main container to allow more horizontal spread */}
+
         <div className="container relative mx-auto flex min-h-[60vh] max-w-7xl flex-col-reverse items-center justify-center px-4 md:flex-row md:gap-12 md:px-22 md:py-10 lg:p-8">
           {/* left-text */}
           <div className="flex-1 space-y-4 text-center md:space-y-10 md:text-left">
