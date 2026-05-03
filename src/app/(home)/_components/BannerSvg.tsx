@@ -45,8 +45,7 @@ export const BannerSvg = () => (
      2. Use 'fill-primary' for light mode (#27548A).
      3. Use 'dark:fill-accent' for dark mode (#FFC470).
   */
-   style={{ fill: "var(--hero-circle)" }}
-//   className="fill-primary dark:fill-accent transition-colors duration-500"
+  className="fill-primary  transition-colors duration-500"
 >
   <animate attributeName="cx" values="450;430;450" dur="8s" repeatCount="indefinite" />
   <animate attributeName="cy" values="300;320;300" dur="9s" repeatCount="indefinite" />
