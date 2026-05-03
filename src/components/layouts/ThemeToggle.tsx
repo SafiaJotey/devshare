@@ -4,8 +4,8 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 
 
-import { DarkModeIcon } from "./ui/icons/DarkModeIcon";
-import { LightModeIcon } from "./ui/icons/LightModeIcon";
+import { DarkModeIcon } from "../icons/DarkModeIcon";
+import { LightModeIcon } from "../icons/LightModeIcon";
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
@@ -25,9 +25,9 @@ export function ThemeToggle() {
       aria-label="Toggle Theme"
     >
       {theme === "dark" ? (
-         <LightModeIcon className="text-accent " />
+         <LightModeIcon className="text-accent cursor-pointer " />
       ) : (
-        <DarkModeIcon className=" text-primary " />
+        <DarkModeIcon className=" text-primary  cursor-pointer  " />
       )}
     </button>
   );

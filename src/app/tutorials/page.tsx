@@ -1,4 +1,4 @@
-import ComingSoon from "@/components/comingSoon";
+import ComingSoon from "@/components/shared/ComingSoon";
 
 
 
