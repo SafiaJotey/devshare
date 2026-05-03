@@ -123,9 +123,9 @@ export const BannerSvg = () => (
               </div>
               
               {/* Article count badge */}
-              <div className="absolute -bottom-6 -right-6 flex items-center gap-1 rounded-full bg-white px-4 py-2 text-sm font-medium shadow-lg dark:bg-gray-800">
+              <div className="hidden absolute -bottom-6 -right-6 md:flex items-center gap-1 rounded-full bg-white px-4 py-1 text-sm font-medium shadow-lg dark:bg-gray-800">
                 <div className="h-2 w-2 rounded-full bg-accent dark:bg-dark-accent" />
-                <span className="bg-gradient-to-r from-accent to-primary bg-clip-text text-transparent dark:from-dark-accent dark:to-dark-primary">
+                <span className="bg-gradient-to-r text-sm from-accent to-accent bg-clip-text text-transparent dark:from-dark-primary dark:to-dark-primary">
                   50+ Articles
                 </span>
               </div>

@@ -23,9 +23,9 @@ export default function HeroSection() {
         </div>
 
         {/* Added max-w-7xl to the main container to allow more horizontal spread */}
-        <div className="container relative mx-auto flex min-h-[90vh] max-w-7xl flex-col items-center justify-center px-4 py-24 md:flex-row md:gap-12 md:py-22 lg:px-8">
+        <div className="container relative mx-auto flex min-h-[60vh] max-w-7xl flex-col-reverse items-center justify-center px-4 md:flex-row md:gap-12 md:px-22 md:py-10 lg:p-8">
           {/* left-text */}
-          <div className="flex-1 space-y-8 text-center md:space-y-10 md:text-left">
+          <div className="flex-1 space-y-4 text-center md:space-y-10 md:text-left">
             <span className="inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-2 text-sm font-medium text-accent dark:bg-dark-accent/20 dark:text-dark-accent">
               <Sparkles className="h-4 w-4" />
               New Article Every Week
@@ -104,12 +104,12 @@ export default function HeroSection() {
         </div>
 
         {/* Scrolling indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 cursor-pointer">
+        {/* <div className="absolute bottom-8 left-1/2 -translate-x-1/2 cursor-pointer">
           <div className="flex flex-col items-center">
             <div className="h-6 w-4 rounded-full bg-primary dark:bg-dark-primary" />
             <span className="mt-2 text-xs text-secondary/60 dark:text-dark-text/60">Scroll Down</span>
           </div>
-        </div>
+        </div> */}
       </section>
     </div>
   );

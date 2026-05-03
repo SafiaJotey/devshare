@@ -10,7 +10,7 @@ export default function ButtonGroup() {
             >
               <Button
                 size="lg" 
-                className="group gap-2 shadow-lg hover:shadow-primary/20 transition-all duration-300 transform hover:-translate-y-1"
+                className="group gap-2 shadow-lg cursor-pointer hover:shadow-primary/20 transition-all duration-300 transform hover:-translate-y-1"
               >
                 Explore Articles
                 <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -18,9 +18,9 @@ export default function ButtonGroup() {
               <Button 
                 variant="outline" 
                 size="lg" 
-                className="border-secondary/30 dark:border-dark-text/30 group transition-all duration-300 transform hover:-translate-y-1"
+                className="border-secondary/30 dark:border-dark-text/30 cursor-pointer group transition-all duration-300 transform hover:-translate-y-1"
               >
-                <span className="bg-gradient-to-r from-accent to-primary dark:from-dark-accent dark:to-dark-primary bg-clip-text text-transparent group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-accent">
+                <span className="bg-gradient-to-r from-accent to-primary dark:from-dark-accent dark:to-dark-primary bg-clip-text text-transparent group-hover:bg-gradient-to-r group-hover:from-black group-hover:to-black">
                   Meet The Authors
                 </span>
               </Button>
