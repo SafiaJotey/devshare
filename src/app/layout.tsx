@@ -9,8 +9,8 @@ import Footer from "@/components/layouts/Footer";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Safia Ahmed | Blog",
-  description: "A professional blog by Safia Ahmed about technology, design, and development",
+  title: "Dev Share ",
+  description: "A professional blog website about technology, design, and development",
 };
 
 export default function RootLayout({
