@@ -10,6 +10,10 @@ import {
 import { Button } from "../ui/button";
 import { ProfileIcon } from "../icons/ProfileIcon";
 import Link from "next/link";
+import { SettingsIcon } from "../icons/SettingsIcon";
+import { DashboardIcon } from "../icons/DashboardIcon";
+import { HelpIcon } from "../icons/HelpIcon";
+import { LogoutIcon } from "../icons/LogoutIcon";
 
 const UserAccountMenu=() =>{
     
@@ -17,7 +21,7 @@ const UserAccountMenu=() =>{
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="icon" className="relative  rounded-full  cursor-pointer outline-none hover:bg-transparent">
-          <ProfileIcon className="text-foreground cursor-pointer" />
+          <ProfileIcon className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 bg-background" align="end" forceMount>
@@ -30,25 +34,25 @@ const UserAccountMenu=() =>{
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link href="/dashboard" className="cursor-pointer">
-            {/* <LayoutDashboard className="mr-2 h-4 w-4" /> */}
+           <DashboardIcon  className="h-5 w-5"/>
             <span>Dashboard</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/settings" className="cursor-pointer">
-            {/* <Settings className="mr-2 h-4 w-4" /> */}
+            <SettingsIcon  className="h-5 w-5" />
             <span>Settings</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>
           <Link href="/help" className="cursor-pointer">
-            {/* <HelpCircle className="mr-2 h-4 w-4" /> */}
+            <HelpIcon  className="h-5 w-5" />
             <span>Help</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem className="text-red-600 focus:text-red-600 cursor-pointer">
-          {/* <LogOut className="mr-2 h-4 w-4" /> */}
+        <DropdownMenuItem className=" cursor-pointer">
+          <LogoutIcon className="h-5 w-5" />
           <span>Log out</span>
         </DropdownMenuItem>
       </DropdownMenuContent>

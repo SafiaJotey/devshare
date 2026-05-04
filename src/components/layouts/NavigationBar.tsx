@@ -21,12 +21,13 @@ import { navItems } from "@/constants/menu";
 import { cn } from "@/lib/utils"; // Standard Shadcn utility
 import { Logo } from "../shared/Logo";
 import UserAccountMenu from "./UserAccountMenu";
+import { LoginIcon } from "../icons/LoginIcon";
 
 export default function NavigationBar() {
   const pathname = usePathname();
   // const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-
+ const [isLoggedIn,] = useState(true); 
   // useEffect(() => setIsOpen(false), [pathname]);
 
   useEffect(() => {
@@ -78,14 +79,30 @@ export default function NavigationBar() {
 
           <div className="ml-2 flex items-center gap-2">
             <ThemeToggle />
-            <UserAccountMenu />
+           {isLoggedIn ? (
+              <UserAccountMenu />
+            ) : (
+         
+                <Link href="/login">
+                  <LoginIcon  className="text-foreground cursor-pointer" />
+                </Link>
+     
+            )}
           </div>
         </nav>
 
         {/* Mobile Header Actions */}
         <div className="flex items-center md:hidden gap-1">
           <div className="flex items-center gap-1 mr-2">
-         <UserAccountMenu />
+        {isLoggedIn ? (
+              <UserAccountMenu />
+            ) : (
+          
+                <Link href="/login">
+                  <LoginIcon  className="text-foreground cursor-pointer" />
+                </Link>
+       
+            )}
             <ThemeToggle />
           </div>
           <Sheet>
