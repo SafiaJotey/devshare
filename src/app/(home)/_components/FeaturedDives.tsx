@@ -1,5 +1,5 @@
 import React from 'react';
-import { Clock, Calendar } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import Section from '@/components/shared/Section';
 
 const FeaturedDives = () => {
@@ -73,7 +73,7 @@ const FeaturedDives = () => {
             
             <div className="flex items-center justify-between pt-2 border-t border-foreground/10">
               <div className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-background font-bold">
+                <div className="w-10 h-10 rounded-full bg-accent/60 flex items-center justify-center text-background font-bold">
                   {mainPost.author[0]}
                 </div>
                 <div>
@@ -114,7 +114,7 @@ const FeaturedDives = () => {
 
   <div className="flex items-center justify-between pt-2 border-t border-foreground/10">
               <div className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-accent flex items-center justify-center text-background font-bold">
+                <div className="w-10 h-10 rounded-full bg-accent/60 flex items-center justify-center text-background font-bold">
                   {post.author[0]}
                 </div>
                 <div>
