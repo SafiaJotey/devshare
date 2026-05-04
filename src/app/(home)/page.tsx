@@ -1,3 +1,4 @@
+import BecomeContributor from "./_components/BecomeContributor";
 import Category from "./_components/Category";
 import FeaturedDives from "./_components/FeaturedDives";
 import HeroSection from "./_components/HeroSection";
@@ -22,9 +23,10 @@ export default function Home() {
     <FeaturedDives/>
     <Category/>
      <LatestInsights/>
-       <TopContributors/>
+     
     
-   
+   <BecomeContributor/>
+     <TopContributors/>
   
     <WriteCTA/>
     
