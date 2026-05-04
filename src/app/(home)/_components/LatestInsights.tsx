@@ -6,7 +6,7 @@ const LatestInsights = () => {
   const posts = [
     { 
       id:1,
-        title: "Building a Design System with Tailwind CSS", 
+        title: "Building a Design System with Tailwind CSS ", 
         author: "Alex Rivera", 
         tag: "Design", 
         readTime: "5 min",

@@ -2,6 +2,8 @@ import Category from "./_components/Category";
 import FeaturedDives from "./_components/FeaturedDives";
 import HeroSection from "./_components/HeroSection";
 import LatestInsights from "./_components/LatestInsights";
+import TopContributors from "./_components/TopContributors";
+import WriteCTA from "./_components/WriteCTA";
 
 // import LatestInsights from "./_components/LatestInsights";
 // import TechStack from "./_components/TechStack";
@@ -20,10 +22,11 @@ export default function Home() {
     <FeaturedDives/>
     <Category/>
      <LatestInsights/>
-    {/* 
+       <TopContributors/>
+    
    
-    <TopContributors/>
-    <WriteCTA/> */}
+  
+    <WriteCTA/>
     
     </>
 }
