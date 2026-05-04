@@ -3,8 +3,8 @@ import Image from "next/image";
 const TopContributors = () => {
   const authors = [
     { name: "Jessica Lee", role: "UX Architect", posts: 24, img: "https://i.pravatar.cc/150?u=alex" },
-    { name: "David Miller", role: "DevOps Engineer", posts: 18, img: "https://i.pravatar.cc/150?u=sarah" },
-    { name: "Sophia Wang", role: "AI Researcher", posts: 31, img: "https://i.pravatar.cc/150?u=mike" },
+    { name: "David Miller", role: "DevOps Engineer", posts: 18,img: "https://i.pravatar.cc/150?u=mike"   },
+    { name: "Sophia Wang", role: "AI Researcher", posts: 31, img: "https://i.pravatar.cc/150?u=sarah" },
     { name: "Marcus Thorne", role: "Fullstack Dev", posts: 12, img: "https://i.pravatar.cc/150?u=elena" },
   ];
 
