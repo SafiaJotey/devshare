@@ -1,6 +1,7 @@
 import React from 'react';
 import { Clock } from 'lucide-react';
 import Section from '@/components/shared/Section';
+import Image from 'next/image';
 
 const FeaturedDives = () => {
   // 1. Added 'author' to sidePosts data
@@ -12,6 +13,7 @@ const FeaturedDives = () => {
     author: "Safia Ahmed",
     date: "Oct 12, 2023",
     readTime: "12 min read",
+    avatar:"https://i.pravatar.cc/150?u=emma",
     image: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800",
   };
 
@@ -23,6 +25,7 @@ const FeaturedDives = () => {
       author: "Alex Rivera", // Added author
       date: "Oct 10, 2023",
       readTime: "8 min read",
+        avatar:"https://i.pravatar.cc/150?u=mike",
       image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=500",
     },
     {
@@ -32,6 +35,7 @@ const FeaturedDives = () => {
       author: "Jordan Smith", // Added author
       date: "Oct 08, 2023",
       readTime: "6 min read",
+        avatar:"https://i.pravatar.cc/150?u=john",
       image: "https://images.unsplash.com/photo-1516116216624-53e697fedbea?auto=format&fit=crop&q=80&w=500",
     }
   ];
@@ -75,9 +79,14 @@ const FeaturedDives = () => {
             
             <div className="flex items-center justify-between pt-2 border-t border-foreground/10">
               <div className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-accent/60 flex items-center justify-center text-background font-bold">
-                  {mainPost.author[0]}
-                </div>
+                 <div className="w-8 h-8 rounded-full bg-foreground/10 overflow-hidden relative">
+                               <Image 
+                                   src={mainPost.avatar} 
+                                   alt={mainPost.author}
+                                   fill
+                                   className="object-cover"
+                               />
+                             </div>
                 <div>
                   <p className="text-sm font-bold">{mainPost.author}</p>
                   <p className="text-xs text-foreground/50">{mainPost.date}</p>
@@ -116,9 +125,14 @@ const FeaturedDives = () => {
 
   <div className="flex items-center justify-between pt-2 border-t border-foreground/10">
               <div className="flex items-center gap-2">
-                <div className="w-10 h-10 rounded-full bg-accent/60 flex items-center justify-center text-background font-bold">
-                  {post.author[0]}
-                </div>
+               <div className="w-8 h-8 rounded-full bg-foreground/10 overflow-hidden relative">
+                               <Image 
+                                   src={post.avatar} 
+                                   alt={post.author}
+                                   fill
+                                   className="object-cover"
+                               />
+                             </div>
                 <div>
                   <p className="text-sm font-bold">{post.author}</p>
                   <p className="text-xs text-foreground/50">{post.date}</p>
