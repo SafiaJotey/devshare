@@ -23,7 +23,7 @@ export default function HeroSection() {
         </div>
 
 
-        <div className="container relative mx-auto flex min-h-[60vh] max-w-7xl flex-col-reverse items-center justify-center px-4 md:flex-row md:gap-12 md:px-22 md:py-10 lg:p-8">
+        <div className="container relative mx-auto flex min-h-[60vh] max-w-9xl  flex-col-reverse items-center justify-center  md:flex-row md:gap-12  md:px-10 lg:py-8">
           {/* left-text */}
           <div className="flex-1 space-y-4 text-center md:space-y-10 md:text-left">
             <span className="inline-flex items-center gap-2 rounded-full bg-accent/10 px-4 py-2 text-sm font-medium text-accent dark:bg-dark-accent/20 dark:text-dark-accent">
