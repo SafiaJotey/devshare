@@ -43,6 +43,8 @@ const FeaturedDives = () => {
       subtitle="In-depth technical storytelling and architectural breakdowns. Master the mental models behind high-performance engineering."
       linkText="View All Insights"
       linkHref="/blogs"
+      paddingTop
+      paddingBottom
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
         

@@ -18,6 +18,8 @@ interface SectionProps extends SectionHeaderProps {
   bgColor?: string;
   noPaddingX?: boolean;
   centerHeader?: boolean;
+  paddingTop?: boolean;
+  paddingBottom?: boolean;
   className?: string;
 }
 
@@ -34,8 +36,8 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
   if (!title && !subtitle && !tag) return null;
 
   return (
-    <div className={`flex flex-col md:flex-row md:items-center gap-6 mb-12 ${
-      center ? 'items-center text-center' : 'items-end justify-between text-left'
+    <div className={`flex  flex-col md:flex-row md:items-center gap-6 mb-12 ${
+      center ? 'items-center justify-center text-center' : 'items-end justify-between text-left'
     }`}>
       <div className={`flex-1 ${center ? 'max-w-3xl' : 'max-w-5xl'}`}>
         {tag && (
@@ -84,10 +86,12 @@ const Section: React.FC<SectionProps> = ({
   bgColor = "bg-transparent", 
   noPaddingX = false, 
   centerHeader = false,
+  paddingTop=false,
+  paddingBottom=false,
   className = "" 
 }) => {
   return (
-    <section className={`${bgColor} py-16 md:py-28 overflow-hidden ${className}`}>
+    <section className={`${bgColor} ${paddingTop?"pt-16 md:pt-28":''} ${paddingBottom?"pb-16 md:pb-28":''} overflow-hidden ${className}`}>
       <div className={`mx-auto ${noPaddingX ? 'w-full' : 'container px-6 lg:px-8'}`}>
         
         {/* Render custom header if provided, otherwise default header */}

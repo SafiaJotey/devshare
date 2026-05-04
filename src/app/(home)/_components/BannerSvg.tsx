@@ -98,7 +98,7 @@ export const BannerSvg: React.FC = () => (
     <div className="relative mx-auto aspect-[4/3] w-full">
       
       {/* Decorative frame shadow/glow */}
-      <div className="absolute -inset-4 -z-10 rounded-3xl bg-gradient-to-br from-accent/10 via-primary/10 to-secondary/10 opacity-70 blur-xl" />
+      <div className="absolute -inset-4 -z-10 rounded-3xl blur-xl" />
       
       <div className="relative h-full w-full overflow-hidden rounded-2xl">
         <svg 
