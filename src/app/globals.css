@@ -33,7 +33,7 @@
   --primary: #27548A;
   --primary-foreground: #F5EEDC;
   --accent: #DDA853;
-  
+   --blob-opacity: 0.15;
 }
 
 .dark {
@@ -43,6 +43,7 @@
   --primary: #3A7BCC;
   --primary-foreground: #1A1A1A;
   --accent: #FFC470;
+    --blob-opacity: 1;
 }
 
 /* 
