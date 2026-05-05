@@ -1,15 +1,17 @@
 import React, { ReactNode } from 'react';
-import { ArrowUpRight } from 'lucide-react';
+import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import Link from 'next/link';
 
 // --- Types ---
 
 interface SectionHeaderProps {
-  title?: string;
+  title?: React.ReactNode; // Changed from string to ReactNode to allow spans
   subtitle?: string;
   tag?: string;
   center?: boolean;
   linkText?: string;
   linkHref?: string;
+  variant?: 'default' | 'colorful'; // Added variant prop
 }
 
 interface SectionProps extends SectionHeaderProps {
@@ -31,29 +33,32 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
   tag, 
   center, 
   linkText, 
-  linkHref 
+  linkHref,
+  variant = 'default' 
 }) => {
   if (!title && !subtitle && !tag) return null;
 
+  // Use the specific layout for the colorful variant, otherwise default
+  const isColorful = variant === 'colorful';
+
   return (
-    <div className={`flex  flex-col md:flex-row md:items-center gap-6 mb-12 ${
-      center ? 'items-center justify-center text-center' : 'items-end justify-between text-left'
+    <div className={`flex flex-col md:flex-row gap-6 mb-12 ${
+      center ? 'items-center justify-center text-center' : isColorful ? 'items-end justify-between text-left' : 'items-end justify-between text-left'
     }`}>
-      <div className={`flex-1 ${center ? 'max-w-3xl' : 'max-w-5xl'}`}>
+      <div className={`flex-1 ${center ? 'max-w-3xl' : 'max-w-xl'}`}>
         {tag && (
-          <span className="text-accent font-mono text-xs md:text-sm font-bold tracking-widest uppercase block mb-3">
+          <span className={`font-bold tracking-[0.3em] uppercase text-xs block mb-3 ${isColorful ? 'text-accent' : 'text-accent font-mono tracking-widest'}`}>
             {tag}
           </span>
         )}
         
         {title && (
-          <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-foreground leading-tight">
+          <h2 className={`${isColorful ? 'text-3xl md:text-5xl font-bold leading-tight' : 'text-3xl md:text-5xl font-extrabold tracking-tight leading-tight'} text-foreground`}>
             {title}
           </h2>
         )}
         
          {subtitle && (
-          /* Added line-clamp-2 to handle the 2-line limit and ellipsis */
           <p className={`mt-4 text-lg text-muted-foreground leading-relaxed line-clamp-2 ${center ? 'mx-auto' : ''}`}>
             {subtitle}
           </p>
@@ -61,15 +66,19 @@ const SectionHeader: React.FC<SectionHeaderProps> = ({
       </div>
 
       {(linkText || linkHref) && (
-        <a 
+        <Link 
           href={linkHref || "#"} 
-          className={`flex items-center gap-2 text-primary font-bold hover:gap-3 transition-all duration-300 group whitespace-nowrap ${
-            center ? 'mt-4' : 'mb-2'
-          }`}
+          className={`flex items-center gap-2 font-bold transition-all duration-300 group whitespace-nowrap pb-2 ${
+            isColorful ? 'text-sm hover:text-primary' : 'text-primary hover:gap-3'
+          } ${center ? 'mt-4' : ''}`}
         >
           {linkText || "View all"} 
-          <ArrowUpRight size={20} className="group-hover:-translate-y-1 transition-transform" />
-        </a>
+          {isColorful ? (
+            <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+          ) : (
+            <ArrowUpRight size={20} className="group-hover:-translate-y-1 transition-transform" />
+          )}
+        </Link>
       )}
     </div>
   );
@@ -83,6 +92,7 @@ const Section: React.FC<SectionProps> = ({
   linkText,
   linkHref,
   headerComponent, 
+  variant = 'default',
   bgColor = "bg-transparent", 
   noPaddingX = false, 
   centerHeader = false,
@@ -94,7 +104,6 @@ const Section: React.FC<SectionProps> = ({
     <section className={`${bgColor} ${paddingTop?"pt-16 md:pt-28":''} ${paddingBottom?"pb-16 md:pb-28":''} overflow-hidden ${className}`}>
       <div className={`mx-auto ${noPaddingX ? 'w-full' : 'container px-6 lg:px-8'}`}>
         
-        {/* Render custom header if provided, otherwise default header */}
         {headerComponent ? (
           <div className="mb-10">{headerComponent}</div>
         ) : (
@@ -105,6 +114,7 @@ const Section: React.FC<SectionProps> = ({
             center={centerHeader}
             linkText={linkText}
             linkHref={linkHref}
+            variant={variant}
           />
         )}
 
