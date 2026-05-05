@@ -176,7 +176,7 @@ export default function Home() {
         title="The Insight Stream"
         subtitle="A continuous flow of refined technical knowledge."
         linkText="Explore All"
-        linkHref="/archive"
+        linkHref="/blogs"
         paddingTop
         paddingBottom
       >
@@ -220,7 +220,7 @@ export default function Home() {
               <div className="absolute top-0 right-0 w-32 h-32 bg-accent opacity-20 blur-3xl -mr-10 -mt-10" />
               <div className="relative z-10">
                 <h3 className="text-2xl md:text-3xl font-bold mb-4">Ready to contribute?</h3>
-                <p className="opacity-70 mb-8 leading-relaxed">Whether it's a deep dive into Rust or a CSS trick, we'd love to hear from you.</p>
+                <p className="opacity-70 mb-8 leading-relaxed">Whether it&apos;s a deep dive into Rust or a CSS trick, we&apos;d love to hear from you.</p>
                 <div className="flex flex-col gap-4">
                   <button className="w-full py-4 bg-accent text-foreground dark:text-black font-bold rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2 group">
                     Submit a Proposal
