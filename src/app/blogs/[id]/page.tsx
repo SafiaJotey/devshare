@@ -6,7 +6,7 @@ import {
   ChevronLeft, 
   Clock, 
   Calendar, 
-  Share2, 
+
   Bookmark, 
   MessageSquare, 
   Twitter, 
@@ -126,14 +126,14 @@ export default function BlogDetails() {
 
             <h2 className="text-3xl font-bold mt-12 mb-6">Why this matters</h2>
             <p>
-              By treating form submissions as "Actions," React can automatically handle the 
+              By treating form submissions as &quot;Actions,&quot; React can automatically handle the 
               transition period, meaning you no longer need to wrap your fetch calls in 
-              startTransition manually. It's a cleaner, more declarative way to build 
+              startTransition manually. It&apos;s a cleaner, more declarative way to build 
               interactive web applications.
             </p>
 
             <blockquote className="border-l-4 border-accent pl-8 my-12 italic text-2xl font-serif text-foreground/70">
-              "The best code is the code that feels like the platform it's built upon."
+              &quot;The best code is the code that feels like the platform it&apos;s built upon.&quot;
             </blockquote>
           </div>
 
