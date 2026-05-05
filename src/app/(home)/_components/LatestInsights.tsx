@@ -1,5 +1,6 @@
 import Card from "@/components/shared/Card";
 import Section from "@/components/shared/Section";
+import Link from "next/link";
 
 
 const LatestInsights = () => {
@@ -90,7 +91,8 @@ const LatestInsights = () => {
     >
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-6">
         {posts.map((post) => (
-          <Card key={post?.id} post={post}/>
+          <Link key={post.id} href={`/blogs/${post.id}`}> 
+          <Card key={post?.id} post={post}/></Link>
         ))}
       </div>
     </Section>

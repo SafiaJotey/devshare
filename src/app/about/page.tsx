@@ -1,5 +1,7 @@
+import ReadyToContribute from "@/components/shared/ReadyToContribute";
 import Section from "@/components/shared/Section";
-import { Coffee, Code2, Share2, Lightbulb, CheckCircle2, Rocket, Users, Zap, Globe, Terminal, Cpu, Lock, Layers } from "lucide-react";
+import WriteCTA from "@/components/shared/WriteCTA";
+import {  Code2, Share2, Lightbulb, CheckCircle2, Rocket, Users, Zap, Globe, Terminal, Cpu, Lock, Layers } from "lucide-react";
 
 const About = () => {
   return (
@@ -31,7 +33,7 @@ const About = () => {
             </div>
             <h3 className="text-3xl font-bold mb-4">Refined Content</h3>
             <p className="text-background/70 max-w-md text-lg leading-relaxed">
-              We move away from the "clickbait" culture. Every article on Dev Share is reviewed for technical accuracy and clarity, ensuring you spend your time learning, not debugging.
+              We move away from the clickbait culture. Every article on Dev Share is reviewed for technical accuracy and clarity, ensuring you spend your time learning, not debugging.
             </p>
           </div>
 
@@ -51,7 +53,7 @@ const About = () => {
             </div>
             <h3 className="text-xl font-bold mb-3 text-foreground">Architecture Mindset</h3>
             <p className="text-foreground/60 text-sm leading-relaxed">
-              We go beyond syntax. Our contributors focus on the 'why'—helping you understand system design and patterns.
+              We go beyond syntax. Our contributors focus on the why—helping you understand system design and patterns.
             </p>
           </div>
 
@@ -89,7 +91,7 @@ const About = () => {
       </h2>
       
       <p className="text-foreground/70 mb-10 text-lg leading-relaxed">
-        Dev Share isn't limited to syntax. We host deep-dives across the entire development spectrum, ensuring every contributor brings "production-ready" perspective to the table.
+        Dev Share isnt limited to syntax. We host deep-dives across the entire development spectrum, ensuring every contributor brings &quot;production-ready&quot; perspective to the table.
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-10">
@@ -187,7 +189,7 @@ const About = () => {
                     <span className="text-[10px] font-bold text-primary uppercase">Architecture Pattern</span>
                 </div>
                 <p className="text-[12px] leading-tight text-foreground/80">
-                    "Implementing Micro-Frontends: A study on module federation and team decoupling."
+                    Implementing Micro-Frontends: A study on module federation and team decoupling
                 </p>
             </div>
         </div>
@@ -221,16 +223,9 @@ const About = () => {
         </div>
       </section>
 
-      {/* NEW SECTION 5: FINAL CTA */}
-      <section className="text-center container-box py-10">
-        <h2 className="text-4xl md:text-6xl font-bold mb-8">Ready to contribute?</h2>
-        <p className="text-foreground/60 max-w-xl mx-auto mb-10">
-          We are always looking for deep-dives, architectural breakdowns, and technical stories.
-        </p>
-        <button className="bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-5 rounded-full font-bold transition-all hover:scale-105 active:scale-95 shadow-xl shadow-primary/20">
-          Start Writing Now
-        </button>
-      </section>
+<ReadyToContribute/>
+   
+          <WriteCTA/>
     </div>
   );
 };

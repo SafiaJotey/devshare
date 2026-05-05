@@ -2,6 +2,7 @@ import React from 'react';
 import { Clock } from 'lucide-react';
 import Section from '@/components/shared/Section';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const FeaturedDives = () => {
   // 1. Added 'author' to sidePosts data
@@ -51,9 +52,10 @@ const FeaturedDives = () => {
       paddingBottom
     >
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
-        
+      
         {/* LARGE FEATURE CARD (Left) */}
         <div className="lg:col-span-2 group cursor-pointer relative overflow-hidden rounded-bl-3xl bg-foreground/5 dark:bg-foreground/10 border border-foreground/10 flex flex-col">
+           <Link key={mainPost.id} href={`/blogs/${mainPost.id}`}> 
           <div className="relative aspect-video lg:aspect-auto lg:h-[400px] overflow-hidden">
             <img 
               src={mainPost.image} 
@@ -97,12 +99,15 @@ const FeaturedDives = () => {
               </div>
             </div>
           </div>
+          </Link>
         </div>
 
         {/* SMALL STACKED CARDS (Right) */}
         <div className="flex flex-col gap-2">
           {sidePosts.map((post) => (
+          
             <div key={post.id} className="group cursor-pointer flex flex-col h-full bg-foreground/5 dark:bg-foreground/10 border border-foreground/10 rounded-br-3xl overflow-hidden transition-all hover:shadow-xl hover:shadow-primary/5">
+              <Link key={post.id} href={`/blogs/${post.id}`}> 
               <div className="relative h-44 overflow-hidden">
                 <img 
                   src={post.image} 
@@ -144,7 +149,9 @@ const FeaturedDives = () => {
             </div>
               
               </div>
+                  </Link>
             </div>
+        
           ))}
         </div>
 

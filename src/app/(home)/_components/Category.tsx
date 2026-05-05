@@ -1,5 +1,6 @@
 import Section from '@/components/shared/Section';
 import { Code2, Cpu, Globe, Layout, Server, Smartphone } from 'lucide-react';
+import Link from 'next/link';
 
 
 const Category = () => {
@@ -28,13 +29,14 @@ paddingBottom
        
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {categories.map((cat, i) => (
+            <Link key={i} href={`/blogs`}> 
             <div key={i} className="group cursor-pointer bg-background border border-foreground/10 p-6 rounded-2xl flex flex-col items-center justify-center text-center transition-all  hover:-translate-y-1 hover:shadow-lg hover:shadow-accent/10">
               <div className={`p-3 rounded-xl mb-4 transition-transform group-hover:scale-110 ${cat.color}`}>
                 {cat.icon}
               </div>
               <h3 className="font-bold text-sm">{cat.name}</h3>
               <p className="text-[10px] uppercase tracking-widest text-foreground/40 mt-1 font-bold">{cat.count} Articles</p>
-            </div>
+            </div></Link>
           ))}
         </div>
   
