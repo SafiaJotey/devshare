@@ -1,10 +1,11 @@
+import WriteCTA from "@/components/shared/WriteCTA";
 import BecomeContributor from "./_components/BecomeContributor";
 import Category from "./_components/Category";
 import FeaturedDives from "./_components/FeaturedDives";
 import HeroSection from "./_components/HeroSection";
 import LatestInsights from "./_components/LatestInsights";
 import TopContributors from "./_components/TopContributors";
-import WriteCTA from "../../components/shared/WriteCTA";
+
 
 // import LatestInsights from "./_components/LatestInsights";
 // import TechStack from "./_components/TechStack";
