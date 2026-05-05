@@ -18,14 +18,6 @@ import {
   authors 
 } from "@/constants/home";
 
-/**
- * HOME PAGE COMPONENT
- * 
- * Role: Main entry point for the landing page.
- * Type: Next.js Server Component (Default).
- * Features: High-performance image optimization, semantic sectioning, 
- * and modular data-driven layouts.
- */
 export default function Home() {
   return (
     <>
@@ -53,7 +45,7 @@ export default function Home() {
                   src={mainPost.image} 
                   alt={mainPost.title}
                   fill
-                  priority // Loads this image first (LCP optimization)
+                  priority 
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute top-4 left-4 z-10">
@@ -142,31 +134,34 @@ export default function Home() {
       </Section>
 
       {/* =============================================
-          CATEGORIES (Build Your Stack)
+          CATEGORIES (Build Your Stack) - AUTO SLIDER
           ============================================= */}
-      <Section 
-        tag="Ecosystem Navigation"
-        bgColor='bg-primary/5'
-        title="Build Your Stack"
-        subtitle="Explore our technical library categorized by the tools that define your workflow."
-        centerHeader
-        paddingTop
-        paddingBottom
-      >
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-          {categories.map((cat, i) => (
-            <Link key={i} href={`/blogs`}> 
-              <div className="group cursor-pointer bg-background border border-foreground/10 p-6 rounded-2xl flex flex-col items-center justify-center text-center transition-all hover:-translate-y-1 hover:shadow-lg hover:shadow-accent/10">
-                <div className={`p-3 rounded-xl mb-4 transition-transform group-hover:scale-110 ${cat.color}`}>
-                  {cat.icon}
-                </div>
-                <h3 className="font-bold text-sm">{cat.name}</h3>
-                <p className="text-[10px] uppercase tracking-widest text-foreground/40 mt-1 font-bold">{cat.count} Articles</p>
-              </div>
-            </Link>
-          ))}
+    <Section 
+  tag="Ecosystem Navigation"
+  bgColor='bg-primary/5'
+  title="Build Your Stack"
+  subtitle="Explore our technical library categorized by the tools that define your workflow."
+  centerHeader
+  paddingTop
+  paddingBottom
+>
+ <div className="relative overflow-hidden w-full">
+  {/* The container below now handles the pause via CSS hover */}
+  <div className="animate-marquee flex gap-6 py-4">
+    {[...categories, ...categories].map((cat, i) => (
+      <Link key={i} href={`/blogs`} className="w-[200px] shrink-0"> 
+        <div className="group bg-background border border-foreground/10 p-6 rounded-2xl flex flex-col items-center justify-center text-center transition-all hover:-translate-y-1 hover:shadow-lg h-full">
+          <div className={`p-3 rounded-xl mb-4 transition-transform group-hover:scale-110 ${cat.color}`}>
+            {cat.icon}
+          </div>
+          <h3 className="font-bold text-sm">{cat.name}</h3>
+          <p className="text-[10px] uppercase tracking-widest text-foreground/40 mt-1 font-bold">{cat.count} Articles</p>
         </div>
-      </Section>
+      </Link>
+    ))}
+  </div>
+</div>
+</Section>
 
       {/* =============================================
           LATEST INSIGHTS (The Stream)
@@ -237,28 +232,32 @@ export default function Home() {
       </Section>
 
       {/* =============================================
-          TOP CONTRIBUTORS (Authors)
+          TOP CONTRIBUTORS - AUTO SLIDER
           ============================================= */}
-      <section className="py-20 bg-primary/5">
-        <div className="container-box">
-          <h2 className="text-center text-3xl font-bold mb-12">Meet Our Top Contributors</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {authors.map((author, i) => (
-              <div key={i} className="bg-background p-6 rounded-3xl border border-foreground/5 flex flex-col items-center text-center shadow-sm">
-                <div className="w-20 h-20 rounded-full bg-foreground/10 overflow-hidden relative shrink-0 mb-4">
-                  <Image src={author.img} alt={author.name} fill className="object-cover" />
-                </div>
-                <h4 className="font-bold text-lg">{author.name}</h4>
-                <p className="text-foreground/50 text-sm mb-4">{author.role}</p>
-                <div className="w-full pt-4 border-t border-foreground/5 flex justify-between items-center px-4">
-                  <span className="text-xs font-bold text-primary">{author.posts} Articles</span>
-                  <button className="text-xs font-black uppercase text-accent hover:underline">Profile</button>
-                </div>
-              </div>
-            ))}
-          </div>
+     <section className="py-20 bg-primary/5 overflow-hidden">
+  <div className="container-box mb-12">
+    <h2 className="text-center text-3xl font-bold">Meet Our Top Contributors</h2>
+  </div>
+  
+ <div className="relative overflow-hidden w-full">
+  {/* The container below now handles the pause via CSS hover */}
+  <div className="animate-marquee flex gap-8 py-4 px-4">
+    {[...authors, ...authors].map((author, i) => (
+      <div key={i} className="w-[300px] shrink-0 bg-background p-6 rounded-3xl border border-foreground/5 flex flex-col items-center text-center shadow-sm transition-transform hover:scale-[1.02]">
+        <div className="w-20 h-20 rounded-full bg-foreground/10 overflow-hidden relative shrink-0 mb-4">
+          <Image src={author.img} alt={author.name} fill className="object-cover" />
         </div>
-      </section>
+        <h4 className="font-bold text-lg">{author.name}</h4>
+        <p className="text-foreground/50 text-sm mb-4">{author.role}</p>
+        <div className="w-full pt-4 border-t border-foreground/5 flex justify-between items-center px-4">
+          <span className="text-xs font-bold text-primary">{author.posts} Articles</span>
+          <button className="text-xs font-black uppercase text-accent hover:underline">Profile</button>
+        </div>
+      </div>
+    ))}
+  </div>
+</div>
+</section>
 
       <WriteCTA />
     </>

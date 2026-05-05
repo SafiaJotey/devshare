@@ -323,7 +323,7 @@ export default function AuthPage() {
             </div>
 
             <Button className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-xl shadow-primary/20 transition-all active:scale-[0.98]">
-              {isLogin ? "Sign In" : "Initialize Account"}
+              {isLogin ? "Sign In" : "Create Account"}
               <ArrowRight className="ml-2 w-4 h-4" />
             </Button>
           </form>

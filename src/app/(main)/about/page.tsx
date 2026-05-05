@@ -20,7 +20,7 @@ const About = () => {
   return (
     <div className="space-y-32 pb-20 overflow-hidden">
       {/* SECTION 1: HERO MANIFESTO */}
-      <section className="pt-32 px-4 text-center relative">
+      <section className="pt-20 px-4 text-center relative">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,var(--accent)_0%,transparent_70%)] opacity-[0.03] pointer-events-none" />
         <div className="max-w-4xl mx-auto relative z-10">
           <span className="text-accent font-bold tracking-[0.3em] uppercase text-xs">The Philosophy</span>

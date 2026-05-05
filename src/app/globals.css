@@ -69,3 +69,23 @@
     @apply max-w-[90%] mx-auto;
   }
 }
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex; /* Ensures the row is flexed */
+  width: max-content; /* Vital for infinite width */
+  animation: marquee 40s linear infinite;
+}
+
+/* This is the magic fix for pausing */
+.animate-marquee:hover {
+  animation-play-state: paused !important;
+}
