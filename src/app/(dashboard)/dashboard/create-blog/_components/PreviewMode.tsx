@@ -93,12 +93,12 @@ export const PreviewMode = ({ category, title, description, blocks }: PreviewMod
                       <div className="w-2.5 h-2.5 rounded-full bg-amber-500/40" />
                       <div className="w-2.5 h-2.5 rounded-full bg-green-500/40" />
                     </div>
-                    <div className="flex items-center gap-2 text-[10px] text-white/40 font-mono tracking-widest uppercase">
+                    <div className="flex  items-center gap-2 text-[10px] text-white/40 font-mono tracking-widest uppercase">
                       <Terminal size={12} /> {block.metadata || "script.ts"}
                     </div>
                   </div>
                   {/* Code pre uses overflow-x-auto to allow horizontal scrolling for long code lines */}
-                  <pre className="p-6 text-sm overflow-x-auto text-blue-300 font-mono leading-relaxed bg-transparent">
+                  <pre className="p-6 text-sm overflow-x-auto text-blue-300 font-mono leading-relaxed break-words whitespace-pre-wrap bg-transparent">
                     <code>{block.content}</code>
                   </pre>
                 </div>

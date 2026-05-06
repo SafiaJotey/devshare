@@ -1,4 +1,5 @@
-import { Terminal } from "lucide-react";
+import { handleAutoResize } from "../../helper";
+
 
 export const CodeBlock = ({ content, metadata, onUpdate }: any) => (
   <div className="my-4 rounded-2xl overflow-hidden border border-foreground/10 bg-[#0d1117] shadow-xl group/code">
@@ -20,6 +21,8 @@ export const CodeBlock = ({ content, metadata, onUpdate }: any) => (
       onChange={(e) => onUpdate(e.target.value, metadata)}
       placeholder="// Write or paste code here..."
       className="w-full font-mono text-sm bg-transparent border-none text-blue-300 p-6 min-h-[150px] focus:outline-none resize-none"
-    />
+       onInput={handleAutoResize}
+   
+   />
   </div>
 );
