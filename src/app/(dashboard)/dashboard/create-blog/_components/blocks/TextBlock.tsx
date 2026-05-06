@@ -1,0 +1,38 @@
+"use client";
+
+import React, { useRef, useEffect } from "react";
+
+interface TextBlockProps {
+  content: string;
+  onUpdate: (val: string) => void;
+}
+
+export const TextBlock = ({ content, onUpdate }: TextBlockProps) => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const adjustHeight = () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      // Reset height to auto to get the correct scrollHeight
+      textarea.style.height = "auto";
+      // Set the height to match the scrollHeight (the total content height)
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  };
+
+  // Adjust height on initial load and whenever content changes
+  useEffect(() => {
+    adjustHeight();
+  }, [content]);
+
+  return (
+    <textarea
+      ref={textareaRef}
+      rows={1}
+      value={content}
+      onChange={(e) => onUpdate(e.target.value)}
+      placeholder="Write your thoughts..."
+      className="w-full text-lg text-foreground/70 bg-transparent border-none outline-none resize-none overflow-hidden leading-relaxed placeholder:text-foreground/10"
+    />
+  );
+};
