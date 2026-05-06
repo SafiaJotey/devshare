@@ -126,7 +126,7 @@ export default function Blogs() {
                     </h2>
                     <div className="flex items-center gap-4 text-xs font-mono opacity-60">
                       <span>{DEMO_POSTS[0].author}</span>
-                      <span>//</span>
+                      <span>/</span>
                       <span>{DEMO_POSTS[0].readTime} READ</span>
                     </div>
                   </div>
