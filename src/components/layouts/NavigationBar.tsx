@@ -27,7 +27,7 @@ export default function NavigationBar() {
   const pathname = usePathname();
   // const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
- const [isLoggedIn,] = useState(true); 
+ const [isLoggedIn,] = useState(false); 
   // useEffect(() => setIsOpen(false), [pathname]);
 
   useEffect(() => {
