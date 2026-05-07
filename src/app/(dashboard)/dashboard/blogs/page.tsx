@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useState } from "react";
@@ -14,8 +15,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
+
 
 // --- Types & Data ---
 const CATEGORY_CONFIG: Record<string, { icon: any, color: string, bg: string }> = {
@@ -47,7 +47,7 @@ export default function MyBlogsDashboard() {
             <Hash size={12} /> Workspace / Content_Manager
           </div>
           <h1 className="text-4xl font-black tracking-tighter text-foreground uppercase">
-            My <span className="text-primary italic font-serif lowercase">Publications</span>
+          Publications
           </h1>
         </div>
         <div className="flex items-center gap-3">

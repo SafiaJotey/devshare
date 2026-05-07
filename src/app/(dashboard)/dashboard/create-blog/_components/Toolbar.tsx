@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Button } from "@/components/ui/button";
 import { Type, Heading2, Terminal, Quote, ImageIcon } from "lucide-react";
 

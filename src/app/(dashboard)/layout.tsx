@@ -7,7 +7,7 @@ import {
   LayoutDashboard, 
   FileText, 
   PlusCircle, 
-  BarChart3, 
+ 
   Settings, 
   LogOut,
   Bell
@@ -20,7 +20,7 @@ const menuItems = [
   { name: "Overview", href: "/dashboard", icon: LayoutDashboard },
   { name: "My Blogs", href: "/dashboard/blogs", icon: FileText },
   { name: "Write New", href: "/dashboard/create-blog", icon: PlusCircle },
-  { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
+  // { name: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 

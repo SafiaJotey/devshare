@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { User, Shield, Cog, Hash, Save, Terminal } from "lucide-react";
+import { User, Shield, Cog,  Save, Terminal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ProfileSettings from "./_components/ProfileSettings";
 import AccountSettings from "./_components/AccountSettings";

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { handleAutoResize } from "../../helper";
 
 export const HeadingBlock = ({ content, onUpdate }: any) => (
