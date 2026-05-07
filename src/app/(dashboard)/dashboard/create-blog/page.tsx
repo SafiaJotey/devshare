@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState} from "react";
 import { 
   DndContext, 
   closestCenter, 
@@ -17,7 +17,7 @@ import {
 
 // UI Components
 import { Button } from "@/components/ui/button";
-import { Eye, Save, Rocket, AlertCircle, Edit3, Check } from "lucide-react";
+import { Eye,  Rocket, AlertCircle, Edit3 } from "lucide-react";
 
 
 import { FixedHeader } from "./_components/FixedHeader";
@@ -28,7 +28,7 @@ import { Block, BlockType } from "./type";
 
 export default function WriteNewPage() {
   const [isPreview, setIsPreview] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+
   
   // 1. Mandatory Header States
   const [category, setCategory] = useState("");

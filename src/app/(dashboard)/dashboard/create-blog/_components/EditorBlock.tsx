@@ -5,7 +5,7 @@ import { CodeBlock } from "./blocks/CodeBlock";
 import { QuoteBlock } from "./blocks/QuoteBlock";
 import { HeadingBlock } from "./blocks/HeadingBlock";
 import { TextBlock } from "./blocks/TextBlock";
-// ... import others
+
 
 export const EditorBlock = ({ block, onUpdate, onDelete }: any) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: block.id });
@@ -16,6 +16,7 @@ export const EditorBlock = ({ block, onUpdate, onDelete }: any) => {
     <div ref={setNodeRef} style={style} className={`group relative mb-2 flex gap-2 items-start ${isDragging ? "opacity-50" : ""}`}>
       <div {...attributes} {...listeners} className="mt-4 cursor-grab opacity-0 group-hover:opacity-100 transition-all text-foreground/20 hover:text-primary shrink-0">
         <GripVertical size={20} />
+        
       </div>
 
       <div className="flex-1">
