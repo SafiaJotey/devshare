@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { ImageIcon, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 
