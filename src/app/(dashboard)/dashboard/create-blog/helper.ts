@@ -1,4 +1,4 @@
-// helper.ts
+
 import React from "react";
 
 export const handleAutoResize = (e: React.FormEvent<HTMLTextAreaElement>) => {
