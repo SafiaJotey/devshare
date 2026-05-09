@@ -1,8 +1,12 @@
 
 import { ImageIcon, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
+interface CodeBlockProps {
+  content: string;
 
-export const ImageBlock = ({ content, onUpdate }: any) => (
+  onUpdate: (content: string, metadata: string) => void;
+}
+export const ImageBlock = ({ content, onUpdate }:CodeBlockProps ) => (
   <div className="my-8 group/img">
     {!content ? (
       <div className="aspect-[21/9] bg-foreground/5 border-2 border-dashed border-foreground/10 rounded-[2rem] flex flex-col items-center justify-center transition-all hover:bg-foreground/10 hover:border-primary/50 p-8">
