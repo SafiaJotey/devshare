@@ -18,7 +18,7 @@ import { Button } from "@/components/ui/button";
 
 
 // --- Types & Data ---
-const CATEGORY_CONFIG: Record<string, { icon: any, color: string, bg: string }> = {
+const CATEGORY_CONFIG: Record<string, { icon: React.ElementType, color: string, bg: string }> = {
   Frontend: { icon: Monitor, color: "text-blue-500", bg: "bg-blue-500/10" },
   Backend: { icon: Server, color: "text-emerald-500", bg: "bg-emerald-500/10" },
   DevOps: { icon: Zap, color: "text-purple-500", bg: "bg-purple-500/10" },
