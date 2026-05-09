@@ -1,8 +1,13 @@
 
 import { handleAutoResize } from "../../helper";
 
+interface CodeBlockProps {
+  content: string;
+  metadata: string;
+  onUpdate: (content: string, metadata: string) => void;
+}
 
-export const CodeBlock = ({ content, metadata, onUpdate }: any) => (
+export const CodeBlock = ({ content, metadata, onUpdate }: CodeBlockProps) => (
   <div className="my-4 rounded-2xl overflow-hidden border border-foreground/10 bg-[#0d1117] shadow-xl group/code">
     <div className="bg-[#161b22] px-4 py-2 border-b border-white/5 flex justify-between items-center">
       <div className="flex gap-1.5">
