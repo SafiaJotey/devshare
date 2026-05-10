@@ -6,6 +6,7 @@ import { CodeBlock } from "./blocks/CodeBlock";
 import { QuoteBlock } from "./blocks/QuoteBlock";
 import { HeadingBlock } from "./blocks/HeadingBlock";
 import { TextBlock } from "./blocks/TextBlock";
+import { ImageBlock } from "./blocks/ImageBlock";
 
 
 export const EditorBlock = ({ block, onUpdate, onDelete }: any) => {
@@ -29,7 +30,7 @@ export const EditorBlock = ({ block, onUpdate, onDelete }: any) => {
         )}
         {block.type === "code" && <CodeBlock content={block.content} metadata={block.metadata} onUpdate={onUpdate} />}
         {block.type === "quote" && <QuoteBlock content={block.content} onUpdate={onUpdate} />}
-        {/* Add Image block here */}
+      {block.type ==="image" && <ImageBlock content={block.content} onUpdate={onUpdate}/>}
       </div>
 
       <button onClick={onDelete} className="mt-4 opacity-0 group-hover:opacity-100 transition-all text-red-400 hover:text-red-600 p-1">
