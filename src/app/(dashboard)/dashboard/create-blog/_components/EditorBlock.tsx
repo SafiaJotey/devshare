@@ -7,9 +7,15 @@ import { QuoteBlock } from "./blocks/QuoteBlock";
 import { HeadingBlock } from "./blocks/HeadingBlock";
 import { TextBlock } from "./blocks/TextBlock";
 import { ImageBlock } from "./blocks/ImageBlock";
+import { Block } from "../type";
+interface EditorBlockProps {
+  block: Block;
+  onUpdate: (content: string, metadata?: string) => void; // Notice the "?"
+  onDelete: () => void;
+}
 
 
-export const EditorBlock = ({ block, onUpdate, onDelete }: any) => {
+export const EditorBlock = ({ block, onUpdate, onDelete }: EditorBlockProps) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: block.id });
 
   const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 50 : 0 };

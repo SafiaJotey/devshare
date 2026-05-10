@@ -1,12 +1,15 @@
-
 import { ImageIcon, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
-interface CodeBlockProps {
-  content: string;
+import { OnUpdateFn } from "../../type";
 
-  onUpdate: (content: string, metadata: string) => void;
+
+interface ImageBlockProps {
+  content: string;
+  // Use the central type or define it with an optional second parameter
+  onUpdate: OnUpdateFn; 
 }
-export const ImageBlock = ({ content, onUpdate }:CodeBlockProps ) => (
+
+export const ImageBlock = ({ content, onUpdate }: ImageBlockProps) => (
   <div className="my-8 group/img">
     {!content ? (
       <div className="aspect-[21/9] bg-foreground/5 border-2 border-dashed border-foreground/10 rounded-[2rem] flex flex-col items-center justify-center transition-all hover:bg-foreground/10 hover:border-primary/50 p-8">
@@ -14,7 +17,8 @@ export const ImageBlock = ({ content, onUpdate }:CodeBlockProps ) => (
         <Input 
           placeholder="Paste high-res image URL (e.g. Unsplash)..." 
           className="max-w-xs bg-background border-foreground/10 text-xs"
-          onChange={(e) => onUpdate(e.target.value)}
+          // Now TypeScript is happy because metadata is optional
+          onChange={(e) => onUpdate(e.target.value)} 
         />
       </div>
     ) : (
