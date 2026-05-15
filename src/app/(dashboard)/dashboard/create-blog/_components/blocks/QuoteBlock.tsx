@@ -11,7 +11,7 @@ export const QuoteBlock = ({ content, onUpdate }: QuoteBlockProps) => (
     <textarea
       rows={1}
       value={content}
-      // TypeScript is happy now because metadata? is optional in the interface
+     
       onChange={(e) => onUpdate(e.target.value)}
       placeholder="Insightful engineering quote..."
       className="w-full italic text-2xl font-serif border-none bg-transparent px-0 focus:outline-none resize-none text-foreground/80 placeholder:text-foreground/10 overflow-hidden leading-relaxed"

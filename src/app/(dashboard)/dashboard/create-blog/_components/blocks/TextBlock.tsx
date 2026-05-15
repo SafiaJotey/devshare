@@ -13,14 +13,14 @@ export const TextBlock = ({ content, onUpdate }: TextBlockProps) => {
   const adjustHeight = () => {
     const textarea = textareaRef.current;
     if (textarea) {
-      // Reset height to auto to get the correct scrollHeight
+    
       textarea.style.height = "auto";
-      // Set the height to match the scrollHeight (the total content height)
+   
       textarea.style.height = `${textarea.scrollHeight}px`;
     }
   };
 
-  // Adjust height on initial load and whenever content changes
+
   useEffect(() => {
     adjustHeight();
   }, [content]);

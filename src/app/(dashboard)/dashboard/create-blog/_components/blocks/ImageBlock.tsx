@@ -5,7 +5,7 @@ import { OnUpdateFn } from "../../type";
 
 interface ImageBlockProps {
   content: string;
-  // Use the central type or define it with an optional second parameter
+
   onUpdate: OnUpdateFn; 
 }
 
@@ -17,7 +17,7 @@ export const ImageBlock = ({ content, onUpdate }: ImageBlockProps) => (
         <Input 
           placeholder="Paste high-res image URL (e.g. Unsplash)..." 
           className="max-w-xs bg-background border-foreground/10 text-xs"
-          // Now TypeScript is happy because metadata is optional
+   
           onChange={(e) => onUpdate(e.target.value)} 
         />
       </div>

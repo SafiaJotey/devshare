@@ -19,7 +19,7 @@ import {
 const About = () => {
   return (
     <div className="space-y-32 pb-20 overflow-hidden">
-      {/* SECTION 1: HERO MANIFESTO */}
+      {/*  HERO MANIFESTO */}
       <section className="pt-20 px-4 text-center relative">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,var(--accent)_0%,transparent_70%)] opacity-[0.03] pointer-events-none" />
         <div className="max-w-4xl mx-auto relative z-10">
@@ -33,7 +33,7 @@ const About = () => {
         </div>
       </section>
 
-      {/* SECTION 2: THE PILLARS (Bento Style) */}
+      {/*  THE PILLARS (Bento Style) */}
       <Section
         tag="Our Pillars"
         title="Built for the modern engineer"
@@ -92,7 +92,7 @@ const About = () => {
         </div>
       </Section>
 
-      {/* SECTION 3: THE KNOWLEDGE STACK (Converted to Section Component) */}
+      {/*  THE KNOWLEDGE STACK (Converted to Section Component) */}
       <Section 
         headerComponent={<></>} // This hides the default top-header
         className="py-10"
@@ -193,7 +193,7 @@ const About = () => {
         </div>
       </Section>
 
-      {/* SECTION 4: THE FLYWHEEL */}
+      {/* THE FLYWHEEL */}
       <section className="bg-foreground text-background py-24 rounded-[3rem] mx-4 overflow-hidden relative">
         <div className="container-box relative z-10 text-center">
             <h2 className="text-4xl md:text-6xl font-bold mb-16 tracking-tight">The <span className="text-accent underline decoration-1 underline-offset-8">Flywheel</span> of Growth</h2>
