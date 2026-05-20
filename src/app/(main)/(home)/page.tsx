@@ -2,13 +2,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowRight, Clock } from 'lucide-react';
 
-// UI Components
+
 import Section from '@/components/shared/Section';
 import Card from "@/components/shared/Card";
 import WriteCTA from "@/components/shared/WriteCTA";
 import HeroSection from "./_components/HeroSection";
 
-// Data & Constants
+
 import { 
   mainPost, 
   sidePosts, 
@@ -23,9 +23,7 @@ export default function Home() {
     <>
       <HeroSection />
 
-      {/* =============================================
-          FEATURED DEEP DIVES (Editor's Choice)
-          ============================================= */}
+      {/*FEATURED DEEP DIVES  */}
       <Section 
         tag="Editor’s Choice"
         title="Featured Deep Dives"
@@ -133,9 +131,7 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* =============================================
-          CATEGORIES (Build Your Stack) - AUTO SLIDER
-          ============================================= */}
+      {/* CATEGORIES */}
     <Section 
   tag="Ecosystem Navigation"
   bgColor='bg-primary/5'
@@ -146,7 +142,7 @@ export default function Home() {
   paddingBottom
 >
  <div className="relative overflow-hidden w-full">
-  {/* The container below now handles the pause via CSS hover */}
+
   <div className="animate-marquee flex gap-6 py-4">
     {[...categories, ...categories].map((cat, i) => (
       <Link key={i} href={`/blogs`} className="w-[200px] shrink-0"> 
@@ -163,9 +159,7 @@ export default function Home() {
 </div>
 </Section>
 
-      {/* =============================================
-          LATEST INSIGHTS (The Stream)
-          ============================================= */}
+      {/*LATEST INSIGHTS*/}
       <Section 
         tag="Newly Published"
         title="The Insight Stream"
@@ -184,9 +178,7 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* =============================================
-          CONTRIBUTOR CTA (Collaboration)
-          ============================================= */}
+      {/* CONTRIBUTOR CTA */}
       <Section
         tag="Collaboration"
         title="Shape the Future of Code"
@@ -231,9 +223,7 @@ export default function Home() {
         </div>
       </Section>
 
-      {/* =============================================
-          TOP CONTRIBUTORS - AUTO SLIDER
-          ============================================= */}
+      {/*TOP CONTRIBUTORS */}
      <section className="py-20 bg-primary/5 overflow-hidden">
   <div className="container-box mb-12">
     <h2 className="text-center text-3xl font-bold">Meet Our Top Contributors</h2>
