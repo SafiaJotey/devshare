@@ -9,9 +9,7 @@ import {
   BookOpen, 
   PenTool, 
   Zap, 
-
   MessageSquare,
-
   Code2,
   Users,
   GitBranch,
@@ -74,6 +72,7 @@ export default function HelpCenter() {
  
       <section className="container-box -mt-10 relative z-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          
           
 
           <div className="bg-background border border-foreground/5 p-10 rounded-[2.5rem] shadow-2xl group hover:border-primary/30 transition-all">
@@ -153,7 +152,6 @@ export default function HelpCenter() {
             </Accordion>
           </div>
 
-  
           <div className="space-y-8">
             <h3 className="flex items-center gap-3 text-lg font-black uppercase tracking-widest text-foreground/40 pb-4 border-b border-foreground/5">
               <Zap size={18} /> For Insight Architects
