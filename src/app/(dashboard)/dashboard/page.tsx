@@ -13,7 +13,7 @@ import { Logo } from "@/components/shared/Logo";
 export default function DashboardOverview() {
   return (
     <div className="space-y-10">
-      {/* WELCOME SECTION */}
+      
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <span className="text-accent font-bold tracking-widest text-xs uppercase">Welcome back, Arjun</span>
@@ -24,7 +24,7 @@ export default function DashboardOverview() {
         </Button>
       </div>
 
-      {/* STATS GRID */}
+    
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {[
           { label: "Total Views", value: "48.2k", icon: Eye, color: "text-blue-500", trend: "+12%" },
@@ -47,9 +47,9 @@ export default function DashboardOverview() {
         ))}
       </div>
 
-      {/* RECENT ACTIVITY & SYSTEM LOGS */}
+   
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* RECENT BLOGS TABLE */}
+ 
         <div className="lg:col-span-2 bg-background border border-foreground/5 rounded-[2.5rem] p-8 shadow-sm">
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-xl font-bold">Your Recent Publications</h3>
@@ -57,7 +57,7 @@ export default function DashboardOverview() {
           </div>
           
           <div className="space-y-6">
-            {[1, 2, 3].map((_, i) => (
+            {[1, 2, 3].map((_,i) => (
               <div key={i} className="flex items-center justify-between group cursor-pointer">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-2xl bg-foreground/5 overflow-hidden">
@@ -76,7 +76,7 @@ export default function DashboardOverview() {
           </div>
         </div>
 
-        {/* SYSTEM STATUS / LOGS (Creative Engineering Touch) */}
+   
         <div className="bg-foreground text-background rounded-[2.5rem] p-8 relative overflow-hidden group">
           <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-125 transition-transform duration-700">
              <Logo className="w-32 h-32" />
