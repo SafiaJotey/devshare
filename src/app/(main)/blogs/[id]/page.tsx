@@ -70,7 +70,7 @@ const RELATED_POSTS: Post[] = [
 export default function BlogDetails() {
   const [completion, setCompletion] = useState(0);
 
-  // Scroll progress logic
+
   useEffect(() => {
     const updateScrollCompletion = () => {
       const currentProgress = window.scrollY;
@@ -85,7 +85,7 @@ export default function BlogDetails() {
 
   return (
     <main className="min-h-screen bg-background pb-20">
-      {/* 1. READING PROGRESS BAR */}
+
       <div className="fixed top-0 left-0 w-full h-1 bg-primary/10 z-50">
         <div 
           className="h-full bg-primary transition-all duration-150" 
@@ -93,7 +93,7 @@ export default function BlogDetails() {
         />
       </div>
 
-      {/* 2. TOP NAVIGATION */}
+
       <nav className="pt-12 pb-10 container-box">
         <Link 
           href="/blogs" 
@@ -242,7 +242,7 @@ export default function BlogDetails() {
         </div>
       </article>
 
-      {/* 6. SUGGESTED BLOGS SECTION */}
+  
       <Section
         variant="colorful"
         tag="More Insights"
@@ -251,7 +251,7 @@ export default function BlogDetails() {
         linkHref="/blogs"
         className="mt-32 border-t border-foreground/5 pt-20"
       >
-        {/* RELATED CARDS GRID */}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
           {RELATED_POSTS.map((post) => (
             <Link key={post.id} href={`/blogs/${post.id}`}>
@@ -260,7 +260,7 @@ export default function BlogDetails() {
           ))}
         </div>
       </Section>
-      {/* 7. CTAs */}
+
       <div className="mt-32">
         <ReadyToContribute />
       </div>
