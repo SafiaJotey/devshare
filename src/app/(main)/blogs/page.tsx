@@ -81,7 +81,7 @@ export default function Blogs() {
     post.title.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // Reusable Subscription Component to avoid repetition
+ 
   const SubscriptionWidget = ({ isMobile = false }) => (
     <div className={`p-6 rounded-3xl bg-foreground text-background relative overflow-hidden group ${isMobile ? "mt-20" : "mt-16"}`}>
       <div className="absolute -top-6 -right-6 p-8 opacity-5 group-hover:rotate-12 transition-transform duration-700">
@@ -101,7 +101,7 @@ export default function Blogs() {
 
   return (
     <main className="min-h-screen bg-background text-foreground">
-      {/* 1. HERO SECTION */}
+
       <section className="pt-22 pb-20 border-b border-foreground/5 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-[50%] h-full bg-primary/5 -skew-x-12 translate-x-20 pointer-events-none" />
         <div className="container-box relative z-10">
@@ -140,7 +140,7 @@ export default function Blogs() {
         </div>
       </section>
 
-      {/* 2. MARQUEE */}
+
       <div className="bg-foreground text-background py-3 overflow-hidden border-y border-white/10 select-none">
         <div className="flex animate-marquee whitespace-nowrap gap-20">
           {[1, 2, 3].map((i) => (
@@ -159,7 +159,7 @@ export default function Blogs() {
       <div className="container-box py-10 lg:py-20">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
           
-          {/* MOBILE SEARCH & CATEGORY TABS (Visible only on md and down) */}
+        
           <div className="lg:hidden space-y-6">
             <div className="group">
               <input 
@@ -171,7 +171,7 @@ export default function Blogs() {
               />
             </div>
             
-            {/* Horizontal Scrollable Tabs */}
+       
             <div className="flex items-center gap-2 overflow-x-auto pb-4 no-scrollbar">
               {CATEGORIES.map((cat) => (
                 <button
@@ -189,7 +189,6 @@ export default function Blogs() {
             </div>
           </div>
 
-          {/* 3. DESKTOP SIDEBAR (Visible only on lg) */}
           <aside className="hidden lg:block lg:col-span-3 space-y-10">
             <div className="sticky top-32">
               <div className="mb-10 group">
@@ -238,7 +237,7 @@ export default function Blogs() {
             </div>
           </aside>
 
-          {/* 4. MAIN FEED */}
+
           <div className="lg:col-span-9">
             <div className="flex items-center justify-between mb-8 lg:mb-12 pb-6 border-b border-foreground/5">
                 <div className="flex items-center gap-3 text-[10px] font-mono font-bold uppercase tracking-widest text-foreground/40">
@@ -275,7 +274,7 @@ export default function Blogs() {
               </div>
             )}
 
-            {/* MOBILE SUBSCRIPTION (Visible only on md and down) */}
+    
             <div className="lg:hidden">
                 <SubscriptionWidget isMobile={true} />
             </div>
