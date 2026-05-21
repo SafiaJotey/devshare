@@ -2,7 +2,6 @@
 
 
 import { 
-
   Terminal, 
   CheckCircle2, 
   Cpu, 
