@@ -44,9 +44,9 @@ export default function HelpCenter() {
   return (
     <main className="min-h-screen bg-background pb-20">
       
-      {/* 1. HERO: THE KNOWLEDGE PROTOCOL */}
+    
       <section className="relative pt-32 pb-20 bg-foreground  overflow-hidden">
-        {/* Subtle Grid Background */}
+     
         <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
           <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
             <defs>
@@ -67,37 +67,15 @@ export default function HelpCenter() {
             The <span className="text-primary italic font-serif lowercase">Dev Share</span> <br /> 
             Operation Manual
           </h1>
-          {/* <div className="max-w-2xl mx-auto relative mt-12 group">
-
-  <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-white/50 dark:text-black/50" size={20} />
-  
-  <input 
-    type="text"
-    placeholder="Search protocols (e.g. 'verification', 'markdown')..."
-    className="
-      w-full h-16 md:h-20 pl-16 pr-8 rounded-2xl transition-all text-lg outline-none shadow-2xl
-  
-  
-      bg-primary/60 border border-white/20 text-white placeholder:text-white/60
-     
-   
-       dark:border-black/10 dark:text-black dark:placeholder:text-black/50
-      
-
-      focus:ring-4 focus:ring-accent/20 focus:border-accent/50
-    "
-    value={searchQuery}
-    onChange={(e) => setSearchQuery(e.target.value)}
-  />
-</div> */}
+       
         </div>
       </section>
 
-      {/* 2. CORE PATHS: READ VS CONTRIBUTE */}
+ 
       <section className="container-box -mt-10 relative z-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           
-          {/* Reader Card */}
+
           <div className="bg-background border border-foreground/5 p-10 rounded-[2.5rem] shadow-2xl group hover:border-primary/30 transition-all">
             <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mb-8 text-primary group-hover:scale-110 transition-transform">
               <BookOpen size={30} />
@@ -121,7 +99,6 @@ export default function HelpCenter() {
             </ul>
           </div>
 
-          {/* Contributor Card */}
           <div className="bg-foreground text-background p-10 rounded-[2.5rem] shadow-2xl group relative overflow-hidden">
             <div className="absolute top-0 right-0 p-10 opacity-10 rotate-12 group-hover:rotate-0 transition-transform duration-700">
                <Code2 size={120} />
@@ -151,7 +128,7 @@ export default function HelpCenter() {
         </div>
       </section>
 
-      {/* 3. TECHNICAL FAQs */}
+
       <section className="container-box py-32">
         <div className="text-center mb-20">
           <span className="text-accent font-mono text-[10px] font-bold uppercase tracking-[0.4em]">Query_Repository</span>
@@ -159,7 +136,7 @@ export default function HelpCenter() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20">
-          {/* Reader FAQ Column */}
+  
           <div className="space-y-8">
             <h3 className="flex items-center gap-3 text-lg font-black uppercase tracking-widest text-foreground/40 pb-4 border-b border-foreground/5">
               <Users size={18} /> For Knowledge Seekers
@@ -176,7 +153,7 @@ export default function HelpCenter() {
             </Accordion>
           </div>
 
-          {/* Contributor FAQ Column */}
+  
           <div className="space-y-8">
             <h3 className="flex items-center gap-3 text-lg font-black uppercase tracking-widest text-foreground/40 pb-4 border-b border-foreground/5">
               <Zap size={18} /> For Insight Architects
@@ -194,7 +171,7 @@ export default function HelpCenter() {
           </div>
         </div>
       </section>
-      {/* 6. NEW SECTION: ROADMAP (The Future) */}
+
       <section className="container-box py-10 px-4">
          <div className="bg-primary/5 dark:bg-slate-900 border border-primary/10 dark:border-slate-800 rounded-[3rem] p-12 relative overflow-hidden">
             <div className="absolute top-0 right-0 p-20 opacity-5">
@@ -218,7 +195,7 @@ export default function HelpCenter() {
             </div>
          </div>
       </section>
-      {/* 4. NEW SECTION: CONTENT GUIDELINES (Code of Conduct) */}
+ 
       <section className="container-box py-10">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
           <div className="lg:col-span-5">
@@ -257,7 +234,7 @@ export default function HelpCenter() {
           </div>
         </div>
       </section>
-      {/* 4. SUPPORT TERMINAL */}
+
       <section className="container-box">
          <div className="bg-foreground/[0.02] border border-foreground/5 rounded-[3rem] p-8 md:p-20 text-center relative overflow-hidden">
             <div className="max-w-2xl mx-auto relative z-10">
@@ -275,7 +252,7 @@ export default function HelpCenter() {
                </div>
             </div>
             
-            {/* Background Icon */}
+
             <Cpu className="absolute -bottom-10 -right-10 text-foreground/[0.03]" size={300} />
          </div>
       </section>
