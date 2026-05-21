@@ -19,7 +19,7 @@ import {
 const About = () => {
   return (
     <div className="space-y-32 pb-20 overflow-hidden">
-      {/*  HERO MANIFESTO */}
+   
       <section className="pt-20 px-4 text-center relative">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,var(--accent)_0%,transparent_70%)] opacity-[0.03] pointer-events-none" />
         <div className="max-w-4xl mx-auto relative z-10">
@@ -33,7 +33,7 @@ const About = () => {
         </div>
       </section>
 
-      {/*  THE PILLARS (Bento Style) */}
+ 
       <Section
         tag="Our Pillars"
         title="Built for the modern engineer"
@@ -92,13 +92,13 @@ const About = () => {
         </div>
       </Section>
 
-      {/*  THE KNOWLEDGE STACK (Converted to Section Component) */}
+   
       <Section 
-        headerComponent={<></>} // This hides the default top-header
+        headerComponent={<></>} 
         className="py-10"
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
-          {/* Left Side: Content Depth */}
+
           <div className="order-2 lg:order-1">
             <span className="text-accent font-bold tracking-[0.3em] text-xs uppercase">The Ecosystem</span>
             <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-8 leading-tight">
@@ -126,7 +126,7 @@ const About = () => {
               ))}
             </div>
             
-            {/* Quality Badge */}
+ 
             <div className="mt-12 p-6 rounded-2xl bg-foreground/5 border border-foreground/10 flex items-start gap-4">
               <CheckCircle2 className="text-accent shrink-0" size={24} />
               <div>
@@ -136,7 +136,7 @@ const About = () => {
             </div>
           </div>
 
-          {/* Right Side: Creative Visual */}
+    
           <div className="order-1 lg:order-2 relative">
             <div className="absolute -top-10 -right-10 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
             <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-accent/10 rounded-full blur-3xl" />
