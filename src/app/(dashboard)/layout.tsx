@@ -29,7 +29,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex min-h-screen bg-background">
-      {/* SIDEBAR */}
+
       <aside className="w-64 border-r border-foreground/5 hidden md:flex flex-col sticky top-0 h-screen bg-foreground/[0.02]">
         <div className="p-6">
           <Link href="/" className="flex items-center gap-2 mb-10">
@@ -64,9 +64,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </aside>
 
-      {/* MAIN CONTENT AREA */}
+ 
       <main className="flex-1 flex flex-col">
-        {/* HEADER */}
+     
         <header className="h-16 border-b border-foreground/5 flex items-center justify-between px-8 bg-background/50 backdrop-blur-md sticky top-0 z-10">
           <h2 className="font-bold text-sm text-foreground/40 uppercase tracking-widest">
             {menuItems.find(i => i.href === pathname)?.name || "Dashboard"}
@@ -83,7 +83,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
         </header>
 
-        {/* PAGE CONTENT */}
+
         <div className="py-4 px-2 max-w-7xl w-full mx-auto">
           {children}
         </div>
