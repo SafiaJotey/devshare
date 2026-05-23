@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 export const FixedHeader = ({ category, setCategory, title, setTitle, description, setDescription }: any) => {
   
-  // This function makes the textarea grow as you type
+
   const autoResize = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     e.target.style.height = "auto";
     e.target.style.height = e.target.scrollHeight + "px";
@@ -28,7 +28,7 @@ export const FixedHeader = ({ category, setCategory, title, setTitle, descriptio
         </Select>
       </div>
 
-      {/* AUTO-RESIZING TITLE */}
+
       <textarea
         placeholder="Deep Dive: Enter your title..."
         className="w-full text-center text-4xl md:text-6xl font-bold bg-transparent border-none outline-none resize-none placeholder:text-foreground/10 leading-[1.1] tracking-tight overflow-hidden"
@@ -40,7 +40,7 @@ export const FixedHeader = ({ category, setCategory, title, setTitle, descriptio
         }}
       />
 
-      {/* AUTO-RESIZING DESCRIPTION */}
+
       <textarea
         placeholder="An in-depth exploration of..."
         className="w-full text-center text-lg md:text-xl text-foreground/50 bg-transparent border-none outline-none resize-none placeholder:text-foreground/10 max-w-2xl mx-auto overflow-hidden mt-4"
