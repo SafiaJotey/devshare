@@ -17,7 +17,7 @@ export default function AccountSettings() {
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-right-4 duration-500">
       
-      {/* 1. EMAIL SECTION */}
+
       <section className="space-y-6">
         <div>
           <h3 className="text-xl font-bold flex items-center gap-2">
@@ -48,7 +48,7 @@ export default function AccountSettings() {
 
       <Separator className="bg-foreground/5" />
 
-      {/* 2. PASSWORD SECTION */}
+
       <section className="space-y-6">
         <div>
           <h3 className="text-xl font-bold flex items-center gap-2">
@@ -75,7 +75,6 @@ export default function AccountSettings() {
 
       <Separator className="bg-foreground/5" />
 
-      {/* 3. TWO FACTOR SECTION */}
       <section className="p-6 rounded-[2rem] bg-primary/[0.03] border border-primary/10 flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
@@ -93,7 +92,7 @@ export default function AccountSettings() {
         </Button>
       </section>
 
-      {/* 4. DANGER ZONE */}
+  
       <section className="mt-20 border border-red-500/10 rounded-[2rem] overflow-hidden">
         <div className="bg-red-500/5 px-8 py-4 border-b border-red-500/10 flex items-center gap-2 text-red-600">
            <AlertTriangle size={16} />
