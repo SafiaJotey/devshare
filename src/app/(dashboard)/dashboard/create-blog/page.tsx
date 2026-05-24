@@ -15,7 +15,7 @@ import {
   verticalListSortingStrategy 
 } from "@dnd-kit/sortable";
 
-// UI Components
+
 import { Button } from "@/components/ui/button";
 import { Eye,  Rocket, AlertCircle, Edit3 } from "lucide-react";
 
@@ -30,23 +30,23 @@ export default function WriteNewPage() {
   const [isPreview, setIsPreview] = useState(false);
 
   
-  // 1. Mandatory Header States
+
   const [category, setCategory] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   
-  // 2. Dynamic Content Blocks
+
   const [blocks, setBlocks] = useState<Block[]>([
     { id: "init-1", type: "p", content: "" }
   ]);
 
-  // 3. Validation Logic
+
   const isReadyToPublish = category !== "" && title.trim() !== "" && description.trim() !== "";
 
-  // 4. Drag and Drop Sensors
+
   const sensors = useSensors(useSensor(PointerSensor, {
     activationConstraint: {
-      distance: 8, // Prevents accidental drags when clicking to edit text
+      distance: 8, 
     },
   }));
 
@@ -82,11 +82,11 @@ export default function WriteNewPage() {
 
   return (
     <div className="min-h-screen bg-background pb-40">
-      {/* --- TOP CONTROL BAR --- */}
+
       <div className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-foreground/5 h-20">
         <div className="max-w-6xl mx-auto h-full flex justify-between items-center px-6">
           
-          {/* Status Indicator */}
+
           <div className="flex items-center gap-4">
             <div className={`flex items-center gap-2 px-3 py-1 rounded-full border ${
               isReadyToPublish 
@@ -103,7 +103,7 @@ export default function WriteNewPage() {
             </span>
           </div>
           
-          {/* Action Buttons */}
+
           <div className="flex items-center gap-3">
              <Button 
                 variant="ghost" 
@@ -125,18 +125,18 @@ export default function WriteNewPage() {
         </div>
       </div>
 
-      {/* --- MAIN EDITOR / PREVIEW CANVAS --- */}
+
       <div className="max-w-4xl mx-auto px-6 mt-16">
         {!isPreview ? (
           <div className="animate-in fade-in duration-500">
-            {/* Fixed Header: Category, Title, Description */}
+       
             <FixedHeader 
               category={category} setCategory={setCategory}
               title={title} setTitle={setTitle}
               description={description} setDescription={setDescription}
             />
 
-            {/* Draggable Blocks Area */}
+   
             <DndContext 
               sensors={sensors} 
               collisionDetection={closestCenter} 
@@ -162,11 +162,11 @@ export default function WriteNewPage() {
               </SortableContext>
             </DndContext>
 
-            {/* Floating Toolbar to add more blocks */}
+
             <Toolbar addBlock={addBlock} />
           </div>
         ) : (
-          /* Preview Mode: Renders exactly like the live site */
+
           <PreviewMode 
             category={category} 
             title={title} 

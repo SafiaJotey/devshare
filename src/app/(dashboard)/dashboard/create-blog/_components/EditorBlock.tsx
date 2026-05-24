@@ -10,8 +10,7 @@ import { ImageBlock } from "./blocks/ImageBlock";
 import { Block } from "../type";
 interface EditorBlockProps {
   block: Block;
-  onUpdate: (content: string, metadata?: string) => void; // Notice the "?"
-  onDelete: () => void;
+  onUpdate: (content: string, metadata?: string) => void; 
 }
 
 
