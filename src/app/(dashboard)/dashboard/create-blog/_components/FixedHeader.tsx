@@ -15,7 +15,7 @@ export const FixedHeader = ({ category, setCategory, title, setTitle, descriptio
     textarea.style.height = textarea.scrollHeight + "px";
   };
 
-  // 3. Trigger resize on mount and whenever the value changes
+
   useEffect(() => {
     adjustHeight(titleRef.current);
   }, [title]);
@@ -42,14 +42,14 @@ export const FixedHeader = ({ category, setCategory, title, setTitle, descriptio
       </div>
 
       <textarea
-        ref={titleRef} // Attach ref
+        ref={titleRef}
         placeholder="Deep Dive: Enter your title..."
         className="w-full text-center text-4xl md:text-6xl font-bold bg-transparent border-none outline-none resize-none placeholder:text-foreground/10 leading-[1.1] tracking-tight overflow-hidden"
         rows={1}
         value={title}
         onChange={(e) => {
           setTitle(e.target.value);
-          // adjustHeight(e.target); // Handled by useEffect now
+  
         }}
       />
 
