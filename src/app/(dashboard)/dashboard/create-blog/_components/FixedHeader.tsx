@@ -4,11 +4,10 @@ import { useEffect, useRef } from "react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export const FixedHeader = ({ category, setCategory, title, setTitle, description, setDescription }: any) => {
-  // 1. Create refs for the textareas
+
   const titleRef = useRef<HTMLTextAreaElement>(null);
   const descRef = useRef<HTMLTextAreaElement>(null);
 
-  // 2. Create a reusable resize function
   const adjustHeight = (textarea: HTMLTextAreaElement | null) => {
     if (!textarea) return;
     textarea.style.height = "auto";
@@ -54,14 +53,14 @@ export const FixedHeader = ({ category, setCategory, title, setTitle, descriptio
       />
 
       <textarea
-        ref={descRef} // Attach ref
+        ref={descRef} 
         placeholder="An in-depth exploration of..."
         className="w-full text-center text-lg md:text-xl text-foreground/50 bg-transparent border-none outline-none resize-none placeholder:text-foreground/10 max-w-2xl mx-auto overflow-hidden mt-4"
         rows={1}
         value={description}
         onChange={(e) => {
           setDescription(e.target.value);
-          // adjustHeight(e.target); // Handled by useEffect now
+        
         }}
       />
     </div>
