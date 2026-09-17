@@ -60,7 +60,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return (
     <NextThemesProvider 
       attribute="class"    /* Adds the 'dark' class to <html> */
-      defaultTheme="system" /* Follows user computer settings */
+      defaultTheme="dark" /* Follows user computer settings */
       enableSystem
     >
       {children}
