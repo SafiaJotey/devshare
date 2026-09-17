@@ -53,7 +53,7 @@ export default function NavigationBar() {
     <header
       className={cn(
         "sticky top-0 z-50 w-full transition-all backdrop-blur supports-[backdrop-filter]:bg-background/60",
-        isScrolled ? "bg-background/90 border-b" : "bg-background/95"
+        isScrolled ? "bg-background/90 " : "bg-background/95"
       )}
     >
       <div className="container-box flex h-16 items-center justify-between">
