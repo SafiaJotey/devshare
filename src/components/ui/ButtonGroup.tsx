@@ -20,7 +20,7 @@ export default function ButtonGroup() {
                 size="lg" 
                 className="border-secondary/30 dark:border-dark-text/30 cursor-pointer group transition-all duration-300 transform hover:-translate-y-1"
               >
-                <span className="bg-gradient-to-r from-accent to-primary dark:from-dark-accent dark:to-dark-primary bg-clip-text text-transparent group-hover:bg-gradient-to-r group-hover:from-black group-hover:to-black">
+                <span className="">
                   Meet The Authors
                 </span>
               </Button>

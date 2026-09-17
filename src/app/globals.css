@@ -26,28 +26,55 @@
   This is where we set your EXACT hex codes.
   Notice the variable names are IDENTICAL in both sections.
 */
-:root {
-  /* Light Mode Colors */
-  --background: #F5EEDC;
-  --foreground: #183B4E;
-  --primary: #27548A;
-  --primary-foreground: #F5EEDC;
-  --accent: #DDA853;
-   --blob-opacity: 0.15;
+
+/* 1 */
+/* :root {
+
+  --background: #FFFFFF;
+  --foreground: #09090B;
+  --primary: #4F46E5;
+  --primary-foreground: #FFFFFF;
+  --accent: #8B5CF6;
+  --blob-opacity: 0.10;
 }
 
 .dark {
-  /* Dark Mode Colors */
-  --background: #1A1A1A;
-  --foreground: #E0E0E0;
-  --primary: #3A7BCC;
-  --primary-foreground: #1A1A1A;
-  --accent: #FFC470;
-    --blob-opacity: 0.7;
+
+  --background: #09090B;
+  --foreground: #FAFAFA;
+  --primary: #6366F1;
+  --primary-foreground: #FFFFFF;
+  --accent: #A78BFA;
+  --blob-opacity: 0.35;
+} */
+
+
+/* 2 */
+
+ :root {
+
+  --background: #F4F8F6;
+  --foreground: #0A1C14;
+  --primary: #0F5132;
+  --primary-foreground: #FFFFFF;
+  --accent: #10B981;
+  --blob-opacity: 0.12;
 }
 
+.dark {
+
+  --background: #07120D;
+  --foreground: #E6F4ED;
+  --primary: #10B981;
+  --primary-foreground: #07120D;
+  --accent: #34D399;
+  --blob-opacity: 0.40;
+} 
+
 /* 
-  3. BASE STYLES
+ 
+
+3. BASE STYLES
 */
 @layer base {
   html {
