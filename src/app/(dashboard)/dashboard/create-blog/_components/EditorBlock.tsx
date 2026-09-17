@@ -11,6 +11,7 @@ import { Block } from "../type";
 interface EditorBlockProps {
   block: Block;
   onUpdate: (content: string, metadata?: string) => void; 
+onDelete: () => void;
 }
 
 
