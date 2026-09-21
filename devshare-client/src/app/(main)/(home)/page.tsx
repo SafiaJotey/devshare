@@ -146,7 +146,7 @@ export default function Home() {
       >
         <div className="relative overflow-hidden w-full">
 
-          <div className="animate-marquee flex gap-6 py-4">
+          <div className="animate-marquee flex gap-6 ">
             {[...categories, ...categories].map((cat, i) => (
               <Link key={i} href={`/blogs`} className="w-[200px] shrink-0">
                 <div className="group bg-background border border-foreground/10 p-6 rounded-2xl flex flex-col items-center justify-center text-center transition-all hover:-translate-y-1 hover:shadow-lg h-full">
