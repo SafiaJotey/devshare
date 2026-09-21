@@ -14,11 +14,18 @@ export interface IUser {
     twitter?: string;
     website?: string;
   };
+  /** SHA-256 hashed refresh tokens — one entry per active device/session */
+  refreshTokens: string[];
+  /** Allows admins to suspend accounts without deletion */
+  isActive: boolean;
+  /** Timestamp of the most recent successful login */
+  lastLoginAt?: Date;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export type IUserResponse = Omit<IUser, "password">;
+/** Safe user shape returned to clients — password and tokens never exposed */
+export type IUserResponse = Omit<IUser, "password" | "refreshTokens">;
 
 export interface IJwtPayload {
   id: string;
@@ -39,4 +46,9 @@ export interface IRegisterUserPayload {
 export interface ILoginUserPayload {
   email: string;
   password: string;
+}
+
+export interface IChangePasswordPayload {
+  currentPassword: string;
+  newPassword: string;
 }

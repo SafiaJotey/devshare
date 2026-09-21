@@ -3,24 +3,31 @@ import httpStatus from "http-status";
 import AppError from "../../errors/AppError";
 import { getUserCollection } from "./user.model";
 import {
+  IChangePasswordPayload,
   ILoginUserPayload,
   IRegisterUserPayload,
   IUser,
   IUserResponse,
 } from "./user.interface";
-import { comparePassword, generateToken, hashPassword } from "../../utils/jwt";
+import {
+  comparePassword,
+  generateAccessToken,
+  generateRefreshToken,
+  hashPassword,
+  hashToken,
+  verifyRefreshToken,
+} from "../../utils/jwt";
 
-// Helper to strip password from user object
+// Helper to strip password and refreshTokens from user object
 const sanitizeUser = (user: IUser): IUserResponse => {
-  const { password, ...sanitized } = user;
+  const { password, refreshTokens, ...sanitized } = user;
   return sanitized;
 };
 
 const registerUser = async (
   payload: IRegisterUserPayload
-): Promise<{ user: IUserResponse; token: string }> => {
+): Promise<{ user: IUserResponse; accessToken: string; refreshToken: string }> => {
   const collection = getUserCollection();
-
   const normalizedEmail = payload.email.trim().toLowerCase();
 
   // Check if user already exists
@@ -51,6 +58,9 @@ const registerUser = async (
     title: payload.title || "Developer & Contributor",
     bio: payload.bio || "",
     socialLinks: {},
+    refreshTokens: [],
+    isActive: true,
+    lastLoginAt: new Date(),
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -58,23 +68,33 @@ const registerUser = async (
   const result = await collection.insertOne(newUser);
   newUser._id = result.insertedId;
 
-  // Generate JWT token
-  const token = generateToken({
+  const jwtPayload = {
     id: newUser._id.toString(),
     email: newUser.email,
     name: newUser.name,
     role: newUser.role,
-  });
+  };
+
+  const accessToken = generateAccessToken(jwtPayload);
+  const refreshToken = generateRefreshToken(jwtPayload);
+
+  // Store hashed refresh token in DB
+  const hashedRefreshToken = hashToken(refreshToken);
+  await collection.updateOne(
+    { _id: newUser._id },
+    { $push: { refreshTokens: hashedRefreshToken } }
+  );
 
   return {
     user: sanitizeUser(newUser),
-    token,
+    accessToken,
+    refreshToken,
   };
 };
 
 const loginUser = async (
   payload: ILoginUserPayload
-): Promise<{ user: IUserResponse; token: string }> => {
+): Promise<{ user: IUserResponse; accessToken: string; refreshToken: string }> => {
   const collection = getUserCollection();
   const normalizedEmail = payload.email.trim().toLowerCase();
 
@@ -87,6 +107,13 @@ const loginUser = async (
     );
   }
 
+  if (user.isActive === false) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "Your account has been deactivated. Please contact support."
+    );
+  }
+
   const isPasswordMatch = await comparePassword(payload.password, user.password);
 
   if (!isPasswordMatch) {
@@ -96,17 +123,178 @@ const loginUser = async (
     );
   }
 
-  const token = generateToken({
+  const jwtPayload = {
     id: user._id!.toString(),
     email: user.email,
     name: user.name,
     role: user.role,
-  });
+  };
+
+  const accessToken = generateAccessToken(jwtPayload);
+  const refreshToken = generateRefreshToken(jwtPayload);
+  const hashedRefreshToken = hashToken(refreshToken);
+
+  // Limit stored refresh tokens to 5 active sessions max, append newest
+  await collection.updateOne(
+    { _id: user._id },
+    {
+      $set: { lastLoginAt: new Date(), updatedAt: new Date() },
+      $push: {
+        refreshTokens: {
+          $each: [hashedRefreshToken],
+          $slice: -5, // keep at most the last 5 sessions
+        },
+      },
+    }
+  );
 
   return {
     user: sanitizeUser(user),
-    token,
+    accessToken,
+    refreshToken,
   };
+};
+
+const refreshAccessToken = async (
+  incomingRefreshToken: string
+): Promise<{ accessToken: string; newRefreshToken: string; user: IUserResponse }> => {
+  if (!incomingRefreshToken) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "Refresh token is required"
+    );
+  }
+
+  // Verify token signature & expiry
+  const decoded = verifyRefreshToken(incomingRefreshToken);
+  const collection = getUserCollection();
+
+  if (!ObjectId.isValid(decoded.id)) {
+    throw new AppError(httpStatus.UNAUTHORIZED, "Invalid token payload");
+  }
+
+  const hashedIncoming = hashToken(incomingRefreshToken);
+
+  // Find user that holds this hashed refresh token
+  const user = await collection.findOne({
+    _id: new ObjectId(decoded.id),
+    refreshTokens: hashedIncoming,
+  });
+
+  if (!user) {
+    throw new AppError(
+      httpStatus.UNAUTHORIZED,
+      "Invalid or revoked session. Please log in again."
+    );
+  }
+
+  if (user.isActive === false) {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "Your account has been deactivated. Please contact support."
+    );
+  }
+
+  // Rotate token: Issue new access & refresh tokens
+  const jwtPayload = {
+    id: user._id!.toString(),
+    email: user.email,
+    name: user.name,
+    role: user.role,
+  };
+
+  const newAccessToken = generateAccessToken(jwtPayload);
+  const newRefreshToken = generateRefreshToken(jwtPayload);
+  const hashedNew = hashToken(newRefreshToken);
+
+  // Replace old refresh token with new one in user's refreshTokens array
+  await collection.updateOne(
+    { _id: user._id },
+    {
+      $pull: { refreshTokens: hashedIncoming },
+    }
+  );
+
+  await collection.updateOne(
+    { _id: user._id },
+    {
+      $push: {
+        refreshTokens: {
+          $each: [hashedNew],
+          $slice: -5,
+        },
+      },
+      $set: { updatedAt: new Date() },
+    }
+  );
+
+  return {
+    accessToken: newAccessToken,
+    newRefreshToken,
+    user: sanitizeUser(user),
+  };
+};
+
+const logoutUser = async (userId?: string, incomingRefreshToken?: string): Promise<void> => {
+  if (!userId && !incomingRefreshToken) return;
+
+  const collection = getUserCollection();
+
+  if (incomingRefreshToken) {
+    const hashed = hashToken(incomingRefreshToken);
+    await collection.updateOne(
+      { refreshTokens: hashed },
+      { $pull: { refreshTokens: hashed } }
+    );
+  } else if (userId && ObjectId.isValid(userId)) {
+    await collection.updateOne(
+      { _id: new ObjectId(userId) },
+      { $set: { refreshTokens: [] } }
+    );
+  }
+};
+
+const changePassword = async (
+  userId: string,
+  payload: IChangePasswordPayload
+): Promise<void> => {
+  if (!ObjectId.isValid(userId)) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid user identifier");
+  }
+
+  const collection = getUserCollection();
+  const user = await collection.findOne({ _id: new ObjectId(userId) });
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User profile not found");
+  }
+
+  const isCurrentMatch = await comparePassword(payload.currentPassword, user.password);
+  if (!isCurrentMatch) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Incorrect current password");
+  }
+
+  const isSame = await comparePassword(payload.newPassword, user.password);
+  if (isSame) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "New password cannot be identical to the current password"
+    );
+  }
+
+  const hashedPassword = await hashPassword(payload.newPassword);
+
+  // Invalidate all existing sessions on password change for security
+  await collection.updateOne(
+    { _id: user._id },
+    {
+      $set: {
+        password: hashedPassword,
+        refreshTokens: [],
+        updatedAt: new Date(),
+      },
+    }
+  );
 };
 
 const getMe = async (userId: string): Promise<IUserResponse> => {
@@ -136,7 +324,8 @@ const updateProfile = async (
   }
 
   // Prevent modifying critical fields via profile update
-  const { _id, email, password, role, createdAt, ...allowedUpdates } = payload as any;
+  const { _id, email, password, role, refreshTokens, isActive, createdAt, ...allowedUpdates } =
+    payload as any;
 
   const result = await collection.findOneAndUpdate(
     { _id: new ObjectId(userId) },
@@ -159,8 +348,12 @@ const updateProfile = async (
 export const UserService = {
   registerUser,
   loginUser,
+  refreshAccessToken,
+  logoutUser,
+  changePassword,
   getMe,
   updateProfile,
 };
 
 export default UserService;
+

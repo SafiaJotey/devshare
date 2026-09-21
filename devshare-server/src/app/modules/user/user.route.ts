@@ -1,17 +1,51 @@
 import { Router } from "express";
 import UserController from "./user.controller";
+import UserValidation from "./user.validation";
 import auth from "../../middlewares/auth";
+import validateRequest from "../../middlewares/validateRequest";
 
-const router: Router = Router();
+// ─── Auth Routes (/api/v1/auth) ───────────────────────────────────────────────
 
-// Public Authentication Endpoints
-router.post("/register", UserController.register);
-router.post("/login", UserController.login);
-router.post("/logout", UserController.logout);
+const authRouter: Router = Router();
 
-// Protected User Endpoints
-router.get("/me", auth(), UserController.getMe);
-router.patch("/profile", auth(), UserController.updateProfile);
+authRouter.post(
+  "/register",
+  validateRequest(UserValidation.registerValidationSchema),
+  UserController.register
+);
 
-export const UserRoutes: Router = router;
+authRouter.post(
+  "/login",
+  validateRequest(UserValidation.loginValidationSchema),
+  UserController.login
+);
+
+authRouter.post("/refresh-token", UserController.refreshToken);
+
+authRouter.post("/logout", UserController.logout);
+
+export const AuthRoutes: Router = authRouter;
+
+// ─── User Routes (/api/v1/users) ──────────────────────────────────────────────
+
+const userRouter: Router = Router();
+
+userRouter.get("/me", auth(), UserController.getMe);
+
+userRouter.patch(
+  "/profile",
+  auth(),
+  validateRequest(UserValidation.updateProfileValidationSchema),
+  UserController.updateProfile
+);
+
+userRouter.patch(
+  "/change-password",
+  auth(),
+  validateRequest(UserValidation.changePasswordValidationSchema),
+  UserController.changePassword
+);
+
+export const UserRoutes: Router = userRouter;
 export default UserRoutes;
+

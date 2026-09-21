@@ -2,15 +2,13 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/providers/theme-provider";
-
-// import Footer from "@/components/footer";
-
 import { AuthProvider } from "@/providers/auth-provider";
+import { Toaster } from "sonner";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Dev Share ",
+  title: "Dev Share",
   description: "A professional blog website about technology, design, and development",
 };
 
@@ -27,9 +25,15 @@ export default function RootLayout({
             <main className="">
               {children}
             </main>
+            <Toaster
+              richColors
+              position="top-right"
+              closeButton
+              theme="system"
+            />
           </AuthProvider>
         </ThemeProvider>
       </body>
     </html>
   );
-}
+}

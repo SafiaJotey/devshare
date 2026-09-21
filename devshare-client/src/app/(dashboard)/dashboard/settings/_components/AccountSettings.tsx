@@ -1,23 +1,64 @@
 "use client";
 
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { 
-
   Mail, 
   Key, 
   AlertTriangle, 
-  Smartphone,
-  ChevronRight
+  Smartphone, 
+  ChevronRight,
+  Loader2
 } from "lucide-react";
+import { useAuth } from "@/providers/auth-provider";
+import { changePasswordApi } from "@/lib/api";
 
 export default function AccountSettings() {
+  const router = useRouter();
+  const { user, logout } = useAuth();
+
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
+
+  const handleUpdatePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!currentPassword || !newPassword) {
+      toast.error("Please fill in both current and new passwords.");
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      toast.error("New password must be at least 8 characters long.");
+      return;
+    }
+
+    if (!/[A-Z]/.test(newPassword) || !/[a-z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
+      toast.error("Password must contain uppercase, lowercase, and numeric characters.");
+      return;
+    }
+
+    setIsUpdatingPassword(true);
+    try {
+      await changePasswordApi({ currentPassword, newPassword });
+      toast.success("Password changed successfully! Please log in with your new password.");
+      await logout();
+      router.push("/auth");
+    } catch (error: any) {
+      toast.error(error.message || "Failed to update password");
+    } finally {
+      setIsUpdatingPassword(false);
+    }
+  };
+
   return (
     <div className="space-y-12 animate-in fade-in slide-in-from-right-4 duration-500">
-      
-
       <section className="space-y-6">
         <div>
           <h3 className="text-xl font-bold flex items-center gap-2">
@@ -32,7 +73,8 @@ export default function AccountSettings() {
             <Label className="text-[10px] uppercase tracking-widest font-black text-foreground/40">Registered Email</Label>
             <div className="relative">
               <Input 
-                defaultValue="arjun.sharma@engineer.com" 
+                value={user?.email || ""} 
+                disabled
                 className="rounded-xl border-foreground/10 bg-foreground/[0.02] pl-4 pr-24 h-12" 
               />
               <div className="absolute right-3 top-1/2 -translate-y-1/2 bg-emerald-500/10 text-emerald-600 text-[9px] font-bold px-2 py-1 rounded-md border border-emerald-500/20">
@@ -40,14 +82,10 @@ export default function AccountSettings() {
               </div>
             </div>
           </div>
-          <Button variant="outline" className="h-12 rounded-xl border-foreground/10 hover:bg-foreground/5 font-bold text-xs uppercase tracking-widest">
-            Change Email
-          </Button>
         </div>
       </section>
 
       <Separator className="bg-foreground/5" />
-
 
       <section className="space-y-6">
         <div>
@@ -58,20 +96,46 @@ export default function AccountSettings() {
           <p className="text-sm text-foreground/40 mt-1">Ensure your account uses a complex architectural password.</p>
         </div>
 
-        <div className="space-y-4 max-w-md">
+        <form onSubmit={handleUpdatePassword} className="space-y-4 max-w-md">
           <div className="space-y-2">
             <Label className="text-[10px] uppercase tracking-widest font-black text-foreground/40">Current Password</Label>
-            <Input type="password" placeholder="••••••••" className="rounded-xl border-foreground/10 bg-foreground/[0.02] h-11" />
+            <Input 
+              type="password" 
+              value={currentPassword}
+              onChange={(e) => setCurrentPassword(e.target.value)}
+              placeholder="••••••••" 
+              disabled={isUpdatingPassword}
+              className="rounded-xl border-foreground/10 bg-foreground/[0.02] h-11" 
+            />
           </div>
           <div className="space-y-2">
             <Label className="text-[10px] uppercase tracking-widest font-black text-foreground/40">New Security String</Label>
-            <Input type="password" placeholder="••••••••" className="rounded-xl border-foreground/10 bg-foreground/[0.02] h-11" />
+            <Input 
+              type="password" 
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="••••••••" 
+              disabled={isUpdatingPassword}
+              className="rounded-xl border-foreground/10 bg-foreground/[0.02] h-11" 
+            />
           </div>
-          <Button className="bg-foreground text-background hover:bg-foreground/90 rounded-xl px-6 h-11 font-bold text-xs uppercase tracking-widest transition-all">
-            Update Credentials
+          <Button 
+            type="submit"
+            disabled={isUpdatingPassword}
+            className="bg-foreground text-background hover:bg-foreground/90 rounded-xl px-6 h-11 font-bold text-xs uppercase tracking-widest transition-all cursor-pointer"
+          >
+            {isUpdatingPassword ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Updating...
+              </>
+            ) : (
+              "Update Credentials"
+            )}
           </Button>
-        </div>
+        </form>
       </section>
+
 
       <Separator className="bg-foreground/5" />
 

@@ -13,8 +13,8 @@ import {
   Facebook,
   User,
   Loader2,
-  AlertCircle,
 } from "lucide-react";
+import { toast } from "sonner";
 
 // UI Components
 import { Button } from "@/components/ui/button";
@@ -33,20 +33,29 @@ export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage(null);
 
     if (!email || !password) {
-      setErrorMessage("Please fill in all required fields.");
+      toast.error("Please fill in all required fields.");
       return;
     }
 
     if (!isLogin && !name.trim()) {
-      setErrorMessage("Please enter your name.");
+      toast.error("Please enter your name.");
       return;
+    }
+
+    if (!isLogin) {
+      if (password.length < 8) {
+        toast.error("Password must be at least 8 characters long.");
+        return;
+      }
+      if (!/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/[0-9]/.test(password)) {
+        toast.error("Password must contain at least one uppercase letter, one lowercase letter, and one number.");
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -54,12 +63,14 @@ export default function AuthPage() {
     try {
       if (isLogin) {
         await login(email, password);
+        toast.success("Welcome back! Login successful.");
       } else {
         await register(name, email, password);
+        toast.success("Account created successfully! Welcome to DevShare.");
       }
       router.push("/dashboard");
     } catch (err: any) {
-      setErrorMessage(err.message || "Authentication failed. Please try again.");
+      toast.error(err.message || "Authentication failed. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -169,14 +180,6 @@ export default function AuthPage() {
             </div>
           </div>
 
-          {/* ERROR ALERT */}
-          {errorMessage && (
-            <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 text-red-600 dark:text-red-400 flex items-start gap-3 text-sm animate-in fade-in duration-200">
-              <AlertCircle size={18} className="shrink-0 mt-0.5" />
-              <span>{errorMessage}</span>
-            </div>
-          )}
-
           {/* EMAIL FORM */}
           <form className="space-y-5" onSubmit={handleSubmit}>
             {!isLogin && (
@@ -281,10 +284,7 @@ export default function AuthPage() {
             {isLogin ? "New to the collective?" : "Already a member?"}{" "}
             <button
               type="button"
-              onClick={() => {
-                setIsLogin(!isLogin);
-                setErrorMessage(null);
-              }}
+              onClick={() => setIsLogin(!isLogin)}
               className="text-primary font-bold hover:underline ml-1"
             >
               {isLogin ? "Create an account" : "Log in here"}

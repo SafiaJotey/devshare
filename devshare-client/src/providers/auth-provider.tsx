@@ -1,15 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useContext, useEffect, useState, useCallback } from "react";
 import {
   IUser,
   getMeApi,
   loginApi,
   logoutApi,
   registerApi,
-  setAuthToken,
-  removeAuthToken,
-  getAuthToken,
 } from "@/lib/api";
 
 interface AuthContextType {
@@ -28,7 +25,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<IUser | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     try {
       const res = await getMeApi();
       if (res.success && res.data) {
@@ -38,24 +35,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
     } catch {
       setUser(null);
-      removeAuthToken();
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
-    // Attempt auto-login if token or cookie session is active
+    // Check session on initial load
     refreshUser();
-  }, []);
+  }, [refreshUser]);
 
   const login = async (email: string, password: string) => {
     setIsLoading(true);
     try {
       const res = await loginApi({ email, password });
-      if (res.token) {
-        setAuthToken(res.token);
-      }
       if (res.data) {
         setUser(res.data);
       }
@@ -68,9 +61,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setIsLoading(true);
     try {
       const res = await registerApi({ name, email, password });
-      if (res.token) {
-        setAuthToken(res.token);
-      }
       if (res.data) {
         setUser(res.data);
       }
@@ -85,7 +75,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
-      removeAuthToken();
       setUser(null);
     }
   };
@@ -114,3 +103,4 @@ export function useAuth(): AuthContextType {
   }
   return context;
 }
+
