@@ -1,41 +1,25 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+# Dependencies (NEVER upload these)
+node_modules/
+devshare-client/node_modules/
+devshare-server/node_modules/
 
-# dependencies
-/node_modules
-/.pnp
-.pnp.*
-.yarn/*
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/versions
+# Environment variables & secrets (NEVER upload these)
+.env
+.env*.local
+devshare-client/.env*
+devshare-server/.env*
 
-# testing
-/coverage
+# Production Build Outputs
+devshare-client/.next/
+devshare-client/out/
+devshare-server/dist/
+build/
 
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
+# Debug logs
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-.pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
-.vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# OS files
+.DS_Store
+Thumbs.db
