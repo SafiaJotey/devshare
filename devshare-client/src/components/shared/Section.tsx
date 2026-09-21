@@ -99,7 +99,7 @@ const Section: React.FC<SectionProps> = ({
   className = ""
 }) => {
   return (
-    <section className={`${bgColor} ${paddingTop ? "pt-16 md:pt-28" : ''} ${paddingBottom ? "pb-16 md:pb-28" : ''} overflow-hidden ${className}`}>
+    <section className={`${bgColor} ${paddingTop ? "pt-14 md:pt-24" : ''} ${paddingBottom ? "pb-14 md:pb-24" : ''} overflow-hidden ${className}`}>
       <div className={`mx-auto ${noPaddingX ? 'w-full' : 'container px-6 lg:px-8'}`}>
 
         {headerComponent ? (

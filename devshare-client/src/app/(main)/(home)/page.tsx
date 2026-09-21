@@ -38,7 +38,7 @@ export default function Home() {
           {/* Main Featured Post */}
           <div className="lg:col-span-2 group cursor-pointer relative overflow-hidden rounded-bl-3xl bg-foreground/5 dark:bg-foreground/10 border border-foreground/10 flex flex-col">
             <Link key={mainPost.id} href={`/blogs/${mainPost.id}`}>
-              <div className="relative aspect-video lg:aspect-auto lg:h-[400px] overflow-hidden">
+              <div className="relative aspect-video lg:aspect-auto lg:h-[350px] overflow-hidden">
                 <Image
                   src={mainPost.image}
                   alt={mainPost.title}
@@ -56,10 +56,10 @@ export default function Home() {
 
               <div className="p-4 flex flex-col justify-between flex-grow">
                 <div>
-                  <h3 className="text-2xl md:text-3xl font-bold mb-4 group-hover:text-primary transition-colors leading-tight">
+                  <h3 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors leading-tight">
                     {mainPost.title}
                   </h3>
-                  <p className="text-foreground/70 mb-6 line-clamp-2 text-lg">
+                  <p className="text-foreground/70 mb-6 line-clamp-2 ">
                     {mainPost.description}
                   </p>
                 </div>
@@ -93,7 +93,7 @@ export default function Home() {
             {sidePosts.map((post) => (
               <div key={post.id} className="group cursor-pointer flex flex-col h-full bg-foreground/5 dark:bg-foreground/10 border border-foreground/10 rounded-br-3xl overflow-hidden transition-all hover:shadow-xl hover:shadow-primary/5">
                 <Link href={`/blogs/${post.id}`}>
-                  <div className="relative h-44 overflow-hidden">
+                  <div className="relative h-36 overflow-hidden">
                     <Image
                       src={post.image}
                       alt={post.title}
@@ -109,7 +109,7 @@ export default function Home() {
                   </div>
 
                   <div className="p-5 flex flex-col justify-between flex-grow">
-                    <h4 className="font-bold text-lg group-hover:text-primary transition-colors leading-snug mb-4 line-clamp-2">
+                    <h4 className="font-bold  group-hover:text-primary transition-colors leading-snug mb-4 line-clamp-2">
                       {post.title}
                     </h4>
                     <div className="flex items-center justify-between pt-2 border-t border-foreground/10">
