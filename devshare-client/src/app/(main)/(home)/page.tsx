@@ -44,6 +44,7 @@ export default function Home() {
                   alt={mainPost.title}
                   fill
                   priority 
+                  sizes="(max-width: 1024px) 100vw, 66vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
                 <div className="absolute top-4 left-4 z-10">
@@ -70,6 +71,7 @@ export default function Home() {
                         src={mainPost.avatar} 
                         alt={mainPost.author}
                         fill
+                        sizes="32px"
                         className="object-cover"
                       />
                     </div>
@@ -96,6 +98,7 @@ export default function Home() {
                       src={post.image} 
                       alt={post.title}
                       fill
+                      sizes="(max-width: 1024px) 100vw, 33vw"
                       className="object-cover transition-transform duration-500 group-hover:scale-110"
                     />
                     <div className="absolute top-3 left-3 z-10">
@@ -112,7 +115,7 @@ export default function Home() {
                     <div className="flex items-center justify-between pt-2 border-t border-foreground/10">
                       <div className="flex items-center gap-2">
                         <div className="w-8 h-8 rounded-full bg-foreground/10 overflow-hidden relative">
-                          <Image src={post.avatar} alt={post.author} fill className="object-cover" />
+                          <Image src={post.avatar} alt={post.author} fill sizes="32px" className="object-cover" />
                         </div>
                         <div>
                           <p className="text-sm font-bold">{post.author}</p>

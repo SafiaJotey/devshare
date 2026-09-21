@@ -51,6 +51,7 @@ export default function Card({ post }: CardProps) {
             src={post.avatar}
             alt={post.author}
             fill
+            sizes="32px"
             className="object-cover"
           />
         </div>
