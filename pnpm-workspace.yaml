@@ -1,0 +1,23 @@
+# =======================================================
+# PNPM WORKSPACE CONFIGURATION:
+# 1. Unlike npm/yarn, pnpm requires this dedicated yaml file
+#    instead of a "workspaces" field in package.json.
+# 2. To run scripts in a specific workspace, use:
+#    pnpm --filter <package-name> <script>
+#    (e.g., pnpm --filter devshare-client dev)
+# in npm have to use beloww in package.json
+# "workspaces": [
+#   "devshare-client",
+#   "devshare-server"
+#  ],
+# and have to use like
+#"scripts": {
+#    "dev:client": "npm run dev --workspace=devshare-client",
+#   "dev:server": "npm run dev --workspace=devshare-server",
+#    "dev": "concurrently \"npm run dev:client\" \"npm run dev:server\""
+#  },
+# =======================================================
+
+packages:
+  - "devshare-client"
+  - "devshare-server"

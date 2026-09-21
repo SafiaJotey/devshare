@@ -2,15 +2,9 @@
   "name": "devshare-monorepo",
   "version": "1.0.0",
   "private": true,
-  "workspaces": [
-    "devshare-client",
-    "devshare-server"
-  ],
   "scripts": {
-    "dev:client": "npm run dev --workspace=devshare-client",
-    "dev:server": "npm run dev --workspace=devshare-server"
-  },
-  "devDependencies": {
-    "concurrently": "^9.1.2"
+    "dev:client": "pnpm --filter devshare-client dev",
+    "dev:server": "pnpm --filter devshare-server dev",
+    "dev": "pnpm -r --parallel dev"
   }
 }
