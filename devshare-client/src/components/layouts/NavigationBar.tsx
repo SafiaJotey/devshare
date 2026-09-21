@@ -2,11 +2,9 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-
+import { usePathname, useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
-
 import {
   Sheet,
   SheetContent,
@@ -18,17 +16,17 @@ import { ThemeToggle } from "./ThemeToggle";
 
 import { MenuIcon } from "../icons/MenuIcon";
 import { navItems } from "@/constants/menu";
-import { cn } from "@/lib/utils"; // Standard Shadcn utility
+import { cn } from "@/lib/utils";
 import { Logo } from "../shared/Logo";
 import UserAccountMenu from "./UserAccountMenu";
 import { LoginIcon } from "../icons/LoginIcon";
+import { useAuth } from "@/providers/auth-provider";
 
 export default function NavigationBar() {
   const pathname = usePathname();
-  // const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
+  const { isLoggedIn, isLoading } = useAuth();
   const [isScrolled, setIsScrolled] = useState(false);
- const [isLoggedIn,] = useState(false); 
-  // useEffect(() => setIsOpen(false), [pathname]);
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 10);
@@ -36,7 +34,6 @@ export default function NavigationBar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Centralized class logic
   const getLinkClassName = (path: string) => {
     const isActive = pathname === path;
     return cn(
@@ -46,6 +43,22 @@ export default function NavigationBar() {
         : isScrolled
         ? "text-foreground/60 hover:text-foreground"
         : "text-foreground"
+    );
+  };
+
+  const AuthControl = () => {
+    if (isLoading) {
+      return (
+        <div className="w-8 h-8 rounded-full bg-foreground/10 animate-pulse" />
+      );
+    }
+    if (isLoggedIn) {
+      return <UserAccountMenu />;
+    }
+    return (
+      <Link href="/auth">
+        <LoginIcon className="text-foreground cursor-pointer" />
+      </Link>
     );
   };
 
@@ -79,30 +92,14 @@ export default function NavigationBar() {
 
           <div className="ml-2 flex items-center gap-2">
             <ThemeToggle />
-           {isLoggedIn ? (
-              <UserAccountMenu />
-            ) : (
-         
-                <Link href="/auth">
-                  <LoginIcon  className="text-foreground cursor-pointer" />
-                </Link>
-     
-            )}
+            <AuthControl />
           </div>
         </nav>
 
         {/* Mobile Header Actions */}
         <div className="flex items-center md:hidden gap-1">
           <div className="flex items-center gap-1 mr-2">
-        {isLoggedIn ? (
-              <UserAccountMenu />
-            ) : (
-          
-                <Link href="/auth">
-                  <LoginIcon  className="text-foreground cursor-pointer" />
-                </Link>
-       
-            )}
+            <AuthControl />
             <ThemeToggle />
           </div>
           <Sheet>
@@ -111,12 +108,16 @@ export default function NavigationBar() {
                 <MenuIcon className="h-6 w-6" />
               </Button>
             </SheetTrigger>
-            {/* side="top" makes it drop down over the content (absolute) */}
-            <SheetContent side="top"         className="h-screen w-full pt-12 flex flex-col bg-background/95 backdrop-blur-md">
+            <SheetContent
+              side="top"
+              className="h-screen w-full pt-12 flex flex-col bg-background/95 backdrop-blur-md"
+            >
               <SheetHeader>
-                <SheetTitle className="text-left p-0 gap-0">   <Logo className="text-primary dark:text-accent" /></SheetTitle>
+                <SheetTitle className="text-left p-0 gap-0">
+                  <Logo className="text-primary dark:text-accent" />
+                </SheetTitle>
               </SheetHeader>
-              <nav className="flex flex-col gap-2 ">
+              <nav className="flex flex-col gap-2">
                 {navItems.map((item) => (
                   <Button
                     key={item.path}
@@ -130,15 +131,17 @@ export default function NavigationBar() {
                     </Link>
                   </Button>
                 ))}
+
+                {!isLoading && !isLoggedIn && (
+                  <Button asChild className="mt-4 rounded-xl h-12 font-bold">
+                    <Link href="/auth">Sign In</Link>
+                  </Button>
+                )}
               </nav>
             </SheetContent>
           </Sheet>
         </div>
       </div>
-
-      {/* Mobile Menu Dropdown */}
-      {/* isOpen &&  */}
-     
     </header>
   );
 }

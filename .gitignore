@@ -8,6 +8,7 @@ devshare-server/node_modules/
 .env*.local
 devshare-client/.env*
 devshare-server/.env*
+agent.md
 
 # Production Build Outputs
 devshare-client/.next/
