@@ -9,13 +9,13 @@ import WriteCTA from "@/components/shared/WriteCTA";
 import HeroSection from "./_components/HeroSection";
 
 
-import { 
-  mainPost, 
-  sidePosts, 
-  benefits, 
-  posts, 
-  categories, 
-  authors 
+import {
+  mainPost,
+  sidePosts,
+  benefits,
+  posts,
+  categories,
+  authors
 } from "@/constants/home";
 
 export default function Home() {
@@ -24,26 +24,26 @@ export default function Home() {
       <HeroSection />
 
       {/*FEATURED DEEP DIVES  */}
-      <Section 
+      <Section
         tag="Editor’s Choice"
         title="Featured Deep Dives"
         subtitle="In-depth technical storytelling and architectural breakdowns. Master the mental models behind high-performance engineering."
-        linkText="View All Insights"
+        linkText="All Insights"
         linkHref="/blogs"
         paddingTop
         paddingBottom
       >
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
-          
+
           {/* Main Featured Post */}
           <div className="lg:col-span-2 group cursor-pointer relative overflow-hidden rounded-bl-3xl bg-foreground/5 dark:bg-foreground/10 border border-foreground/10 flex flex-col">
-            <Link key={mainPost.id} href={`/blogs/${mainPost.id}`}> 
+            <Link key={mainPost.id} href={`/blogs/${mainPost.id}`}>
               <div className="relative aspect-video lg:aspect-auto lg:h-[400px] overflow-hidden">
-                <Image 
-                  src={mainPost.image} 
+                <Image
+                  src={mainPost.image}
                   alt={mainPost.title}
                   fill
-                  priority 
+                  priority
                   sizes="(max-width: 1024px) 100vw, 66vw"
                   className="object-cover transition-transform duration-500 group-hover:scale-105"
                 />
@@ -53,7 +53,7 @@ export default function Home() {
                   </span>
                 </div>
               </div>
-              
+
               <div className="p-4 flex flex-col justify-between flex-grow">
                 <div>
                   <h3 className="text-2xl md:text-3xl font-bold mb-4 group-hover:text-primary transition-colors leading-tight">
@@ -63,12 +63,12 @@ export default function Home() {
                     {mainPost.description}
                   </p>
                 </div>
-                
+
                 <div className="flex items-center justify-between pt-2 border-t border-foreground/10">
                   <div className="flex items-center gap-2">
                     <div className="w-8 h-8 rounded-full bg-foreground/10 overflow-hidden relative">
-                      <Image 
-                        src={mainPost.avatar} 
+                      <Image
+                        src={mainPost.avatar}
                         alt={mainPost.author}
                         fill
                         sizes="32px"
@@ -81,7 +81,7 @@ export default function Home() {
                     </div>
                   </div>
                   <div className="flex items-center gap-4 text-xs text-foreground/60 font-medium">
-                    <span className="flex items-center gap-1"><Clock size={14}/> {mainPost.readTime}</span>
+                    <span className="flex items-center gap-1"><Clock size={14} /> {mainPost.readTime}</span>
                   </div>
                 </div>
               </div>
@@ -92,10 +92,10 @@ export default function Home() {
           <div className="flex flex-col gap-2">
             {sidePosts.map((post) => (
               <div key={post.id} className="group cursor-pointer flex flex-col h-full bg-foreground/5 dark:bg-foreground/10 border border-foreground/10 rounded-br-3xl overflow-hidden transition-all hover:shadow-xl hover:shadow-primary/5">
-                <Link href={`/blogs/${post.id}`}> 
+                <Link href={`/blogs/${post.id}`}>
                   <div className="relative h-44 overflow-hidden">
-                    <Image 
-                      src={post.image} 
+                    <Image
+                      src={post.image}
                       alt={post.title}
                       fill
                       sizes="(max-width: 1024px) 100vw, 33vw"
@@ -107,7 +107,7 @@ export default function Home() {
                       </span>
                     </div>
                   </div>
-                  
+
                   <div className="p-5 flex flex-col justify-between flex-grow">
                     <h4 className="font-bold text-lg group-hover:text-primary transition-colors leading-snug mb-4 line-clamp-2">
                       {post.title}
@@ -123,7 +123,7 @@ export default function Home() {
                         </div>
                       </div>
                       <div className="flex items-center gap-4 text-xs text-foreground/60 font-medium">
-                        <span className="flex items-center gap-1"><Clock size={14}/> {post.readTime}</span>
+                        <span className="flex items-center gap-1"><Clock size={14} /> {post.readTime}</span>
                       </div>
                     </div>
                   </div>
@@ -135,35 +135,35 @@ export default function Home() {
       </Section>
 
       {/* CATEGORIES */}
-    <Section 
-  tag="Ecosystem Navigation"
-  bgColor='bg-primary/5'
-  title="Build Your Stack"
-  subtitle="Explore our technical library categorized by the tools that define your workflow."
-  centerHeader
-  paddingTop
-  paddingBottom
->
- <div className="relative overflow-hidden w-full">
+      <Section
+        tag="Ecosystem Navigation"
+        bgColor='bg-primary/5'
+        title="Build Your Stack"
+        subtitle="Explore our technical library categorized by the tools that define your workflow."
+        centerHeader
+        paddingTop
+        paddingBottom
+      >
+        <div className="relative overflow-hidden w-full">
 
-  <div className="animate-marquee flex gap-6 py-4">
-    {[...categories, ...categories].map((cat, i) => (
-      <Link key={i} href={`/blogs`} className="w-[200px] shrink-0"> 
-        <div className="group bg-background border border-foreground/10 p-6 rounded-2xl flex flex-col items-center justify-center text-center transition-all hover:-translate-y-1 hover:shadow-lg h-full">
-          <div className={`p-3 rounded-xl mb-4 transition-transform group-hover:scale-110 ${cat.color}`}>
-            {cat.icon}
+          <div className="animate-marquee flex gap-6 py-4">
+            {[...categories, ...categories].map((cat, i) => (
+              <Link key={i} href={`/blogs`} className="w-[200px] shrink-0">
+                <div className="group bg-background border border-foreground/10 p-6 rounded-2xl flex flex-col items-center justify-center text-center transition-all hover:-translate-y-1 hover:shadow-lg h-full">
+                  <div className={`p-3 rounded-xl mb-4 transition-transform group-hover:scale-110 ${cat.color}`}>
+                    {cat.icon}
+                  </div>
+                  <h3 className="font-bold text-sm">{cat.name}</h3>
+                  <p className="text-[10px] uppercase tracking-widest text-foreground/40 mt-1 font-bold">{cat.count} Articles</p>
+                </div>
+              </Link>
+            ))}
           </div>
-          <h3 className="font-bold text-sm">{cat.name}</h3>
-          <p className="text-[10px] uppercase tracking-widest text-foreground/40 mt-1 font-bold">{cat.count} Articles</p>
         </div>
-      </Link>
-    ))}
-  </div>
-</div>
-</Section>
+      </Section>
 
       {/*LATEST INSIGHTS*/}
-      <Section 
+      <Section
         tag="Newly Published"
         title="The Insight Stream"
         subtitle="A continuous flow of refined technical knowledge."
@@ -174,8 +174,8 @@ export default function Home() {
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-6">
           {posts.map((post) => (
-            <Link key={post.id} href={`/blogs/${post.id}`}> 
-              <Card post={post}/>
+            <Link key={post.id} href={`/blogs/${post.id}`}>
+              <Card post={post} />
             </Link>
           ))}
         </div>
@@ -227,30 +227,30 @@ export default function Home() {
       </Section>
 
       {/*TOP CONTRIBUTORS */}
-     <section className="py-20 bg-primary/5 overflow-hidden">
-  <div className="container-box mb-12">
-    <h2 className="text-center text-3xl font-bold">Meet Our Top Contributors</h2>
-  </div>
-  
- <div className="relative overflow-hidden w-full">
-  {/* The container below now handles the pause via CSS hover */}
-  <div className="animate-marquee flex gap-8 py-4 px-4">
-    {[...authors, ...authors].map((author, i) => (
-      <div key={i} className="w-[300px] shrink-0 bg-background p-6 rounded-3xl border border-foreground/5 flex flex-col items-center text-center shadow-sm transition-transform hover:scale-[1.02]">
-        <div className="w-20 h-20 rounded-full bg-foreground/10 overflow-hidden relative shrink-0 mb-4">
-          <Image src={author.img} alt={author.name} fill className="object-cover" />
+      <section className="py-20 bg-primary/5 overflow-hidden">
+        <div className="container-box mb-12">
+          <h2 className="text-center text-3xl font-bold">Meet Our Top Contributors</h2>
         </div>
-        <h4 className="font-bold text-lg">{author.name}</h4>
-        <p className="text-foreground/50 text-sm mb-4">{author.role}</p>
-        <div className="w-full pt-4 border-t border-foreground/5 flex justify-between items-center px-4">
-          <span className="text-xs font-bold text-primary">{author.posts} Articles</span>
-          <button className="text-xs font-black uppercase text-accent hover:underline">Profile</button>
+
+        <div className="relative overflow-hidden w-full">
+          {/* The container below now handles the pause via CSS hover */}
+          <div className="animate-marquee flex gap-8 py-4 px-4">
+            {[...authors, ...authors].map((author, i) => (
+              <div key={i} className="w-[300px] shrink-0 bg-background p-6 rounded-3xl border border-foreground/5 flex flex-col items-center text-center shadow-sm transition-transform hover:scale-[1.02]">
+                <div className="w-20 h-20 rounded-full bg-foreground/10 overflow-hidden relative shrink-0 mb-4">
+                  <Image src={author.img} alt={author.name} fill className="object-cover" />
+                </div>
+                <h4 className="font-bold text-lg">{author.name}</h4>
+                <p className="text-foreground/50 text-sm mb-4">{author.role}</p>
+                <div className="w-full pt-4 border-t border-foreground/5 flex justify-between items-center px-4">
+                  <span className="text-xs font-bold text-primary">{author.posts} Articles</span>
+                  <button className="text-xs font-black uppercase text-accent hover:underline">Profile</button>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-    ))}
-  </div>
-</div>
-</section>
+      </section>
 
       <WriteCTA />
     </>
