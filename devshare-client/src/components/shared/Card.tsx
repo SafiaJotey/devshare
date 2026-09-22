@@ -3,7 +3,7 @@
 import Image from "next/image";
 
 export interface Post {
-  id: number;
+  id: string | number;
   title: string;
   author: string;
   tag: string;
@@ -18,16 +18,15 @@ interface CardProps {
 
 export default function Card({ post }: CardProps) {
   return (
-
     <article className="group cursor-pointer flex flex-col h-full">
-
-      <div className="aspect-[16/10] bg-foreground/10 mb-3 overflow-hidden relative shrink-0">
+      <div className="aspect-[16/10] bg-foreground/10 mb-3 overflow-hidden relative shrink-0 rounded-2xl">
         <Image
           src={post.image}
           alt={post.title}
           fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
           className="object-cover transition-transform duration-500 group-hover:scale-105"
+          unoptimized
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-5">
           <span className="text-white text-xs font-medium">Read Article →</span>
@@ -38,14 +37,11 @@ export default function Card({ post }: CardProps) {
         {post.tag}
       </span>
 
-
       <h3 className="text-lg font-bold group-hover:text-primary transition-colors line-clamp-2 leading-tight mt-1 min-h-[2.8rem]">
         {post.title}
       </h3>
 
-
       <div className="mt-auto pt-4 flex items-center gap-3">
-
         <div className="w-8 h-8 rounded-full bg-foreground/10 overflow-hidden relative shrink-0">
           <Image
             src={post.avatar}
@@ -53,6 +49,7 @@ export default function Card({ post }: CardProps) {
             fill
             sizes="32px"
             className="object-cover"
+            unoptimized
           />
         </div>
         <div className="text-xs">

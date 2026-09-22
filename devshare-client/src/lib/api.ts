@@ -183,4 +183,131 @@ export const changePasswordApi = async (payload: {
   });
 };
 
+// ─── Blog Types & API Endpoints ───────────────────────────────────────────────
+
+export type BlogCategory =
+  | "Frontend"
+  | "Backend"
+  | "DevOps"
+  | "AI & Data"
+  | "Security";
+
+export type BlogBlockType = "h2" | "p" | "code" | "quote" | "image";
+
+export interface IBlogBlock {
+  id: string;
+  type: BlogBlockType;
+  content: string;
+  metadata?: string;
+}
+
+export interface IBlogAuthor {
+  id: string;
+  name: string;
+  avatar?: string;
+  title?: string;
+}
+
+export interface IBlog {
+  _id: string;
+  title: string;
+  slug: string;
+  description: string;
+  category: BlogCategory;
+  tags?: string[];
+  coverImage?: string;
+  blocks: IBlogBlock[];
+  author: IBlogAuthor;
+  authorId: string;
+  status: "Draft" | "Published" | "Archived";
+  readTime: string;
+  views: number;
+  likes: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface ICreateBlogPayload {
+  title: string;
+  description: string;
+  category: string;
+  blocks: IBlogBlock[];
+  status?: "Draft" | "Published";
+  coverImage?: string;
+  tags?: string[];
+}
+
+export interface IPaginationMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface IBlogsListResponse {
+  statusCode: number;
+  success: boolean;
+  message?: string;
+  data: IBlog[];
+  meta: IPaginationMeta;
+}
+
+export const createBlogApi = async (
+  payload: ICreateBlogPayload
+): Promise<ApiResponse<IBlog>> => {
+  return apiFetch<ApiResponse<IBlog>>("/blogs", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+};
+
+export const getBlogsApi = async (
+  params: Record<string, string | number | undefined> = {}
+): Promise<IBlogsListResponse> => {
+  const searchParams = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      searchParams.append(key, String(value));
+    }
+  });
+  const queryString = searchParams.toString();
+  const endpoint = queryString ? `/blogs?${queryString}` : "/blogs";
+  return apiFetch<IBlogsListResponse>(endpoint, {
+    method: "GET",
+  });
+};
+
+export const getBlogByIdApi = async (
+  idOrSlug: string
+): Promise<ApiResponse<IBlog>> => {
+  return apiFetch<ApiResponse<IBlog>>(`/blogs/${encodeURIComponent(idOrSlug)}`, {
+    method: "GET",
+  });
+};
+
+export const getMyBlogsApi = async (
+  params: Record<string, string | number | undefined> = {}
+): Promise<IBlogsListResponse> => {
+  const searchParams = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      searchParams.append(key, String(value));
+    }
+  });
+  const queryString = searchParams.toString();
+  const endpoint = queryString ? `/blogs/my/blogs?${queryString}` : "/blogs/my/blogs";
+  return apiFetch<IBlogsListResponse>(endpoint, {
+    method: "GET",
+  });
+};
+
+export const deleteBlogApi = async (
+  id: string
+): Promise<ApiResponse<null>> => {
+  return apiFetch<ApiResponse<null>>(`/blogs/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });
+};
+
+
 
