@@ -54,7 +54,7 @@ export const FixedHeader = ({
 
   return (
     <div className="space-y-6 text-center border-b border-foreground/5 pb-16 mb-12">
-      {/* Category selector & Cover Image toggle */}
+      {/* Category selector & Cover Image */}
       <div className="flex flex-wrap items-center justify-center gap-3">
         <Select value={category} onValueChange={setCategory}>
           <SelectTrigger className="w-fit bg-background border-none text-accent font-bold tracking-[0.3em] uppercase text-xs focus:ring-0">
