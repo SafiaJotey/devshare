@@ -4,18 +4,26 @@ import cookieParser from "cookie-parser";
 import httpStatus from "http-status";
 import router from "./app/routes";
 import globalErrorHandler from "./app/middlewares/globalErrorHandler";
+import config from "./config";
 
 const app: Application = express();
 
-// Middlewares
+// Professional Dynamic CORS
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "http://127.0.0.1:3000",
-      "http://localhost:3001",
-    ],
-    credentials: true,
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like mobile apps, curl, Postman)
+      if (!origin) return callback(null, true);
+
+      if (config.client_urls.includes(origin)) {
+        return callback(null, true);
+      } else {
+        return callback(new Error(`CORS policy does not allow access from ${origin}`));
+      }
+    },
+    credentials: true, // Allows sending cookies & auth headers
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   })
 );
 
@@ -29,12 +37,12 @@ app.get("/", (req: Request, res: Response) => {
     success: true,
     message: "DevShare API Server is operational 🚀",
     version: "1.0.0",
+    environment: config.env,
   });
 });
 
 // API Routes
 app.use("/api/v1", router);
-app.use("/api", router);
 
 // Global Error Handler
 app.use(globalErrorHandler);
