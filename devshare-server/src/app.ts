@@ -9,32 +9,32 @@ import config from "./config";
 const app: Application = express();
 
 // Set up CORS
-// app.use(
-//   cors({
-//     origin: (origin, callback) => {
-//       // 1. Allow non-browser requests (Postman, mobile apps, server-to-server)
-//       if (!origin) return callback(null, true);
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // 1. Allow non-browser requests (Postman, mobile apps, server-to-server)
+      if (!origin) return callback(null, true);
 
-//       // 2. Check if origin is allowed or is any Vercel preview/production URL
-//       const isAllowed =
-//         config.client_urls.includes(origin) ||
-//         origin.startsWith("http://localhost:") ||
-//         origin.startsWith("http://127.0.0.1:") ||
-//         origin.endsWith(".vercel.app");
+      // 2. Check if origin is allowed or is any Vercel preview/production URL
+      const isAllowed =
+        config.client_urls.includes(origin) ||
+        origin.startsWith("http://localhost:") ||
+        origin.startsWith("http://127.0.0.1:") ||
+        origin.endsWith(".vercel.app");
 
-//       if (isAllowed) {
-//         return callback(null, true);
-//       }
+      if (isAllowed) {
+        return callback(null, true);
+      }
 
-//       // DO NOT pass new Error() here — pass false so it doesn't crash the preflight
-//       return callback(null, false);
-//     },
-//     credentials: true, // Allows sending cookies & auth headers
-//     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-//     // Omit allowedHeaders so that it automatically mirrors whatever headers the client requests
-//     optionsSuccessStatus: 200, // Legacy browser compatibility
-//   })
-// );
+      // DO NOT pass new Error() here — pass false so it doesn't crash the preflight
+      return callback(null, false);
+    },
+    credentials: true, // Allows sending cookies & auth headers
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    // Omit allowedHeaders so that it automatically mirrors whatever headers the client requests
+    optionsSuccessStatus: 200, // Legacy browser compatibility
+  })
+);
 // --- CUSTOM VERCEL CORS MIDDLEWARE ---
 app.use((req: Request, res: Response, next: NextFunction) => {
   const origin = req.headers.origin;

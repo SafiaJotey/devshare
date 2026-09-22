@@ -6,7 +6,7 @@ export default function ButtonGroup() {
   return (
       <div
              
-              className="flex flex-col items-center gap-4 sm:flex-row md:justify-start"
+              className="flex justify-center items-center gap-4 sm:flex-row md:justify-start"
             >
               <Button
                 size="lg" 

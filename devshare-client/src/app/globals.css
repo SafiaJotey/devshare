@@ -21,35 +21,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
-/* 
-  2. THE COLOR VALUES
-  This is where we set your EXACT hex codes.
-  Notice the variable names are IDENTICAL in both sections.
-*/
 
-/* 1 */
-/* :root {
-
-  --background: #FFFFFF;
-  --foreground: #09090B;
-  --primary: #4F46E5;
-  --primary-foreground: #FFFFFF;
-  --accent: #8B5CF6;
-  --blob-opacity: 0.10;
-}
-
-.dark {
-
-  --background: #09090B;
-  --foreground: #FAFAFA;
-  --primary: #6366F1;
-  --primary-foreground: #FFFFFF;
-  --accent: #A78BFA;
-  --blob-opacity: 0.35;
-} */
-
-
-/* 2 */
 
  :root {
 

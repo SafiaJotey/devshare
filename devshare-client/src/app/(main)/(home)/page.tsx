@@ -140,118 +140,131 @@ export default function Home() {
         paddingTop
         paddingBottom
       >
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
-          {/* Main Featured Post */}
-          <div className="lg:col-span-2 group cursor-pointer relative overflow-hidden rounded-bl-3xl bg-foreground/5 dark:bg-foreground/10 border border-foreground/10 flex flex-col">
-            <Link href={`/blogs/${activeMainPost.id}`}>
-              <div className="relative aspect-video lg:aspect-auto lg:h-[350px] overflow-hidden">
-                <Image
-                  src={activeMainPost.image}
-                  alt={activeMainPost.title}
-                  fill
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 66vw"
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  unoptimized
-                />
-                <div className="absolute top-4 left-4 z-10">
-                  <span className="bg-accent text-background px-4 py-1 rounded-full text-xs font-bold uppercase tracking-wider">
-                    {activeMainPost.category}
-                  </span>
-                </div>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-5">
+          {/* Lead story */}
+          <Link
+            href={`/blogs/${activeMainPost.id}`}
+            className="group relative isolate flex min-h-[440px] overflow-hidden rounded-3xl bg-foreground text-background shadow-sm lg:col-span-7 lg:min-h-[540px]"
+          >
+            <Image
+              src={activeMainPost.image}
+              alt={activeMainPost.title}
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 58vw"
+              className="opacity-80 transition-transform duration-700 ease-out group-hover:scale-105"
+              unoptimized
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/55 to-foreground/5" />
+            <div className="absolute inset-0 bg-gradient-to-r from-foreground/40 to-transparent" />
+
+            <div className="relative z-10 flex w-full flex-col justify-between p-6 sm:p-8 md:p-10">
+              <div className="flex items-start justify-between gap-4">
+                <span className="rounded-full bg-accent px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-background">
+                  {activeMainPost.category}
+                </span>
+                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-background/60">
+                  Featured / 01
+                </span>
               </div>
 
-              <div className="p-4 flex flex-col justify-between flex-grow">
-                <div>
-                  <h3 className="text-2xl font-bold mb-2 group-hover:text-primary transition-colors leading-tight line-clamp-2">
-                    {activeMainPost.title}
-                  </h3>
-                  <p className="text-foreground/70 mb-6 line-clamp-2">
-                    {activeMainPost.description}
-                  </p>
+              <div className="max-w-2xl pt-16">
+                <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-accent">
+                  Deep dive
+                </p>
+                <h3 className="text-3xl font-extrabold leading-[1.05] tracking-tight sm:text-4xl md:text-5xl">
+                  {activeMainPost.title}
+                </h3>
+                <p className="mt-5 max-w-xl text-sm leading-relaxed text-background/75 sm:text-base line-clamp-2">
+                  {activeMainPost.description}
+                </p>
+              </div>
+
+              <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-background/20 pt-5">
+                <div className="flex items-center gap-3">
+                  <div className="relative h-9 w-9 overflow-hidden rounded-full border border-background/20 bg-background/10">
+                    <Image
+                      src={activeMainPost.avatar}
+                      alt={activeMainPost.author}
+                      fill
+                      sizes="36px"
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
+                  <div>
+                    <p className="text-sm font-bold">{activeMainPost.author}</p>
+                    <p className="text-xs text-background/60">{activeMainPost.date}</p>
+                  </div>
+                </div>
+                <span className="flex items-center gap-2 text-xs font-bold text-background/75">
+                  <Clock size={14} className="text-accent" />
+                  {activeMainPost.readTime}
+                  <ArrowRight className="ml-2 size-4 transition-transform duration-300 group-hover:translate-x-1" />
+                </span>
+              </div>
+            </div>
+          </Link>
+
+          {/* Companion stories */}
+          <div className="grid gap-4 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-1 lg:gap-5">
+            {activeSidePosts.map((post, index) => (
+              <Link
+                key={post.id}
+                href={`/blogs/${post.id}`}
+                className="group relative flex min-h-[300px] overflow-hidden rounded-3xl border border-foreground/10 bg-foreground/[0.03] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10 sm:p-6 lg:min-h-0 lg:flex-1"
+              >
+                <div className="absolute inset-y-0 right-0 w-[42%] overflow-hidden">
+                  <Image
+                    src={post.image}
+                    alt=""
+                    fill
+                    sizes="(max-width: 640px) 42vw, (max-width: 1024px) 21vw, 18vw"
+                    className="object-cover opacity-25 transition-transform duration-700 group-hover:scale-110 group-hover:opacity-35"
+                    unoptimized
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-r from-background via-background/75 to-transparent" />
                 </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-foreground/10">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-foreground/10 overflow-hidden relative">
-                      <Image
-                        src={activeMainPost.avatar}
-                        alt={activeMainPost.author}
-                        fill
-                        sizes="32px"
-                        className="object-cover"
-                        unoptimized
-                      />
+                <div className="relative z-10 flex w-full flex-col justify-between gap-8">
+                  <div>
+                    <div className="mb-8 flex items-center justify-between gap-3">
+                      <span className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.15em] text-primary">
+                        {post.category}
+                      </span>
+                      <span className="font-mono text-[10px] font-bold text-foreground/35">
+                        0{index + 2}
+                      </span>
                     </div>
-                    <div>
-                      <p className="text-sm font-bold">{activeMainPost.author}</p>
-                      <p className="text-xs text-foreground/50">{activeMainPost.date}</p>
-                    </div>
+                    <h4 className="max-w-[82%] text-xl font-bold leading-tight tracking-tight transition-colors group-hover:text-primary sm:text-2xl line-clamp-3">
+                      {post.title}
+                    </h4>
                   </div>
-                  <div className="flex items-center gap-4 text-xs text-foreground/60 font-medium">
-                    <span className="flex items-center gap-1">
-                      <Clock size={14} /> {activeMainPost.readTime}
+
+                  <div className="flex items-end justify-between gap-3 border-t border-foreground/10 pt-4">
+                    <div className="flex items-center gap-2.5">
+                      <div className="relative h-8 w-8 overflow-hidden rounded-full bg-foreground/10">
+                        <Image
+                          src={post.avatar}
+                          alt={post.author}
+                          fill
+                          sizes="32px"
+                          className="object-cover"
+                          unoptimized
+                        />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold">{post.author}</p>
+                        <p className="text-[11px] text-foreground/50">{post.date}</p>
+                      </div>
+                    </div>
+                    <span className="flex shrink-0 items-center gap-1.5 text-xs font-bold text-foreground/60">
+                      <Clock size={13} className="text-accent" />
+                      {post.readTime}
                     </span>
                   </div>
                 </div>
-              </div>
-            </Link>
-          </div>
-
-          {/* Side Stacked Posts */}
-          <div className="flex flex-col gap-2">
-            {activeSidePosts.map((post) => (
-              <div
-                key={post.id}
-                className="group cursor-pointer flex flex-col h-full bg-foreground/5 dark:bg-foreground/10 border border-foreground/10 rounded-br-3xl overflow-hidden transition-all hover:shadow-xl hover:shadow-primary/5"
-              >
-                <Link href={`/blogs/${post.id}`}>
-                  <div className="relative h-36 overflow-hidden">
-                    <Image
-                      src={post.image}
-                      alt={post.title}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 33vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
-                      unoptimized
-                    />
-                    <div className="absolute top-3 left-3 z-10">
-                      <span className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider">
-                        {post.category}
-                      </span>
-                    </div>
-                  </div>
-
-                  <div className="p-5 flex flex-col justify-between flex-grow">
-                    <h4 className="font-bold group-hover:text-primary transition-colors leading-snug mb-4 line-clamp-2">
-                      {post.title}
-                    </h4>
-                    <div className="flex items-center justify-between pt-2 border-t border-foreground/10">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-full bg-foreground/10 overflow-hidden relative">
-                          <Image
-                            src={post.avatar}
-                            alt={post.author}
-                            fill
-                            sizes="32px"
-                            className="object-cover"
-                            unoptimized
-                          />
-                        </div>
-                        <div>
-                          <p className="text-sm font-bold">{post.author}</p>
-                          <p className="text-xs text-foreground/50">{post.date}</p>
-                        </div>
-                      </div>
-                      <div className="flex items-center gap-4 text-xs text-foreground/60 font-medium">
-                        <span className="flex items-center gap-1">
-                          <Clock size={14} /> {post.readTime}
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-              </div>
+              </Link>
             ))}
           </div>
         </div>
@@ -260,30 +273,58 @@ export default function Home() {
       {/* CATEGORIES MARQUEE */}
       <Section
         tag="Ecosystem Navigation"
-        bgColor="bg-primary/5"
+        bgColor="bg-primary/[0.06]"
         title="Build Your Stack"
-        subtitle="Explore our technical library categorized by the tools that define your workflow."
+        subtitle="Follow the disciplines, tools, and systems that move your work forward."
         centerHeader
         paddingTop
         paddingBottom
       >
-        <div className="relative overflow-hidden w-full">
-          <div className="animate-marquee flex gap-6">
+        <div className="relative">
+          <div className="pointer-events-none absolute -left-20 top-1/2 h-48 w-48 -translate-y-1/2 rounded-full bg-accent/10 blur-3xl" />
+          <div className="pointer-events-none absolute -right-20 top-1/2 h-48 w-48 -translate-y-1/2 rounded-full bg-primary/15 blur-3xl" />
+
+          <div className="mb-6 flex items-center justify-center gap-3 text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/45">
+            <span className="h-px w-8 bg-foreground/15" />
+            06 paths to explore
+            <span className="h-px w-8 bg-foreground/15" />
+          </div>
+
+          <div className="relative w-full overflow-hidden">
+            <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-primary/[0.08] to-transparent sm:w-20" />
+            <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-primary/[0.08] to-transparent sm:w-20" />
+            <div className="animate-marquee flex gap-4 px-2 py-3 sm:gap-5">
             {[...categories, ...categories].map((cat, i) => (
-              <Link key={i} href={`/blogs`} className="w-[200px] shrink-0">
-                <div className="group bg-background border border-foreground/10 p-6 rounded-2xl flex flex-col items-center justify-center text-center transition-all hover:-translate-y-1 hover:shadow-lg h-full">
+              <Link
+                key={`${cat.name}-${i}`}
+                href="/blogs"
+                className="group relative flex h-[190px] w-[230px] shrink-0 flex-col overflow-hidden rounded-3xl border border-foreground/10 bg-background p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/25 hover:shadow-xl hover:shadow-primary/10"
+              >
+                <span className="absolute right-5 top-5 font-mono text-[10px] font-bold tracking-widest text-foreground/30">
+                  0{(i % categories.length) + 1}
+                </span>
+                <div className="absolute -bottom-8 -right-8 h-24 w-24 rounded-full bg-primary/[0.05] transition-transform duration-500 group-hover:scale-150" />
+
+                <div className="relative flex flex-1 flex-col items-start">
                   <div
-                    className={`p-3 rounded-xl mb-4 transition-transform group-hover:scale-110 ${cat.color}`}
+                    className={`mb-5 rounded-2xl p-3 transition-transform duration-300 group-hover:scale-110 ${cat.color}`}
                   >
                     {cat.icon}
                   </div>
-                  <h3 className="font-bold text-sm">{cat.name}</h3>
-                  <p className="text-[10px] uppercase tracking-widest text-foreground/40 mt-1 font-bold">
-                    {cat.count} Articles
+                  <h3 className="text-lg font-bold tracking-tight transition-colors group-hover:text-primary">
+                    {cat.name}
+                  </h3>
+                  <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.15em] text-foreground/45">
+                    {cat.count} articles
                   </p>
+                </div>
+                <div className="relative flex items-center gap-1.5 text-xs font-bold text-foreground/55 transition-colors group-hover:text-accent">
+                  Explore topic
+                  <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                 </div>
               </Link>
             ))}
+            </div>
           </div>
         </div>
       </Section>
@@ -371,40 +412,84 @@ export default function Home() {
       </Section>
 
       {/* TOP CONTRIBUTORS */}
-      <section className="py-20 bg-primary/5 overflow-hidden">
-        <div className="container-box mb-12">
-          <h2 className="text-center text-3xl font-bold">
-            Meet Our Top Contributors
-          </h2>
+      <section className="relative overflow-hidden bg-primary/[0.06] py-16 md:py-24">
+        <div className="pointer-events-none absolute -left-32 top-0 h-72 w-72 rounded-full bg-accent/10 blur-3xl" />
+        <div className="pointer-events-none absolute -right-24 bottom-0 h-64 w-64 rounded-full bg-primary/15 blur-3xl" />
+
+        <div className="container relative mx-auto mb-10 flex flex-col gap-6 px-6 lg:mb-14 lg:flex-row lg:items-end lg:justify-between lg:px-8">
+          <div className="max-w-2xl">
+            <span className="mb-3 block font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-accent">
+              Community / Voices
+            </span>
+            <h2 className="text-3xl font-extrabold tracking-tight md:text-4xl">
+              Meet the people building in public.
+            </h2>
+            <p className="mt-4 max-w-xl text-base leading-relaxed text-foreground/60">
+              Practical lessons, thoughtful experiments, and the generous people
+              behind DevShare&apos;s best conversations.
+            </p>
+          </div>
+          <Link
+            href="/blogs"
+            className="group inline-flex w-fit items-center gap-2 text-sm font-bold text-primary transition-colors hover:text-accent"
+          >
+            Explore their writing
+            <ArrowRight className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
+          </Link>
         </div>
 
-        <div className="relative overflow-hidden w-full">
-          <div className="animate-marquee flex gap-8 py-4 px-4">
+        <div className="relative w-full overflow-hidden">
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-primary/[0.06] to-transparent sm:w-32" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-primary/[0.06] to-transparent sm:w-32" />
+          <div className="animate-marquee flex gap-5 px-4 py-4 sm:gap-6">
             {[...authors, ...authors].map((author, i) => (
-              <div
-                key={i}
-                className="w-[300px] shrink-0 bg-background p-6 rounded-3xl border border-foreground/5 flex flex-col items-center text-center shadow-sm transition-transform hover:scale-[1.02]"
+              <Link
+                key={`${author.name}-${i}`}
+                href="/blogs"
+                className="group relative flex w-[290px] shrink-0 flex-col overflow-hidden rounded-3xl border border-foreground/10 bg-background p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/25 hover:shadow-xl hover:shadow-primary/10 sm:w-[320px]"
               >
-                <div className="w-20 h-20 rounded-full bg-foreground/10 overflow-hidden relative shrink-0 mb-4">
-                  <Image
-                    src={author.img}
-                    alt={author.name}
-                    fill
-                    className="object-cover"
-                    unoptimized
-                  />
-                </div>
-                <h4 className="font-bold text-lg">{author.name}</h4>
-                <p className="text-foreground/50 text-sm mb-4">{author.role}</p>
-                <div className="w-full pt-4 border-t border-foreground/5 flex justify-between items-center px-4">
-                  <span className="text-xs font-bold text-primary">
-                    {author.posts} Articles
+                <div className="absolute right-0 top-0 h-24 w-24 rounded-bl-[4rem] bg-primary/[0.08] transition-colors group-hover:bg-accent/15" />
+                <div className="relative flex items-start justify-between">
+                  <div className="relative h-16 w-16 overflow-hidden rounded-2xl ring-4 ring-primary/10 transition-transform duration-300 group-hover:scale-105">
+                    <Image
+                      src={author.img}
+                      alt={author.name}
+                      fill
+                      sizes="64px"
+                      className="object-cover"
+                      unoptimized
+                    />
+                  </div>
+                  <span className="font-mono text-[10px] font-bold tracking-widest text-foreground/35">
+                    0{(i % authors.length) + 1}
                   </span>
-                  <button className="text-xs font-black uppercase text-accent hover:underline">
-                    Profile
-                  </button>
                 </div>
-              </div>
+
+                <div className="mt-7">
+                  <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-accent">
+                    Top contributor
+                  </p>
+                  <h4 className="mt-2 text-xl font-bold tracking-tight transition-colors group-hover:text-primary">
+                    {author.name}
+                  </h4>
+                  <p className="mt-1 text-sm text-foreground/55">{author.role}</p>
+                </div>
+
+                <div className="mt-7 flex items-end justify-between border-t border-foreground/10 pt-4">
+                  <div>
+                    <span className="block text-2xl font-extrabold leading-none text-primary">
+                      {author.posts}
+                    </span>
+                    <span className="mt-1 block text-[10px] font-bold uppercase tracking-[0.14em] text-foreground/45">
+                      Articles shared
+                    </span>
+                  </div>
+                  <span className="flex items-center gap-1.5 text-xs font-bold text-foreground/60 transition-colors group-hover:text-accent">
+                    Read insights
+                    <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                  </span>
+                </div>
+              </Link>
             ))}
           </div>
         </div>

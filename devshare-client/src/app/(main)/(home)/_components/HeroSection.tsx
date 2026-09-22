@@ -23,10 +23,10 @@ export default function HeroSection() {
         </div>
 
 
-        <div className="container relative mx-auto flex min-h-[60vh] max-w-9xl  flex-col-reverse items-center justify-center  md:flex-row md:gap-12  md:px-10 lg:py-8">
+        <div className="container relative mx-auto flex min-h-[60vh] max-w-9xl  flex-col-reverse items-center justify-center  md:flex-row md:gap-12  px-6  md:px-10 lg:py-8">
           {/* left-text */}
-          <div className="flex-1 space-y-4 text-center md:space-y-10 md:text-left">
-            <span className="flex items-center gap-2  text-lg font-medium text-accent dark:bg-dark-accent/20 dark:text-dark-accent">
+          <div className="flex-1 space-y-4 my-4 md:my-0  text-center md:space-y-10 md:text-left">
+            <span className="flex justify-center md:justify-start items-center gap-2  text-lg font-medium text-accent dark:bg-dark-accent/20 dark:text-dark-accent">
               <Sparkles className="h-4 w-4" />
               New Article Every Week
             </span>
