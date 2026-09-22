@@ -8,22 +8,31 @@ import config from "./config";
 
 const app: Application = express();
 
-// Professional Dynamic CORS
+// Set up CORS
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl, Postman)
+      // 1. Allow non-browser requests (Postman, mobile apps, server-to-server)
       if (!origin) return callback(null, true);
 
-      if (config.client_urls.includes(origin)) {
+      // 2. Check if origin is allowed or is any Vercel preview/production URL
+      const isAllowed =
+        config.client_urls.includes(origin) ||
+        origin.startsWith("http://localhost:") ||
+        origin.startsWith("http://127.0.0.1:") ||
+        origin.endsWith(".vercel.app");
+
+      if (isAllowed) {
         return callback(null, true);
-      } else {
-        return callback(new Error(`CORS policy does not allow access from ${origin}`));
       }
+
+      // DO NOT pass new Error() here — pass false so it doesn't crash the preflight
+      return callback(null, false);
     },
     credentials: true, // Allows sending cookies & auth headers
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    // Omit allowedHeaders so that it automatically mirrors whatever headers the client requests
+    optionsSuccessStatus: 200, // Legacy browser compatibility
   })
 );
 
@@ -43,6 +52,7 @@ app.get("/", (req: Request, res: Response) => {
 
 // API Routes
 app.use("/api/v1", router);
+app.use("/api", router);
 
 // Global Error Handler
 app.use(globalErrorHandler);
