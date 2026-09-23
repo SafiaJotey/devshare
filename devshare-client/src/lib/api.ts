@@ -151,7 +151,7 @@ export const socialLoginApi = async (payload: {
   email: string;
   name: string;
   avatar?: string;
-  provider: "google" | "facebook" | "linkedin" | string;
+  provider: "google" | "facebook" | string;
   idToken?: string;
 }): Promise<ApiResponse<IUser>> => {
   return apiFetch<ApiResponse<IUser>>("/auth/social-login", {

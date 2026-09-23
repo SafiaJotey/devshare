@@ -9,7 +9,6 @@ import {
   ArrowRight,
   CheckCircle2,
   Chrome,
-  Linkedin,
   Facebook,
   User,
   Loader2,
@@ -33,7 +32,7 @@ export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [socialLoading, setSocialLoading] = useState<"google" | "facebook" | "linkedin" | null>(null);
+  const [socialLoading, setSocialLoading] = useState<"google" | "facebook" | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -77,7 +76,7 @@ export default function AuthPage() {
     }
   };
 
-  const handleSocialLogin = async (provider: "google" | "facebook" | "linkedin") => {
+  const handleSocialLogin = async (provider: "google" | "facebook") => {
     setSocialLoading(provider);
     try {
       await loginWithSocial(provider);
@@ -171,33 +170,22 @@ export default function AuthPage() {
           </div>
 
           {/* SOCIAL LOGINS */}
-          <div className="grid grid-cols-3 gap-3 mb-8">
+          <div className="grid grid-cols-2 gap-4 mb-8">
             <Button
               type="button"
               variant="outline"
               disabled={!!socialLoading || isSubmitting}
               onClick={() => handleSocialLogin("google")}
               title="Sign in with Google"
-              className="h-12 border-foreground/10 hover:bg-foreground/5 group relative"
+              className="h-12 border-foreground/10 hover:bg-foreground/5 group relative flex items-center justify-center gap-2"
             >
               {socialLoading === "google" ? (
                 <Loader2 className="w-5 h-5 animate-spin text-primary" />
               ) : (
-                <Chrome className="w-5 h-5 group-hover:text-primary transition-colors" />
-              )}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={!!socialLoading || isSubmitting}
-              onClick={() => handleSocialLogin("linkedin")}
-              title="Sign in with LinkedIn"
-              className="h-12 border-foreground/10 hover:bg-foreground/5 group relative"
-            >
-              {socialLoading === "linkedin" ? (
-                <Loader2 className="w-5 h-5 animate-spin text-primary" />
-              ) : (
-                <Linkedin className="w-5 h-5 group-hover:text-primary transition-colors" />
+                <>
+                  <Chrome className="w-5 h-5 group-hover:text-primary transition-colors" />
+                  <span className="text-sm font-medium">Google</span>
+                </>
               )}
             </Button>
             <Button
@@ -206,12 +194,15 @@ export default function AuthPage() {
               disabled={!!socialLoading || isSubmitting}
               onClick={() => handleSocialLogin("facebook")}
               title="Sign in with Facebook"
-              className="h-12 border-foreground/10 hover:bg-foreground/5 group relative"
+              className="h-12 border-foreground/10 hover:bg-foreground/5 group relative flex items-center justify-center gap-2"
             >
               {socialLoading === "facebook" ? (
                 <Loader2 className="w-5 h-5 animate-spin text-primary" />
               ) : (
-                <Facebook className="w-5 h-5 group-hover:text-primary transition-colors" />
+                <>
+                  <Facebook className="w-5 h-5 group-hover:text-primary transition-colors" />
+                  <span className="text-sm font-medium">Facebook</span>
+                </>
               )}
             </Button>
           </div>

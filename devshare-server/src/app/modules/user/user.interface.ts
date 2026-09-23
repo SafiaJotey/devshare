@@ -53,7 +53,7 @@ export interface ISocialLoginPayload {
   email: string;
   name: string;
   avatar?: string;
-  provider: "google" | "facebook" | "linkedin" | string;
+  provider: "google" | "facebook" | string;
   idToken?: string;
 }
 

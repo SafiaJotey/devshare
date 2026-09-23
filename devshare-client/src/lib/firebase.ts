@@ -3,7 +3,6 @@ import {
   getAuth,
   GoogleAuthProvider,
   FacebookAuthProvider,
-  OAuthProvider,
   signInWithPopup,
 } from "firebase/auth";
 
@@ -25,28 +24,23 @@ googleProvider.setCustomParameters({ prompt: "select_account" });
 export const facebookProvider = new FacebookAuthProvider();
 facebookProvider.setCustomParameters({ display: "popup" });
 
-// LinkedIn OpenID Connect provider for Firebase Auth
-export const linkedInProvider = new OAuthProvider("oidc.linkedin");
-
 export interface SocialAuthResult {
   email: string;
   name: string;
   avatar?: string;
-  provider: "google" | "facebook" | "linkedin";
+  provider: "google" | "facebook";
   idToken?: string;
   uid: string;
 }
 
 export async function signInWithSocial(
-  providerType: "google" | "facebook" | "linkedin"
+  providerType: "google" | "facebook"
 ): Promise<SocialAuthResult> {
   let provider;
   if (providerType === "google") {
     provider = googleProvider;
   } else if (providerType === "facebook") {
     provider = facebookProvider;
-  } else if (providerType === "linkedin") {
-    provider = linkedInProvider;
   } else {
     throw new Error(`Unsupported provider: ${providerType}`);
   }
