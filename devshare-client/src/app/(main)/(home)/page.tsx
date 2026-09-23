@@ -152,11 +152,11 @@ export default function Home() {
               fill
               priority
               sizes="(max-width: 1024px) 100vw, 58vw"
-              className="opacity-80 transition-transform duration-700 ease-out group-hover:scale-105"
+              className="opacity-100 transition-transform duration-700 ease-out group-hover:scale-105"
               unoptimized
             />
             <div className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/55 to-foreground/5" />
-            <div className="absolute inset-0 bg-gradient-to-r from-foreground/40 to-transparent" />
+            {/* <div className="absolute inset-0 bg-gradient-to-r from-foreground/40 to-transparent" />  */}
 
             <div className="relative z-10 flex w-full flex-col justify-between p-6 sm:p-8 md:p-10">
               <div className="flex items-start justify-between gap-4">
@@ -214,16 +214,19 @@ export default function Home() {
                 href={`/blogs/${post.id}`}
                 className="group relative flex min-h-[300px] overflow-hidden rounded-3xl border border-foreground/10 bg-foreground/[0.03] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10 sm:p-6 lg:min-h-0 lg:flex-1"
               >
-                <div className="absolute inset-y-0 right-0 w-[42%] overflow-hidden">
-                  <Image
-                    src={post.image}
-                    alt=""
-                    fill
-                    sizes="(max-width: 640px) 42vw, (max-width: 1024px) 21vw, 18vw"
-                    className="object-cover opacity-25 transition-transform duration-700 group-hover:scale-110 group-hover:opacity-35"
-                    unoptimized
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-r from-background via-background/75 to-transparent" />
+                <div className="absolute inset-y-0 right-0 w-[100%] overflow-hidden">
+                <Image
+  src={post.image}
+  alt="feature"
+  fill
+  sizes="(max-width: 640px) 42vw, (max-width: 1024px) 21vw, 18vw"
+  className={`object-cover ${post.image ? "opacity-100" : "opacity-0"} transition-transform duration-700 group-hover:scale-110 group-hover:opacity-35`}
+  onError={(e) => {
+    e.currentTarget.style.opacity = "0";
+  }}
+  unoptimized
+/>
+                  <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-transparent" />
                 </div>
 
                 <div className="relative z-10 flex w-full flex-col justify-between gap-8">
@@ -258,8 +261,8 @@ export default function Home() {
                         <p className="text-[11px] text-foreground/50">{post.date}</p>
                       </div>
                     </div>
-                    <span className="flex shrink-0 items-center gap-1.5 text-xs font-bold text-foreground/60">
-                      <Clock size={13} className="text-accent" />
+                    <span className="flex shrink-0 items-center gap-1.5 text-xs font-bold text-foreground/50 ">
+                      <Clock size={13} className="text-accent " />
                       {post.readTime}
                     </span>
                   </div>
