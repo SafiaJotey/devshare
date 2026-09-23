@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import Card, { Post } from "@/components/shared/Card";
+import Card, {
+  Post,
+  CardSkeleton,
+  LeadCardSkeleton,
+} from "@/components/shared/Card";
 import {
   Search,
   Terminal,
@@ -17,69 +21,6 @@ import {
 import Link from "next/link";
 import Image from "next/image";
 import { getBlogsApi, IBlog } from "@/lib/api";
-
-const DEMO_POSTS: Post[] = [
-  {
-    id: 1,
-    title: "Deep Dive: How React 19's Actions Will Simplify Form Handling",
-    author: "Arjun Sharma",
-    tag: "Frontend",
-    readTime: "8 min",
-    image:
-      "https://images.unsplash.com/photo-1633356122544-f134324a6cee?q=80&w=2070",
-    avatar: "https://i.pravatar.cc/150?u=arjun",
-  },
-  {
-    id: 2,
-    title: "Building Scalable Microservices with Go and gRPC",
-    author: "Sarah Chen",
-    tag: "Backend",
-    readTime: "12 min",
-    image:
-      "https://images.unsplash.com/photo-1558494949-ef010cbdcc51?q=80&w=2026",
-    avatar: "https://i.pravatar.cc/150?u=sarah",
-  },
-  {
-    id: 3,
-    title: "Why Rust is Becoming the Favorite Language for DevOps Tools",
-    author: "Marcus V. ",
-    tag: "DevOps",
-    readTime: "10 min",
-    image:
-      "https://images.unsplash.com/photo-1629904853716-f0bc549482b8?q=80&w=2070",
-    avatar: "https://i.pravatar.cc/150?u=marcus",
-  },
-  {
-    id: 4,
-    title: "Implementing Vector Search in PostgreSQL for AI Apps",
-    author: "Elena Rodriguez",
-    tag: "AI & Data",
-    readTime: "15 min",
-    image:
-      "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2070",
-    avatar: "https://i.pravatar.cc/150?u=elena",
-  },
-  {
-    id: 5,
-    title: "Mastering CSS Grid: Building Complex Layouts with Ease",
-    author: "James Wilson",
-    tag: "Frontend",
-    readTime: "6 min",
-    image:
-      "https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?q=80&w=2070",
-    avatar: "https://i.pravatar.cc/150?u=james",
-  },
-  {
-    id: 6,
-    title: "Secure by Design: OWASP Top 10 for 2024",
-    author: "Sophia Lee",
-    tag: "Security",
-    readTime: "9 min",
-    image:
-      "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070",
-    avatar: "https://i.pravatar.cc/150?u=sophia",
-  },
-];
 
 const CATEGORY_NAMES = [
   "All",
@@ -111,21 +52,31 @@ export default function Blogs() {
   const [searchQuery, setSearchQuery] = useState("");
   const [dbBlogs, setDbBlogs] = useState<IBlog[]>([]);
   const [allDbBlogs, setAllDbBlogs] = useState<IBlog[]>([]);
+  const [isInitialLoading, setIsInitialLoading] = useState<boolean>(true);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Initial fetch of all published blogs to calculate categories and baseline
   useEffect(() => {
+    let isCancelled = false;
     const fetchAll = async () => {
       try {
         const res = await getBlogsApi({ limit: 100 });
-        if (res.success && res.data) {
+        if (!isCancelled && res.success && res.data) {
           setAllDbBlogs(res.data);
         }
       } catch (err) {
         console.warn("Could not load blogs list from server:", err);
+      } finally {
+        if (!isCancelled) {
+          setIsInitialLoading(false);
+        }
       }
     };
     fetchAll();
+
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
   // Filtered query fetch when category or search changes
@@ -161,50 +112,29 @@ export default function Blogs() {
     };
   }, [activeCategory, searchQuery]);
 
-  // Merge real DB blogs with demo posts as fallback if DB has few entries
+  // Real DB blogs mapped to Post format
   const displayPosts: Post[] = useMemo(() => {
-    const mappedDbPosts = dbBlogs.map(mapBlogToPost);
+    return dbBlogs.map(mapBlogToPost);
+  }, [dbBlogs]);
 
-    if (mappedDbPosts.length > 0) {
-      // If we have search or category active, show real matching results
-      if (activeCategory !== "All" || searchQuery.trim().length > 0) {
-        return mappedDbPosts;
-      }
-      // In "All" with no search, show real posts at the front followed by demo posts without duplicates
-      const demoFiltered = DEMO_POSTS.filter(
-        (dp) => !mappedDbPosts.some((mp) => mp.title === dp.title)
-      );
-      return [...mappedDbPosts, ...demoFiltered];
-    }
-
-    // If no DB posts match, fall back to filtered demo posts
-    return DEMO_POSTS.filter(
-      (post) =>
-        (activeCategory === "All" || post.tag === activeCategory) &&
-        post.title.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [dbBlogs, activeCategory, searchQuery]);
-
-  // Calculate dynamic counts per category
+  // Calculate dynamic counts per category from all published DB blogs
   const categoriesWithCounts = useMemo(() => {
-    const sourceList = [
-      ...allDbBlogs.map(mapBlogToPost),
-      ...DEMO_POSTS.filter(
-        (dp) => !allDbBlogs.some((ab) => ab.title === dp.title)
-      ),
-    ];
-
     return CATEGORY_NAMES.map((name) => {
       if (name === "All") {
-        return { name, count: sourceList.length };
+        return { name, count: allDbBlogs.length };
       }
-      const count = sourceList.filter((p) => p.tag === name).length;
+      const count = allDbBlogs.filter((p) => p.category === name).length;
       return { name, count };
     });
   }, [allDbBlogs]);
 
-  // Lead article: latest published article or fallback
-  const leadPost = displayPosts.length > 0 ? displayPosts[0] : DEMO_POSTS[0];
+  // Lead article: latest published article from DB
+  const leadPost = useMemo(() => {
+    if (allDbBlogs.length > 0) return mapBlogToPost(allDbBlogs[0]);
+    if (dbBlogs.length > 0) return mapBlogToPost(dbBlogs[0]);
+    return null;
+  }, [allDbBlogs, dbBlogs]);
+
   const hasActiveFilters = activeCategory !== "All" || searchQuery.trim().length > 0;
 
   const clearFilters = () => {
@@ -264,66 +194,52 @@ export default function Blogs() {
               </p>
             </div>
             <div className="lg:col-span-6 relative">
-              <Link href={`/blogs/${leadPost.id}`} className="group block">
-                <div className="relative aspect-[4/5] md:aspect-video rounded-3xl overflow-hidden shadow-2xl">
-                  <Image
-                    src={leadPost.image}
-                    alt={leadPost.title}
-                    fill
-                    className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
-                    priority
-                    unoptimized
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-foreground via-transparent to-transparent opacity-60" />
-                  <div className="absolute bottom-0 left-0 p-6 md:p-10 text-background">
-                    <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-accent mb-4 block">
-                      Lead Article // {leadPost.tag}
-                    </span>
-                    <h2 className="text-2xl md:text-4xl font-bold mb-4 tracking-tight leading-tight line-clamp-2">
-                      {leadPost.title}
-                    </h2>
-                    <div className="flex items-center gap-4 text-xs font-mono opacity-60">
-                      <span>{leadPost.author}</span>
-                      <span>/</span>
-                      <span>{leadPost.readTime}</span>
+              {isInitialLoading ? (
+                <LeadCardSkeleton />
+              ) : leadPost ? (
+                <Link href={`/blogs/${leadPost.id}`} className="group block">
+                  <div className="relative aspect-[4/5] md:aspect-video rounded-3xl overflow-hidden shadow-2xl">
+                    <Image
+                      src={leadPost.image}
+                      alt={leadPost.title}
+                      fill
+                      className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                      priority
+                      unoptimized
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-foreground via-transparent to-transparent opacity-60" />
+                    <div className="absolute bottom-0 left-0 p-6 md:p-10 text-background">
+                      <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-accent mb-4 block">
+                        Lead Article // {leadPost.tag}
+                      </span>
+                      <h2 className="text-2xl md:text-4xl font-bold mb-4 tracking-tight leading-tight line-clamp-2">
+                        {leadPost.title}
+                      </h2>
+                      <div className="flex items-center gap-4 text-xs font-mono opacity-60">
+                        <span>{leadPost.author}</span>
+                        <span>/</span>
+                        <span>{leadPost.readTime}</span>
+                      </div>
                     </div>
                   </div>
+                </Link>
+              ) : (
+                <div className="relative aspect-[4/5] md:aspect-video rounded-3xl overflow-hidden border border-dashed border-foreground/15 bg-foreground/[0.02] flex flex-col items-center justify-center p-8 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-foreground/5 flex items-center justify-center mb-4 text-foreground/40">
+                    <BookOpen size={28} />
+                  </div>
+                  <h3 className="text-base font-bold text-foreground/80">No articles published yet</h3>
+                  <p className="text-xs text-foreground/50 mt-1 max-w-xs">
+                    Be the first to share your engineering insights and experience.
+                  </p>
                 </div>
-              </Link>
+              )}
             </div>
           </div>
         </div>
       </section>
 
-      {/* 2. TOPIC NAVIGATION */}
-
-      {/* <section aria-label="Browse blog topics" className="border-y border-foreground/10 bg-foreground/[0.025]">
-        <div className="container-box flex flex-col gap-4 py-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex shrink-0 items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/45">
-            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-            Explore by topic
-          </div>
-          <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar lg:justify-end">
-            {categoriesWithCounts.filter((category) => category.name !== "All").map((category) => (
-              <button
-                key={category.name}
-                type="button"
-                onClick={() => setActiveCategory(category.name)}
-                aria-pressed={activeCategory === category.name}
-                className={`shrink-0 rounded-full border px-3.5 py-2 text-xs font-bold transition-all ${
-                  activeCategory === category.name
-                    ? "border-primary bg-primary text-primary-foreground shadow-sm shadow-primary/20"
-                    : "border-foreground/10 bg-background text-foreground/60 hover:border-primary/30 hover:text-primary"
-                }`}
-              >
-                {category.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section> */}
-
-      {/* 3. MAIN CATALOG WITH SEARCH & SIDEBAR */}
+      {/* 2. MAIN CATALOG WITH SEARCH & SIDEBAR */}
       <div className="container-box py-10 lg:py-20">
         <div className="mb-10 flex flex-col gap-6 border-b border-foreground/10 pb-8 sm:flex-row sm:items-end sm:justify-between lg:mb-14">
           <div className="max-w-2xl">
@@ -338,7 +254,9 @@ export default function Blogs() {
           </div>
           <div className="flex flex-wrap items-center gap-3">
             <span className="rounded-full border border-foreground/10 bg-foreground/[0.03] px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-foreground/50">
-              {searchQuery.trim()
+              {isLoading
+                ? "Loading..."
+                : searchQuery.trim()
                 ? `${displayPosts.length} matching search`
                 : `${categoriesWithCounts.find((category) => category.name === activeCategory)?.count ?? 0} in ${activeCategory}`}
             </span>
@@ -504,11 +422,17 @@ export default function Blogs() {
               </div>
               <div className="flex items-center gap-2 rounded-full border border-foreground/10 bg-foreground/[0.025] px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-foreground/45">
                 {isLoading ? <Loader2 size={12} className="animate-spin text-primary" /> : <span className="h-1.5 w-1.5 rounded-full bg-accent" />}
-                {isLoading ? "Updating" : `${displayPosts.length} ${displayPosts.length === 1 ? "result" : "results"}`}
+                {isLoading ? "Loading..." : `${displayPosts.length} ${displayPosts.length === 1 ? "result" : "results"}`}
               </div>
             </div>
 
-            {displayPosts.length > 0 ? (
+            {isLoading ? (
+              <div className="grid grid-cols-1 gap-x-6 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
+                {Array.from({ length: 6 }).map((_, i) => (
+                  <CardSkeleton key={i} />
+                ))}
+              </div>
+            ) : displayPosts.length > 0 ? (
               <div className="grid grid-cols-1 gap-x-6 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
                 {displayPosts.map((post, i) => (
                   <div key={post.id} className="relative group">

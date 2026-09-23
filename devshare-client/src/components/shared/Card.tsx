@@ -80,3 +80,59 @@ export default function Card({ post }: CardProps) {
     </article>
   );
 }
+
+export function CardSkeleton() {
+  return (
+    <div className="flex h-full flex-col overflow-hidden rounded-3xl border border-foreground/10 bg-background shadow-sm animate-pulse">
+      {/* Media Skeleton */}
+      <div className="relative aspect-[16/10] shrink-0 bg-foreground/10">
+        <div className="absolute left-4 top-4 h-5 w-20 rounded-full bg-foreground/15" />
+      </div>
+
+      {/* Body Skeleton */}
+      <div className="flex flex-1 flex-col p-5">
+        <div className="flex items-center justify-between gap-3">
+          <div className="h-3.5 w-16 rounded-full bg-foreground/15" />
+          <div className="h-3.5 w-14 rounded-full bg-foreground/10" />
+        </div>
+
+        <div className="mt-3 space-y-2 min-h-[3.1rem]">
+          <div className="h-4.5 w-full rounded-lg bg-foreground/15" />
+          <div className="h-4.5 w-3/4 rounded-lg bg-foreground/10" />
+        </div>
+
+        <div className="mt-auto flex items-center gap-3 border-t border-foreground/10 pt-4">
+          <div className="size-9 shrink-0 rounded-full bg-foreground/15" />
+          <div className="flex-1 space-y-1.5">
+            <div className="h-3.5 w-24 rounded bg-foreground/15" />
+            <div className="h-2.5 w-16 rounded bg-foreground/10" />
+          </div>
+          <div className="size-4 rounded bg-foreground/10 ml-auto" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function LeadCardSkeleton() {
+  return (
+    <div className="relative aspect-[4/5] md:aspect-video rounded-3xl overflow-hidden border border-foreground/10 bg-foreground/10 shadow-2xl animate-pulse">
+      <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/40 to-transparent" />
+      <div className="absolute bottom-0 left-0 p-6 md:p-10 w-full space-y-4 z-10">
+        <div className="h-3.5 w-32 rounded-full bg-foreground/20" />
+        <div className="space-y-2.5 max-w-xl">
+          <div className="h-7 md:h-10 w-4/5 rounded-xl bg-foreground/25" />
+          <div className="h-7 md:h-10 w-3/5 rounded-xl bg-foreground/25" />
+        </div>
+        <div className="flex items-center gap-4 pt-1">
+          <div className="h-3.5 w-24 rounded bg-foreground/20" />
+          <div className="h-3.5 w-2 rounded bg-foreground/15" />
+          <div className="h-3.5 w-16 rounded bg-foreground/20" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+Card.Skeleton = CardSkeleton;
+Card.LeadSkeleton = LeadCardSkeleton;

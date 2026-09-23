@@ -6,39 +6,110 @@ import Image from "next/image";
 import { ArrowRight, Clock } from "lucide-react";
 
 import Section from "@/components/shared/Section";
-import Card, { Post } from "@/components/shared/Card";
+import Card, { Post, CardSkeleton } from "@/components/shared/Card";
 import WriteCTA from "@/components/shared/WriteCTA";
 import HeroSection from "./_components/HeroSection";
 import { getBlogsApi, IBlog } from "@/lib/api";
 
 import {
-  mainPost,
-  sidePosts,
   benefits,
-  posts,
   categories,
   authors,
 } from "@/constants/home";
 
+function FeaturedMainSkeleton() {
+  return (
+    <div className="relative flex min-h-[440px] lg:min-h-[540px] lg:col-span-7 overflow-hidden rounded-3xl border border-foreground/10 bg-foreground/10 shadow-sm animate-pulse p-6 sm:p-8 md:p-10 flex-col justify-between">
+      <div className="flex items-start justify-between gap-4">
+        <div className="h-5 w-24 rounded-full bg-foreground/15" />
+        <div className="h-4 w-20 rounded bg-foreground/10" />
+      </div>
+
+      <div className="max-w-2xl pt-16 space-y-4">
+        <div className="h-3 w-20 rounded bg-foreground/15" />
+        <div className="space-y-2.5">
+          <div className="h-9 sm:h-12 w-4/5 rounded-xl bg-foreground/20" />
+          <div className="h-9 sm:h-12 w-3/5 rounded-xl bg-foreground/20" />
+        </div>
+        <div className="space-y-2 pt-2">
+          <div className="h-4 w-full max-w-xl rounded bg-foreground/10" />
+          <div className="h-4 w-4/5 max-w-lg rounded bg-foreground/10" />
+        </div>
+      </div>
+
+      <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-foreground/10 pt-5">
+        <div className="flex items-center gap-3">
+          <div className="size-9 rounded-full bg-foreground/20" />
+          <div className="space-y-1.5">
+            <div className="h-3.5 w-24 rounded bg-foreground/20" />
+            <div className="h-2.5 w-16 rounded bg-foreground/10" />
+          </div>
+        </div>
+        <div className="h-4 w-20 rounded bg-foreground/15" />
+      </div>
+    </div>
+  );
+}
+
+function FeaturedSideSkeleton() {
+  return (
+    <div className="relative flex min-h-[250px] lg:min-h-0 lg:flex-1 overflow-hidden rounded-3xl border border-foreground/10 bg-foreground/[0.03] p-5 sm:p-6 animate-pulse flex-col justify-between gap-8">
+      <div>
+        <div className="mb-6 flex items-center justify-between gap-3">
+          <div className="h-5 w-20 rounded-full bg-foreground/15" />
+          <div className="h-4 w-6 rounded bg-foreground/10" />
+        </div>
+        <div className="space-y-2">
+          <div className="h-6 sm:h-7 w-4/5 rounded-lg bg-foreground/20" />
+          <div className="h-6 sm:h-7 w-3/5 rounded-lg bg-foreground/20" />
+        </div>
+      </div>
+
+      <div className="flex items-end justify-between gap-3 border-t border-foreground/10 pt-4">
+        <div className="flex items-center gap-2.5">
+          <div className="size-8 rounded-full bg-foreground/20" />
+          <div className="space-y-1">
+            <div className="h-3 w-20 rounded bg-foreground/20" />
+            <div className="h-2.5 w-14 rounded bg-foreground/10" />
+          </div>
+        </div>
+        <div className="h-3.5 w-16 rounded bg-foreground/15" />
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const [blogs, setBlogs] = useState<IBlog[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
+    let isCancelled = false;
     const fetchHomeBlogs = async () => {
+      setIsLoading(true);
       try {
         const res = await getBlogsApi({ limit: 12 });
-        if (res.success && res.data) {
+        if (!isCancelled && res.success && res.data) {
           setBlogs(res.data);
         }
       } catch (err) {
-        console.warn("Could not fetch home blogs from API:", err);
+        if (!isCancelled) {
+          console.warn("Could not fetch home blogs from API:", err);
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchHomeBlogs();
+    return () => {
+      isCancelled = true;
+    };
   }, []);
 
-  // Main Lead Featured Post: first blog in DB or default mainPost
+  // Main Lead Featured Post: first blog in DB
   const activeMainPost = useMemo(() => {
     if (blogs.length > 0) {
       const b = blogs[0];
@@ -64,13 +135,13 @@ export default function Home() {
           "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&q=80&w=800",
       };
     }
-    return mainPost;
+    return null;
   }, [blogs]);
 
-  // Side Featured Posts: blogs 2 & 3 or default sidePosts
+  // Side Featured Posts: blogs 2 & 3
   const activeSidePosts = useMemo(() => {
     if (blogs.length > 1) {
-      const sides = blogs.slice(1, 3).map((b) => ({
+      return blogs.slice(1, 3).map((b) => ({
         id: b._id,
         category: b.category,
         title: b.title,
@@ -90,19 +161,14 @@ export default function Home() {
           b.coverImage ||
           "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=500",
       }));
-
-      if (sides.length === 1) {
-        return [sides[0], sidePosts[1]];
-      }
-      return sides;
     }
-    return sidePosts;
+    return [];
   }, [blogs]);
 
   // The Insight Stream posts
   const activeStreamPosts: Post[] = useMemo(() => {
     if (blogs.length > 0) {
-      const mappedDb: Post[] = blogs.map((b) => ({
+      return blogs.map((b) => ({
         id: b._id,
         title: b.title,
         author: b.author?.name || "DevShare Author",
@@ -116,14 +182,9 @@ export default function Home() {
           `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
             b.author?.name || "Dev"
           )}`,
-      }));
-
-      const remainder = posts.filter(
-        (p) => !mappedDb.some((m) => m.title === p.title)
-      );
-      return [...mappedDb, ...remainder].slice(0, 8);
+      })).slice(0, 8);
     }
-    return posts;
+    return [];
   }, [blogs]);
 
   return (
@@ -141,135 +202,154 @@ export default function Home() {
         paddingBottom
       >
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-5">
-          {/* Lead story */}
-          <Link
-            href={`/blogs/${activeMainPost.id}`}
-            className="group relative isolate flex min-h-[440px] overflow-hidden rounded-3xl bg-foreground text-background shadow-sm lg:col-span-7 lg:min-h-[540px]"
-          >
-            <Image
-              src={activeMainPost.image}
-              alt={activeMainPost.title}
-              fill
-              priority
-              sizes="(max-width: 1024px) 100vw, 58vw"
-              className="opacity-100 transition-transform duration-700 ease-out group-hover:scale-105"
-              unoptimized
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/55 to-foreground/5" />
-            {/* <div className="absolute inset-0 bg-gradient-to-r from-foreground/40 to-transparent" />  */}
-
-            <div className="relative z-10 flex w-full flex-col justify-between p-6 sm:p-8 md:p-10">
-              <div className="flex items-start justify-between gap-4">
-                <span className="rounded-full bg-accent px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-background">
-                  {activeMainPost.category}
-                </span>
-                <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-background/60">
-                  Featured / 01
-                </span>
+          {isLoading ? (
+            <>
+              <FeaturedMainSkeleton />
+              <div className="grid gap-4 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-1 lg:gap-5">
+                <FeaturedSideSkeleton />
+                <FeaturedSideSkeleton />
               </div>
-
-              <div className="max-w-2xl pt-16">
-                <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-accent">
-                  Deep dive
-                </p>
-                <h3 className="text-3xl font-extrabold leading-[1.05] tracking-tight sm:text-4xl md:text-5xl">
-                  {activeMainPost.title}
-                </h3>
-                <p className="mt-5 max-w-xl text-sm leading-relaxed text-background/75 sm:text-base line-clamp-2">
-                  {activeMainPost.description}
-                </p>
-              </div>
-
-              <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-background/20 pt-5">
-                <div className="flex items-center gap-3">
-                  <div className="relative h-9 w-9 overflow-hidden rounded-full border border-background/20 bg-background/10">
-                    <Image
-                      src={activeMainPost.avatar}
-                      alt={activeMainPost.author}
-                      fill
-                      sizes="36px"
-                      className="object-cover"
-                      unoptimized
-                    />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold">{activeMainPost.author}</p>
-                    <p className="text-xs text-background/60">{activeMainPost.date}</p>
-                  </div>
-                </div>
-                <span className="flex items-center gap-2 text-xs font-bold text-background/75">
-                  <Clock size={14} className="text-accent" />
-                  {activeMainPost.readTime}
-                  <ArrowRight className="ml-2 size-4 transition-transform duration-300 group-hover:translate-x-1" />
-                </span>
-              </div>
-            </div>
-          </Link>
-
-          {/* Companion stories */}
-          <div className="grid gap-4 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-1 lg:gap-5">
-            {activeSidePosts.map((post, index) => (
+            </>
+          ) : activeMainPost ? (
+            <>
+              {/* Lead story */}
               <Link
-                key={post.id}
-                href={`/blogs/${post.id}`}
-                className="group relative flex min-h-[300px] overflow-hidden rounded-3xl border border-foreground/10 bg-foreground/[0.03] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10 sm:p-6 lg:min-h-0 lg:flex-1"
+                href={`/blogs/${activeMainPost.id}`}
+                className={`group relative isolate flex min-h-[440px] overflow-hidden rounded-3xl bg-foreground text-background shadow-sm lg:min-h-[540px] ${
+                  activeSidePosts.length > 0 ? "lg:col-span-7" : "lg:col-span-12"
+                }`}
               >
-                <div className="absolute inset-y-0 right-0 w-[100%] overflow-hidden">
                 <Image
-  src={post.image}
-  alt="feature"
-  fill
-  sizes="(max-width: 640px) 42vw, (max-width: 1024px) 21vw, 18vw"
-  className={`object-cover ${post.image ? "opacity-100" : "opacity-0"} transition-transform duration-700 group-hover:scale-110 group-hover:opacity-35`}
-  onError={(e) => {
-    e.currentTarget.style.opacity = "0";
-  }}
-  unoptimized
-/>
-                  <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-transparent" />
-                </div>
+                  src={activeMainPost.image}
+                  alt={activeMainPost.title}
+                  fill
+                  priority
+                  sizes="(max-width: 1024px) 100vw, 58vw"
+                  className="opacity-100 transition-transform duration-700 ease-out group-hover:scale-105"
+                  unoptimized
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/55 to-foreground/5" />
 
-                <div className="relative z-10 flex w-full flex-col justify-between gap-8">
-                  <div>
-                    <div className="mb-8 flex items-center justify-between gap-3">
-                      <span className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.15em] text-primary">
-                        {post.category}
-                      </span>
-                      <span className="font-mono text-[10px] font-bold text-foreground/35">
-                        0{index + 2}
-                      </span>
-                    </div>
-                    <h4 className="max-w-[82%] text-xl font-bold leading-tight tracking-tight transition-colors group-hover:text-primary sm:text-2xl line-clamp-3">
-                      {post.title}
-                    </h4>
+                <div className="relative z-10 flex w-full flex-col justify-between p-6 sm:p-8 md:p-10">
+                  <div className="flex items-start justify-between gap-4">
+                    <span className="rounded-full bg-accent px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-background">
+                      {activeMainPost.category}
+                    </span>
+                    <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-background/60">
+                      Featured / 01
+                    </span>
                   </div>
 
-                  <div className="flex items-end justify-between gap-3 border-t border-foreground/10 pt-4">
-                    <div className="flex items-center gap-2.5">
-                      <div className="relative h-8 w-8 overflow-hidden rounded-full bg-foreground/10">
+                  <div className="max-w-2xl pt-16">
+                    <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-accent">
+                      Deep dive
+                    </p>
+                    <h3 className="text-3xl font-extrabold leading-[1.05] tracking-tight sm:text-4xl md:text-5xl">
+                      {activeMainPost.title}
+                    </h3>
+                    <p className="mt-5 max-w-xl text-sm leading-relaxed text-background/75 sm:text-base line-clamp-2">
+                      {activeMainPost.description}
+                    </p>
+                  </div>
+
+                  <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-background/20 pt-5">
+                    <div className="flex items-center gap-3">
+                      <div className="relative h-9 w-9 overflow-hidden rounded-full border border-background/20 bg-background/10">
                         <Image
-                          src={post.avatar}
-                          alt={post.author}
+                          src={activeMainPost.avatar}
+                          alt={activeMainPost.author}
                           fill
-                          sizes="32px"
+                          sizes="36px"
                           className="object-cover"
                           unoptimized
                         />
                       </div>
                       <div>
-                        <p className="text-xs font-bold">{post.author}</p>
-                        <p className="text-[11px] text-foreground/50">{post.date}</p>
+                        <p className="text-sm font-bold">{activeMainPost.author}</p>
+                        <p className="text-xs text-background/60">{activeMainPost.date}</p>
                       </div>
                     </div>
-                    <span className="flex shrink-0 items-center gap-1.5 text-xs font-bold text-foreground/50 ">
-                      <Clock size={13} className="text-accent " />
-                      {post.readTime}
+                    <span className="flex items-center gap-2 text-xs font-bold text-background/75">
+                      <Clock size={14} className="text-accent" />
+                      {activeMainPost.readTime}
+                      <ArrowRight className="ml-2 size-4 transition-transform duration-300 group-hover:translate-x-1" />
                     </span>
                   </div>
                 </div>
               </Link>
-            ))}
-          </div>
+
+              {/* Companion stories */}
+              {activeSidePosts.length > 0 && (
+                <div className="grid gap-4 sm:grid-cols-2 lg:col-span-5 lg:grid-cols-1 lg:gap-5">
+                  {activeSidePosts.map((post, index) => (
+                    <Link
+                      key={post.id}
+                      href={`/blogs/${post.id}`}
+                      className="group relative flex min-h-[300px] overflow-hidden rounded-3xl border border-foreground/10 bg-foreground/[0.03] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10 sm:p-6 lg:min-h-0 lg:flex-1"
+                    >
+                      <div className="absolute inset-y-0 right-0 w-[100%] overflow-hidden">
+                        <Image
+                          src={post.image}
+                          alt="feature"
+                          fill
+                          sizes="(max-width: 640px) 42vw, (max-width: 1024px) 21vw, 18vw"
+                          className={`object-cover ${post.image ? "opacity-100" : "opacity-0"} transition-transform duration-700 group-hover:scale-110 group-hover:opacity-35`}
+                          onError={(e) => {
+                            e.currentTarget.style.opacity = "0";
+                          }}
+                          unoptimized
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-transparent" />
+                      </div>
+
+                      <div className="relative z-10 flex w-full flex-col justify-between gap-8">
+                        <div>
+                          <div className="mb-8 flex items-center justify-between gap-3">
+                            <span className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.15em] text-primary">
+                              {post.category}
+                            </span>
+                            <span className="font-mono text-[10px] font-bold text-foreground/35">
+                              0{index + 2}
+                            </span>
+                          </div>
+                          <h4 className="max-w-[82%] text-xl font-bold leading-tight tracking-tight transition-colors group-hover:text-primary sm:text-2xl line-clamp-3">
+                            {post.title}
+                          </h4>
+                        </div>
+
+                        <div className="flex items-end justify-between gap-3 border-t border-foreground/10 pt-4">
+                          <div className="flex items-center gap-2.5">
+                            <div className="relative h-8 w-8 overflow-hidden rounded-full bg-foreground/10">
+                              <Image
+                                src={post.avatar}
+                                alt={post.author}
+                                fill
+                                sizes="32px"
+                                className="object-cover"
+                                unoptimized
+                              />
+                            </div>
+                            <div>
+                              <p className="text-xs font-bold">{post.author}</p>
+                              <p className="text-[11px] text-foreground/50">{post.date}</p>
+                            </div>
+                          </div>
+                          <span className="flex shrink-0 items-center gap-1.5 text-xs font-bold text-foreground/50 ">
+                            <Clock size={13} className="text-accent " />
+                            {post.readTime}
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="col-span-12 rounded-3xl border border-dashed border-foreground/15 bg-foreground/[0.02] p-12 text-center">
+              <p className="text-sm font-medium text-foreground/50">No featured deep dives published yet.</p>
+            </div>
+          )}
         </div>
       </Section>
 
@@ -343,11 +423,21 @@ export default function Home() {
         paddingBottom
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-6">
-          {activeStreamPosts.map((post) => (
-            <Link key={post.id} href={`/blogs/${post.id}`}>
-              <Card post={post} />
-            </Link>
-          ))}
+          {isLoading ? (
+            Array.from({ length: 4 }).map((_, i) => (
+              <CardSkeleton key={i} />
+            ))
+          ) : activeStreamPosts.length > 0 ? (
+            activeStreamPosts.map((post) => (
+              <Link key={post.id} href={`/blogs/${post.id}`}>
+                <Card post={post} />
+              </Link>
+            ))
+          ) : (
+            <div className="col-span-full rounded-2xl border border-dashed border-foreground/15 p-10 text-center text-xs text-foreground/50">
+              No recent stream articles found.
+            </div>
+          )}
         </div>
       </Section>
 
