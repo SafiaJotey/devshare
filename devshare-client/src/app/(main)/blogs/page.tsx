@@ -5,11 +5,14 @@ import Card, { Post } from "@/components/shared/Card";
 import {
   Search,
   Terminal,
-  Layers,
   ChevronRight,
-  BellRing,
   Zap,
   Loader2,
+  X,
+  SlidersHorizontal,
+  BookOpen,
+  ArrowUpRight,
+  PenLine,
 } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
@@ -202,32 +205,35 @@ export default function Blogs() {
 
   // Lead article: latest published article or fallback
   const leadPost = displayPosts.length > 0 ? displayPosts[0] : DEMO_POSTS[0];
+  const hasActiveFilters = activeCategory !== "All" || searchQuery.trim().length > 0;
 
-  const SubscriptionWidget = ({ isMobile = false }: { isMobile?: boolean }) => (
+  const clearFilters = () => {
+    setActiveCategory("All");
+    setSearchQuery("");
+  };
+
+  const ContributorWidget = ({ isMobile = false }: { isMobile?: boolean }) => (
     <div
       className={`p-6 rounded-3xl bg-foreground text-background relative overflow-hidden group ${
         isMobile ? "mt-20" : "mt-16"
       }`}
     >
       <div className="absolute -top-6 -right-6 p-8 opacity-5 group-hover:rotate-12 transition-transform duration-700">
-        <BellRing size={120} />
+        <PenLine size={120} />
       </div>
       <h4 className="font-bold text-sm mb-2 flex items-center gap-2">
         <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
-        Updates Pipeline
+        Share what you learned
       </h4>
       <p className="text-[11px] opacity-50 mb-6 leading-relaxed">
-        Join 5,000+ engineers receiving our weekly technical logic.
+        Turn a useful lesson, technical decision, or hard-earned fix into an article that helps another engineer.
       </p>
-      <div className="space-y-2">
-        <input
-          placeholder="engineer@dev.com"
-          className="w-full bg-white/10 border border-white/10 rounded-xl px-4 py-2 text-xs outline-none focus:border-accent/50 placeholder:text-white/20"
-        />
-        <button className="w-full bg-accent text-foreground py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-accent/90 transition-colors">
-          Connect
-        </button>
-      </div>
+      <Link
+        href="/dashboard/create-blog"
+        className="relative z-10 flex w-full items-center justify-center gap-2 rounded-xl bg-accent py-2.5 text-[10px] font-black uppercase tracking-widest text-foreground transition-colors hover:bg-accent/90"
+      >
+        Start writing <ArrowUpRight size={14} />
+      </Link>
     </div>
   );
 
@@ -289,44 +295,90 @@ export default function Blogs() {
         </div>
       </section>
 
-      {/* 2. TICKER MARQUEE */}
-      <div className="bg-foreground text-background py-3 overflow-hidden border-y border-white/10 select-none">
-        <div className="flex animate-marquee whitespace-nowrap gap-20">
-          {[1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="flex gap-20 items-center font-mono text-[10px] uppercase tracking-[0.4em]"
-            >
-              <span className="flex items-center gap-2">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]" />{" "}
-                System Online
-              </span>
-              <span>Next.js Primitives</span>
-              <span className="text-accent">●</span>
-              <span>Distributed Logic</span>
-              <span className="text-accent">●</span>
-              <span>Scalable UI Patterns</span>
-            </div>
-          ))}
+      {/* 2. TOPIC NAVIGATION */}
+
+      {/* <section aria-label="Browse blog topics" className="border-y border-foreground/10 bg-foreground/[0.025]">
+        <div className="container-box flex flex-col gap-4 py-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex shrink-0 items-center gap-2 text-[10px] font-bold uppercase tracking-[0.2em] text-foreground/45">
+            <span className="h-1.5 w-1.5 rounded-full bg-accent" />
+            Explore by topic
+          </div>
+          <div className="flex gap-2 overflow-x-auto pb-1 no-scrollbar lg:justify-end">
+            {categoriesWithCounts.filter((category) => category.name !== "All").map((category) => (
+              <button
+                key={category.name}
+                type="button"
+                onClick={() => setActiveCategory(category.name)}
+                aria-pressed={activeCategory === category.name}
+                className={`shrink-0 rounded-full border px-3.5 py-2 text-xs font-bold transition-all ${
+                  activeCategory === category.name
+                    ? "border-primary bg-primary text-primary-foreground shadow-sm shadow-primary/20"
+                    : "border-foreground/10 bg-background text-foreground/60 hover:border-primary/30 hover:text-primary"
+                }`}
+              >
+                {category.name}
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      </section> */}
 
       {/* 3. MAIN CATALOG WITH SEARCH & SIDEBAR */}
       <div className="container-box py-10 lg:py-20">
+        <div className="mb-10 flex flex-col gap-6 border-b border-foreground/10 pb-8 sm:flex-row sm:items-end sm:justify-between lg:mb-14">
+          <div className="max-w-2xl">
+            <div className="mb-3 flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-accent">
+              <BookOpen size={13} />
+              Explore the library
+            </div>
+            <h2 className="text-3xl font-extrabold tracking-tight sm:text-4xl">Find your next useful idea.</h2>
+            <p className="mt-3 text-sm leading-relaxed text-foreground/60 sm:text-base">
+              Search practical notes, deep dives, and field-tested patterns from the DevShare community.
+            </p>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="rounded-full border border-foreground/10 bg-foreground/[0.03] px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-foreground/50">
+              {searchQuery.trim()
+                ? `${displayPosts.length} matching search`
+                : `${categoriesWithCounts.find((category) => category.name === activeCategory)?.count ?? 0} in ${activeCategory}`}
+            </span>
+            {hasActiveFilters && (
+              <button
+                type="button"
+                onClick={clearFilters}
+                className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 px-3 py-2 text-xs font-bold text-primary transition-colors hover:bg-primary/5"
+              >
+                Clear filters <X size={13} />
+              </button>
+            )}
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-16">
           {/* Mobile Search & Filter */}
           <div className="lg:hidden space-y-6">
-            <div className="group">
+            <div className="relative">
+              <Search size={17} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-foreground/35" />
               <input
                 type="text"
-                placeholder="Search topics..."
+                placeholder="Search articles, topics, or authors..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-foreground/5 border border-foreground/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary/50"
+                className="w-full rounded-2xl border border-foreground/10 bg-foreground/[0.03] py-3.5 pl-11 pr-11 text-sm font-medium outline-none transition-all placeholder:text-foreground/35 focus:border-primary/50 focus:bg-background focus:ring-4 focus:ring-primary/5"
               />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setSearchQuery("")}
+                  aria-label="Clear search"
+                  className="absolute right-3 top-1/2 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-lg text-foreground/40 transition-colors hover:bg-foreground/5 hover:text-foreground"
+                >
+                  <X size={16} />
+                </button>
+              )}
             </div>
 
-            <div className="flex items-center gap-2 overflow-x-auto pb-4 no-scrollbar">
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar">
               {categoriesWithCounts.map((cat) => (
                 <button
                   key={cat.name}
@@ -346,22 +398,37 @@ export default function Blogs() {
           {/* Desktop Sidebar */}
           <aside className="hidden lg:block lg:col-span-3 space-y-10">
             <div className="sticky top-32">
-              <div className="mb-10 group">
-                <div className="flex items-center gap-2 text-[10px] font-bold text-foreground/30 uppercase tracking-widest mb-3 px-1">
-                  <Search size={12} /> Search Explorer
+              <div className="mb-8 rounded-3xl border border-foreground/10 bg-foreground/[0.025] p-5">
+                <div className="mb-3 flex items-center gap-2 px-1 text-[10px] font-bold uppercase tracking-widest text-foreground/40">
+                  <Search size={12} /> Search library
                 </div>
-                <input
-                  type="text"
-                  placeholder="Find a topic..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-foreground/5 border border-foreground/10 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary/50 transition-all font-medium placeholder:text-foreground/20"
-                />
+                <div className="relative">
+                  <Search size={15} className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-foreground/35" />
+                  <input
+                    type="text"
+                    placeholder="Topic, article, author..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full rounded-xl border border-foreground/10 bg-background py-3 pl-10 pr-9 text-sm font-medium outline-none transition-all placeholder:text-foreground/30 focus:border-primary/50 focus:ring-4 focus:ring-primary/5"
+                  />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery("")}
+                      aria-label="Clear search"
+                      className="absolute right-2 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-md text-foreground/40 transition-colors hover:bg-foreground/5 hover:text-foreground"
+                    >
+                      <X size={14} />
+                    </button>
+                  )}
+                </div>
               </div>
 
-              <div>
-                <div className="flex items-center gap-2 text-[10px] font-bold text-foreground/30 uppercase tracking-widest mb-4 px-1">
-                  <Layers size={12} /> Library Catalog
+              <div className="rounded-3xl border border-foreground/10 bg-background p-3 shadow-sm">
+                <div className="mb-3 flex items-center px-2 pt-2">
+                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-foreground/40">
+                    <SlidersHorizontal size={12} /> Filter by topic
+                  </div>
                 </div>
                 <nav className="space-y-1">
                   {categoriesWithCounts.map((cat) => (
@@ -404,33 +471,45 @@ export default function Blogs() {
                     </button>
                   ))}
                 </nav>
+                {hasActiveFilters && (
+                  <button
+                    type="button"
+                    onClick={clearFilters}
+                    className="mt-3 flex w-full items-center justify-center gap-1.5 border-t border-foreground/10 pt-3 text-[10px] font-bold uppercase tracking-[0.16em] text-foreground/45 transition-colors hover:text-primary"
+                  >
+                    Reset catalog <X size={12} />
+                  </button>
+                )}
               </div>
 
-              <SubscriptionWidget />
+              <ContributorWidget />
             </div>
           </aside>
 
           {/* Main Grid */}
           <div className="lg:col-span-9">
-            <div className="flex items-center justify-between mb-8 lg:mb-12 pb-6 border-b border-foreground/5">
-              <div className="flex items-center gap-3 text-[10px] font-mono font-bold uppercase tracking-widest text-foreground/40">
-                <Terminal size={14} className="text-primary" />
-                <span className="hidden sm:inline hover:text-foreground cursor-pointer transition-colors">
-                  Root
-                </span>
-                <ChevronRight size={10} className="hidden sm:inline" />
-                <span className="text-foreground underline underline-offset-4 decoration-accent/50">
-                  {activeCategory}
-                </span>
+            <div className="mb-8 flex flex-col gap-4 border-b border-foreground/10 pb-6 sm:flex-row sm:items-end sm:justify-between lg:mb-10">
+              <div>
+                <div className="flex items-center gap-3 text-[10px] font-mono font-bold uppercase tracking-widest text-foreground/40">
+                  <Terminal size={14} className="text-primary" />
+                  <span className="hidden sm:inline">Library</span>
+                  <ChevronRight size={10} className="hidden sm:inline" />
+                  <span className="text-foreground underline decoration-accent/50 underline-offset-4">
+                    {activeCategory}
+                  </span>
+                </div>
+                <h3 className="mt-3 text-2xl font-bold tracking-tight">
+                  {searchQuery.trim() ? `Results for “${searchQuery.trim()}”` : `${activeCategory} articles`}
+                </h3>
               </div>
-              <div className="text-[10px] font-mono font-bold text-foreground/20 uppercase flex items-center gap-2">
-                {isLoading && <Loader2 size={12} className="animate-spin text-primary" />}
-                RESULTS: {displayPosts.length}
+              <div className="flex items-center gap-2 rounded-full border border-foreground/10 bg-foreground/[0.025] px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.14em] text-foreground/45">
+                {isLoading ? <Loader2 size={12} className="animate-spin text-primary" /> : <span className="h-1.5 w-1.5 rounded-full bg-accent" />}
+                {isLoading ? "Updating" : `${displayPosts.length} ${displayPosts.length === 1 ? "result" : "results"}`}
               </div>
             </div>
 
             {displayPosts.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-12">
+              <div className="grid grid-cols-1 gap-x-6 gap-y-10 md:grid-cols-2 lg:grid-cols-3">
                 {displayPosts.map((post, i) => (
                   <div key={post.id} className="relative group">
                     <div className="absolute -top-4 -left-4 text-[9px] font-mono text-foreground/10 group-hover:text-primary transition-colors hidden xl:block">
@@ -443,25 +522,22 @@ export default function Blogs() {
                 ))}
               </div>
             ) : (
-              <div className="py-20 text-center border-2 border-dashed border-foreground/5 rounded-[2rem] bg-foreground/[0.01]">
+              <div className="rounded-[2rem] border border-dashed border-foreground/15 bg-foreground/[0.015] px-6 py-20 text-center">
                 <Terminal size={40} className="mx-auto mb-6 text-foreground/10" />
-                <h3 className="text-lg font-bold uppercase tracking-tighter">
-                  Null Result Set
-                </h3>
+                <h3 className="text-xl font-bold tracking-tight">No articles found</h3>
+                <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-foreground/55">Try a broader search, or return to the full library to discover another topic.</p>
                 <button
-                  onClick={() => {
-                    setActiveCategory("All");
-                    setSearchQuery("");
-                  }}
-                  className="mt-6 text-xs font-bold text-primary underline underline-offset-8"
+                  type="button"
+                  onClick={clearFilters}
+                  className="mt-6 inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground transition-opacity hover:opacity-90"
                 >
-                  [ RESET_QUERY ]
+                  Browse all articles <ArrowUpRight size={14} />
                 </button>
               </div>
             )}
 
             <div className="lg:hidden">
-              <SubscriptionWidget isMobile={true} />
+              <ContributorWidget isMobile={true} />
             </div>
           </div>
         </div>
