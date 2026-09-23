@@ -6,6 +6,7 @@ import {
   IChangePasswordPayload,
   ILoginUserPayload,
   IRegisterUserPayload,
+  ISocialLoginPayload,
   IUser,
   IUserResponse,
 } from "./user.interface";
@@ -114,6 +115,13 @@ const loginUser = async (
     );
   }
 
+  if (!user.password) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      `This account was created with ${user.provider || "social login"}. Please sign in using your social account.`
+    );
+  }
+
   const isPasswordMatch = await comparePassword(payload.password, user.password);
 
   if (!isPasswordMatch) {
@@ -152,6 +160,101 @@ const loginUser = async (
     user: sanitizeUser(user),
     accessToken,
     refreshToken,
+  };
+};
+
+const socialLoginUser = async (
+  payload: ISocialLoginPayload
+): Promise<{
+  user: IUserResponse;
+  accessToken: string;
+  refreshToken: string;
+  isNewUser: boolean;
+}> => {
+  const collection = getUserCollection();
+  const normalizedEmail = payload.email.trim().toLowerCase();
+
+  const existingUser = await collection.findOne({ email: normalizedEmail });
+  let targetUser: IUser;
+  let isNewUser = false;
+
+  if (existingUser) {
+    if (existingUser.isActive === false) {
+      throw new AppError(
+        httpStatus.FORBIDDEN,
+        "Your account has been deactivated. Please contact support."
+      );
+    }
+
+    const updateFields: Partial<IUser> = {
+      lastLoginAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    if (payload.avatar && (!existingUser.avatar || existingUser.avatar.includes("dicebear"))) {
+      updateFields.avatar = payload.avatar;
+    }
+    if (!existingUser.provider) {
+      updateFields.provider = payload.provider;
+    }
+
+    await collection.updateOne({ _id: existingUser._id }, { $set: updateFields });
+    targetUser = { ...existingUser, ...updateFields };
+  } else {
+    isNewUser = true;
+    const newUser: IUser = {
+      name: payload.name.trim() || "Developer",
+      email: normalizedEmail,
+      role: "user",
+      avatar:
+        payload.avatar ||
+        `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
+          payload.name || "Dev"
+        )}`,
+      title: "Developer & Contributor",
+      bio: "",
+      socialLinks: {},
+      provider: payload.provider,
+      refreshTokens: [],
+      isActive: true,
+      lastLoginAt: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const result = await collection.insertOne(newUser);
+    targetUser = { ...newUser, _id: result.insertedId };
+  }
+
+  const jwtPayload = {
+    id: targetUser._id!.toString(),
+    email: targetUser.email,
+    name: targetUser.name,
+    role: targetUser.role,
+  };
+
+  const accessToken = generateAccessToken(jwtPayload);
+  const refreshToken = generateRefreshToken(jwtPayload);
+  const hashedRefreshToken = hashToken(refreshToken);
+
+  await collection.updateOne(
+    { _id: targetUser._id },
+    {
+      $set: { lastLoginAt: new Date(), updatedAt: new Date() },
+      $push: {
+        refreshTokens: {
+          $each: [hashedRefreshToken],
+          $slice: -5,
+        },
+      },
+    }
+  );
+
+  return {
+    user: sanitizeUser(targetUser),
+    accessToken,
+    refreshToken,
+    isNewUser,
   };
 };
 
@@ -269,6 +372,13 @@ const changePassword = async (
     throw new AppError(httpStatus.NOT_FOUND, "User profile not found");
   }
 
+  if (!user.password) {
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      "This account was created using social login and does not have a password set."
+    );
+  }
+
   const isCurrentMatch = await comparePassword(payload.currentPassword, user.password);
   if (!isCurrentMatch) {
     throw new AppError(httpStatus.BAD_REQUEST, "Incorrect current password");
@@ -339,7 +449,7 @@ const updateProfile = async (
   );
 
   if (!result) {
-    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+    throw new AppError(httpStatus.NOT_FOUND, "User profile not found");
   }
 
   return sanitizeUser(result);
@@ -348,6 +458,7 @@ const updateProfile = async (
 export const UserService = {
   registerUser,
   loginUser,
+  socialLoginUser,
   refreshAccessToken,
   logoutUser,
   changePassword,
@@ -356,4 +467,3 @@ export const UserService = {
 };
 
 export default UserService;
-

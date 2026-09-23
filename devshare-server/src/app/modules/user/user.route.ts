@@ -20,6 +20,12 @@ authRouter.post(
   UserController.login
 );
 
+authRouter.post(
+  "/social-login",
+  validateRequest(UserValidation.socialLoginValidationSchema),
+  UserController.socialLogin
+);
+
 authRouter.post("/refresh-token", UserController.refreshToken);
 
 authRouter.post("/logout", UserController.logout);
@@ -48,4 +54,3 @@ userRouter.patch(
 
 export const UserRoutes: Router = userRouter;
 export default UserRoutes;
-

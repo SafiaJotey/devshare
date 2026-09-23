@@ -26,13 +26,14 @@ import { useAuth } from "@/providers/auth-provider";
 
 export default function AuthPage() {
   const router = useRouter();
-  const { login, register } = useAuth();
+  const { login, register, loginWithSocial } = useAuth();
 
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [socialLoading, setSocialLoading] = useState<"google" | "facebook" | "linkedin" | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,6 +74,32 @@ export default function AuthPage() {
       toast.error(err.message || "Authentication failed. Please try again.");
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleSocialLogin = async (provider: "google" | "facebook" | "linkedin") => {
+    setSocialLoading(provider);
+    try {
+      await loginWithSocial(provider);
+      toast.success(
+        `Logged in with ${provider.charAt(0).toUpperCase() + provider.slice(1)} successfully!`
+      );
+      router.push("/dashboard");
+    } catch (err: any) {
+      console.error("Social login error:", err);
+      if (err.code === "auth/popup-closed-by-user") {
+        toast.info("Sign-in popup was closed.");
+      } else if (err.code === "auth/account-exists-with-different-credential") {
+        toast.error("An account already exists with the same email using a different sign-in provider.");
+      } else if (err.code === "auth/operation-not-allowed") {
+        toast.error(`${provider.charAt(0).toUpperCase() + provider.slice(1)} sign-in is not enabled in your Firebase console yet.`);
+      } else if (err.code === "auth/configuration-not-found") {
+        toast.error(`Firebase configuration for ${provider} not found. Please enable it in Firebase console.`);
+      } else {
+        toast.error(err.message || `Failed to sign in with ${provider}.`);
+      }
+    } finally {
+      setSocialLoading(null);
     }
   };
 
@@ -148,23 +175,44 @@ export default function AuthPage() {
             <Button
               type="button"
               variant="outline"
-              className="h-12 border-foreground/10 hover:bg-foreground/5 group"
+              disabled={!!socialLoading || isSubmitting}
+              onClick={() => handleSocialLogin("google")}
+              title="Sign in with Google"
+              className="h-12 border-foreground/10 hover:bg-foreground/5 group relative"
             >
-              <Chrome className="w-5 h-5 group-hover:text-primary transition-colors" />
+              {socialLoading === "google" ? (
+                <Loader2 className="w-5 h-5 animate-spin text-primary" />
+              ) : (
+                <Chrome className="w-5 h-5 group-hover:text-primary transition-colors" />
+              )}
             </Button>
             <Button
               type="button"
               variant="outline"
-              className="h-12 border-foreground/10 hover:bg-foreground/5 group"
+              disabled={!!socialLoading || isSubmitting}
+              onClick={() => handleSocialLogin("linkedin")}
+              title="Sign in with LinkedIn"
+              className="h-12 border-foreground/10 hover:bg-foreground/5 group relative"
             >
-              <Linkedin className="w-5 h-5 group-hover:text-primary transition-colors" />
+              {socialLoading === "linkedin" ? (
+                <Loader2 className="w-5 h-5 animate-spin text-primary" />
+              ) : (
+                <Linkedin className="w-5 h-5 group-hover:text-primary transition-colors" />
+              )}
             </Button>
             <Button
               type="button"
               variant="outline"
-              className="h-12 border-foreground/10 hover:bg-foreground/5 group"
+              disabled={!!socialLoading || isSubmitting}
+              onClick={() => handleSocialLogin("facebook")}
+              title="Sign in with Facebook"
+              className="h-12 border-foreground/10 hover:bg-foreground/5 group relative"
             >
-              <Facebook className="w-5 h-5 group-hover:text-primary transition-colors" />
+              {socialLoading === "facebook" ? (
+                <Loader2 className="w-5 h-5 animate-spin text-primary" />
+              ) : (
+                <Facebook className="w-5 h-5 group-hover:text-primary transition-colors" />
+              )}
             </Button>
           </div>
 
@@ -198,7 +246,7 @@ export default function AuthPage() {
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Linus Torvalds"
                     required={!isLogin}
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !!socialLoading}
                     className="pl-10 h-12 bg-foreground/5 border-foreground/10 focus-visible:ring-primary"
                   />
                 </div>
@@ -221,7 +269,7 @@ export default function AuthPage() {
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="dev@share.com"
                   required
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !!socialLoading}
                   className="pl-10 h-12 bg-foreground/5 border-foreground/10 focus-visible:ring-primary"
                 />
               </div>
@@ -254,7 +302,7 @@ export default function AuthPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || !!socialLoading}
                   className="pl-10 h-12 bg-foreground/5 border-foreground/10 focus-visible:ring-primary"
                 />
               </div>
@@ -262,7 +310,7 @@ export default function AuthPage() {
 
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !!socialLoading}
               className="w-full h-12 bg-primary hover:bg-primary/90 text-primary-foreground font-bold shadow-xl shadow-primary/20 transition-all active:scale-[0.98]"
             >
               {isSubmitting ? (

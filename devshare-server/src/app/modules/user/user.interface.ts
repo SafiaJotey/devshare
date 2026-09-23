@@ -4,7 +4,7 @@ export interface IUser {
   _id?: ObjectId;
   name: string;
   email: string;
-  password: string;
+  password?: string;
   role: "user" | "admin";
   avatar?: string;
   title?: string;
@@ -14,6 +14,7 @@ export interface IUser {
     twitter?: string;
     website?: string;
   };
+  provider?: string;
   /** SHA-256 hashed refresh tokens — one entry per active device/session */
   refreshTokens: string[];
   /** Allows admins to suspend accounts without deletion */
@@ -46,6 +47,14 @@ export interface IRegisterUserPayload {
 export interface ILoginUserPayload {
   email: string;
   password: string;
+}
+
+export interface ISocialLoginPayload {
+  email: string;
+  name: string;
+  avatar?: string;
+  provider: "google" | "facebook" | "linkedin" | string;
+  idToken?: string;
 }
 
 export interface IChangePasswordPayload {

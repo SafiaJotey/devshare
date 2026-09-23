@@ -68,6 +68,7 @@ export async function apiFetch<T = any>(
   const isAuthEndpoint =
     endpoint.startsWith("/auth/login") ||
     endpoint.startsWith("/auth/register") ||
+    endpoint.startsWith("/auth/social-login") ||
     endpoint.startsWith("/auth/refresh-token") ||
     endpoint.startsWith("/auth/logout");
 
@@ -141,6 +142,19 @@ export const loginApi = async (payload: {
   password: string;
 }): Promise<ApiResponse<IUser>> => {
   return apiFetch<ApiResponse<IUser>>("/auth/login", {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+};
+
+export const socialLoginApi = async (payload: {
+  email: string;
+  name: string;
+  avatar?: string;
+  provider: "google" | "facebook" | "linkedin" | string;
+  idToken?: string;
+}): Promise<ApiResponse<IUser>> => {
+  return apiFetch<ApiResponse<IUser>>("/auth/social-login", {
     method: "POST",
     body: JSON.stringify(payload),
   });
@@ -308,6 +322,3 @@ export const deleteBlogApi = async (
     method: "DELETE",
   });
 };
-
-
-

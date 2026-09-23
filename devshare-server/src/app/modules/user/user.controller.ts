@@ -61,6 +61,22 @@ const login = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const socialLogin = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.socialLoginUser(req.body);
+
+  res.cookie("accessToken", result.accessToken, accessTokenCookieOptions);
+  res.cookie("refreshToken", result.refreshToken, refreshTokenCookieOptions);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: result.isNewUser
+      ? "Welcome to DevShare! Account created successfully."
+      : "Welcome back! Login successful.",
+    data: result.user,
+  });
+});
+
 const refreshToken = catchAsync(async (req: Request, res: Response) => {
   const incomingRefreshToken =
     req.cookies?.refreshToken || req.body?.refreshToken;
@@ -141,6 +157,7 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
 export const UserController = {
   register,
   login,
+  socialLogin,
   refreshToken,
   logout,
   getMe,
@@ -149,4 +166,3 @@ export const UserController = {
 };
 
 export default UserController;
-

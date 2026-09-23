@@ -7,13 +7,17 @@ import {
   loginApi,
   logoutApi,
   registerApi,
+  socialLoginApi,
 } from "@/lib/api";
+import { signInWithSocial, auth as firebaseAuth } from "@/lib/firebase";
+import { signOut as firebaseSignOut } from "firebase/auth";
 
 interface AuthContextType {
   user: IUser | null;
   isLoggedIn: boolean;
   isLoading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  loginWithSocial: (provider: "google" | "facebook" | "linkedin") => Promise<void>;
   register: (name: string, email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -57,6 +61,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const loginWithSocial = async (provider: "google" | "facebook" | "linkedin") => {
+    setIsLoading(true);
+    try {
+      const socialUser = await signInWithSocial(provider);
+      const res = await socialLoginApi({
+        email: socialUser.email,
+        name: socialUser.name,
+        avatar: socialUser.avatar,
+        provider: socialUser.provider,
+        idToken: socialUser.idToken,
+      });
+      if (res.data) {
+        setUser(res.data);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const register = async (name: string, email: string, password: string) => {
     setIsLoading(true);
     try {
@@ -72,6 +95,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const logout = async () => {
     try {
       await logoutApi();
+      try {
+        await firebaseSignOut(firebaseAuth);
+      } catch {
+        // Ignore firebase signOut if not signed in with firebase
+      }
     } catch (error) {
       console.error("Logout error:", error);
     } finally {
@@ -86,6 +114,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoggedIn: !!user,
         isLoading,
         login,
+        loginWithSocial,
         register,
         logout,
         refreshUser,
@@ -103,4 +132,3 @@ export function useAuth(): AuthContextType {
   }
   return context;
 }
-

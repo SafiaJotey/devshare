@@ -46,6 +46,20 @@ const loginValidationSchema = z.object({
     .min(1, "Password is required"),
 });
 
+// ─── Social Login (Firebase) ──────────────────────────────────────────────────
+
+const socialLoginValidationSchema = z.object({
+  email: z
+    .string({ error: "Email is required" })
+    .trim()
+    .toLowerCase()
+    .email("Please provide a valid email address"),
+  name: z.string().trim().min(1, "Name is required").max(100),
+  avatar: z.string().url("Avatar must be a valid URL").optional(),
+  provider: z.string().trim().min(1, "Provider is required"),
+  idToken: z.string().optional(),
+});
+
 // ─── Update Profile ───────────────────────────────────────────────────────────
 
 const updateProfileValidationSchema = z.object({
@@ -88,6 +102,7 @@ const changePasswordValidationSchema = z.object({
 export const UserValidation = {
   registerValidationSchema,
   loginValidationSchema,
+  socialLoginValidationSchema,
   updateProfileValidationSchema,
   changePasswordValidationSchema,
 };
