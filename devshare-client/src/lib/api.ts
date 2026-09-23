@@ -322,3 +322,13 @@ export const deleteBlogApi = async (
     method: "DELETE",
   });
 };
+
+export const updateBlogStatusApi = async (
+  id: string,
+  status: "Published" | "Archived"
+): Promise<ApiResponse<IBlog>> => {
+  return apiFetch<ApiResponse<IBlog>>(`/blogs/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    body: JSON.stringify({ status }),
+  });
+};

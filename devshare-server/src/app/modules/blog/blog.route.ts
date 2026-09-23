@@ -23,6 +23,14 @@ router.get("/my/blogs", auth(), BlogController.getMyBlogs);
 // Get single blog by ID or slug (Public)
 router.get("/:id", BlogController.getBlogById);
 
+// Update a blog (Protected - Author or Admin)
+router.patch(
+  "/:id",
+  auth(),
+  validateRequest(BlogValidation.updateBlogValidationSchema),
+  BlogController.updateBlog
+);
+
 // Delete blog (Protected - Author or Admin)
 router.delete("/:id", auth(), BlogController.deleteBlog);
 

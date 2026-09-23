@@ -256,10 +256,13 @@ const getMyBlogs = async (
     filter.$or = [{ title: searchRegex }, { description: searchRegex }];
   }
 
+  const sortField = query.sortBy || "createdAt";
+  const sortDirection = query.sortOrder === "asc" ? 1 : -1;
+
   const [blogs, total] = await Promise.all([
     blogCollection
       .find(filter)
-      .sort({ createdAt: -1 })
+      .sort({ [sortField]: sortDirection })
       .skip(skip)
       .limit(limit)
       .toArray(),
@@ -280,6 +283,40 @@ const getMyBlogs = async (
 };
 
 // ─── Delete Blog ─────────────────────────────────────────────────────────────
+
+const updateBlog = async (
+  userId: string,
+  blogId: string,
+  payload: IUpdateBlogPayload,
+  role?: string
+): Promise<IBlog> => {
+  const blogCollection = getBlogCollection();
+
+  if (!ObjectId.isValid(blogId) || !ObjectId.isValid(userId)) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid ID format");
+  }
+
+  const blog = await blogCollection.findOne({ _id: new ObjectId(blogId) });
+  if (!blog) {
+    throw new AppError(httpStatus.NOT_FOUND, "Article not found");
+  }
+
+  const isAuthor = blog.authorId.toString() === userId;
+  if (!isAuthor && role !== "admin") {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "You do not have permission to update this article"
+    );
+  }
+
+  const updated = await blogCollection.findOneAndUpdate(
+    { _id: new ObjectId(blogId) },
+    { $set: { ...payload, updatedAt: new Date() } },
+    { returnDocument: "after" }
+  );
+
+  return updated as IBlog;
+};
 
 const deleteBlog = async (
   userId: string,
@@ -316,6 +353,7 @@ export const BlogService = {
   getAllBlogs,
   getBlogByIdOrSlug,
   getMyBlogs,
+  updateBlog,
   deleteBlog,
 };
 

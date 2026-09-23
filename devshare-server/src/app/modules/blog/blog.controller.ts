@@ -52,6 +52,20 @@ const getMyBlogs = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateBlog = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user!.id;
+  const role = req.user!.role;
+  const { id } = req.params;
+  const result = await BlogService.updateBlog(userId, id as string, req.body, role);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Article updated successfully",
+    data: result,
+  });
+});
+
 const deleteBlog = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user!.id;
   const role = req.user!.role;
@@ -72,6 +86,7 @@ export const BlogController = {
   getAllBlogs,
   getBlogById,
   getMyBlogs,
+  updateBlog,
   deleteBlog,
 };
 
