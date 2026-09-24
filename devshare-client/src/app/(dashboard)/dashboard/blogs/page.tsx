@@ -14,6 +14,7 @@ import {
   LayoutList,
   Loader2,
   MoreHorizontal,
+  Pencil,
   Plus,
   RefreshCw,
   Search,
@@ -148,7 +149,7 @@ export default function MyBlogsDashboard() {
     if (deleted.length !== selected.length) toast.error("Some publications could not be deleted");
   };
 
-  const updateStatus = async (blog: IBlog, nextStatus: "Published" | "Archived") => {
+  const updateStatus = async (blog: IBlog, nextStatus: IBlog["status"]) => {
     toggleBusy(blog._id, true);
     try {
       await updateBlogStatusApi(blog._id, nextStatus);
@@ -249,15 +250,16 @@ function Summary({ icon: Icon, label, value, detail }: { icon: typeof Eye; label
   return <div className="flex items-center gap-3 rounded-2xl border border-foreground/10 bg-foreground/[0.02] p-4"><span className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary"><Icon size={19} /></span><div><p className="text-xl font-black tracking-tight text-foreground">{value.toLocaleString()}</p><p className="text-xs text-foreground/55">{label} <span className="text-foreground/35">· {detail}</span></p></div></div>;
 }
 
-function BlogRow({ blog, selected, busy, onSelect, onDelete, onStatus, onCopy }: { blog: IBlog; selected: boolean; busy: boolean; onSelect: (checked: boolean) => void; onDelete: (id: string, title: string) => void; onStatus: (blog: IBlog, status: "Published" | "Archived") => void; onCopy: (blog: IBlog) => void }) {
+function BlogRow({ blog, selected, busy, onSelect, onDelete, onStatus, onCopy }: { blog: IBlog; selected: boolean; busy: boolean; onSelect: (checked: boolean) => void; onDelete: (id: string, title: string) => void; onStatus: (blog: IBlog, status: IBlog["status"]) => void; onCopy: (blog: IBlog) => void }) {
   const publicHref = "/blogs/" + (blog.slug || blog._id);
+  const editHref = "/dashboard/create-blog?edit=" + encodeURIComponent(blog._id);
   return <TableRow data-state={selected ? "selected" : undefined} className="group border-foreground/8">
     <TableCell className="px-4 py-4 sm:px-5"><Checkbox checked={selected} onCheckedChange={(checked) => onSelect(checked === true)} aria-label={"Select " + blog.title} /></TableCell>
-    <TableCell className="py-4"><div className="flex min-w-0 items-start gap-3"><span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"><FileText size={17} /></span><div className="min-w-0"><Link href={publicHref} className="block truncate text-sm font-bold text-foreground transition-colors hover:text-primary">{blog.title}</Link><p className="mt-1 line-clamp-1 text-xs text-foreground/50">{blog.description}</p><div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-foreground/45"><span className="rounded-md bg-foreground/[0.05] px-1.5 py-0.5 font-medium">{blog.category}</span><span>{blog.readTime || "Quick read"}</span><span className="md:hidden"><StatusPill status={blog.status} /></span></div></div></div></TableCell>
+    <TableCell className="py-4"><div className="flex min-w-0 items-start gap-3"><span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"><FileText size={17} /></span><div className="min-w-0"><Link href={blog.status === "Published" ? publicHref : editHref} className="block truncate text-sm font-bold text-foreground transition-colors hover:text-primary">{blog.title}</Link><p className="mt-1 line-clamp-1 text-xs text-foreground/50">{blog.description}</p><div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-foreground/45"><span className="rounded-md bg-foreground/[0.05] px-1.5 py-0.5 font-medium">{blog.category}</span><span>{blog.readTime || "Quick read"}</span><span className="md:hidden"><StatusPill status={blog.status} /></span></div></div></div></TableCell>
     <TableCell className="hidden py-4 md:table-cell"><StatusPill status={blog.status} /></TableCell>
     <TableCell className="hidden py-4 lg:table-cell"><div className="flex gap-3 text-xs text-foreground/60"><span className="flex items-center gap-1"><Eye size={13} />{(blog.views || 0).toLocaleString()}</span><span className="flex items-center gap-1"><Users size={13} />{(blog.likes || 0).toLocaleString()}</span></div></TableCell>
     <TableCell className="hidden py-4 text-xs text-foreground/55 xl:table-cell">{formatDate(blog.updatedAt || blog.createdAt)}</TableCell>
-    <TableCell className="py-4 pr-4 text-right sm:pr-5"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" disabled={busy} className="size-8 rounded-lg"><MoreHorizontal size={18} /></Button></DropdownMenuTrigger><DropdownMenuContent align="end" className="w-48 rounded-xl"><DropdownMenuLabel className="text-xs text-foreground/50">Article actions</DropdownMenuLabel><DropdownMenuItem asChild><Link href={publicHref}><Eye size={15} /> View article</Link></DropdownMenuItem><DropdownMenuItem onClick={() => onCopy(blog)}><Copy size={15} /> Copy public link</DropdownMenuItem>{blog.status !== "Published" && <DropdownMenuItem onClick={() => onStatus(blog, "Published")}><Send size={15} /> Publish on DevShare</DropdownMenuItem>}{blog.status !== "Archived" && <DropdownMenuItem onClick={() => onStatus(blog, "Archived")}><Archive size={15} /> Archive article</DropdownMenuItem>}<DropdownMenuSeparator /><DropdownMenuItem onClick={() => onDelete(blog._id, blog.title)} className="text-red-600 focus:bg-red-500/10 focus:text-red-600"><Trash2 size={15} /> Delete article</DropdownMenuItem></DropdownMenuContent></DropdownMenu></TableCell>
+    <TableCell className="py-4 pr-4 text-right sm:pr-5"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" disabled={busy} className="size-8 rounded-lg"><MoreHorizontal size={18} /></Button></DropdownMenuTrigger><DropdownMenuContent align="end" className="w-52 rounded-xl !border-emerald-400/25 !bg-[#06130e] p-1.5 text-foreground shadow-[0_20px_50px_rgba(0,0,0,0.65)]"><DropdownMenuLabel className="px-2.5 text-xs text-foreground/50">Actions</DropdownMenuLabel><DropdownMenuItem asChild><Link href={editHref}><Pencil size={15} /> Edit article</Link></DropdownMenuItem>{blog.status === "Published" && <><DropdownMenuItem asChild><Link href={publicHref}><Eye size={15} /> View live article</Link></DropdownMenuItem><DropdownMenuItem onClick={() => onCopy(blog)}><Copy size={15} /> Copy public link</DropdownMenuItem></>}{blog.status !== "Published" && <DropdownMenuItem onClick={() => onStatus(blog, "Published")}><Send size={15} /> {blog.status === "Archived" ? "Republish article" : "Publish now"}</DropdownMenuItem>}{blog.status === "Published" && <DropdownMenuItem onClick={() => onStatus(blog, "Draft")}><Pencil size={15} /> Move to draft</DropdownMenuItem>}{blog.status === "Archived" && <DropdownMenuItem onClick={() => onStatus(blog, "Draft")}><Pencil size={15} /> Restore as draft</DropdownMenuItem>}{blog.status !== "Archived" && <DropdownMenuItem onClick={() => onStatus(blog, "Archived")}><Archive size={15} /> Archive article</DropdownMenuItem>}<DropdownMenuSeparator className="bg-emerald-50/10" /><DropdownMenuItem onClick={() => onDelete(blog._id, blog.title)} className="text-red-500 focus:bg-red-500/10 focus:text-red-400"><Trash2 size={15} /> Delete article</DropdownMenuItem></DropdownMenuContent></DropdownMenu></TableCell>
   </TableRow>;
 }
 

@@ -46,6 +46,13 @@ userRouter.patch(
 );
 
 userRouter.patch(
+  "/profile/avatar",
+  auth(),
+  validateRequest(UserValidation.avatarUploadValidationSchema),
+  UserController.updateAvatar
+);
+
+userRouter.patch(
   "/change-password",
   auth(),
   validateRequest(UserValidation.changePasswordValidationSchema),

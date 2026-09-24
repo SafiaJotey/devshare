@@ -1,19 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { 
   Mail, 
-  Key, 
+  KeyRound, 
+  ShieldCheck, 
   AlertTriangle, 
-  Smartphone, 
-  ChevronRight,
-  Loader2
+  Loader2, 
+  Lock, 
+  Check, 
+  Smartphone 
 } from "lucide-react";
 import { useAuth } from "@/providers/auth-provider";
 import { changePasswordApi } from "@/lib/api";
@@ -24,6 +25,7 @@ export default function AccountSettings() {
 
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
 
   const handleUpdatePassword = async (e: React.FormEvent) => {
@@ -31,6 +33,11 @@ export default function AccountSettings() {
 
     if (!currentPassword || !newPassword) {
       toast.error("Please fill in both current and new passwords.");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      toast.error("New passwords do not match.");
       return;
     }
 
@@ -47,7 +54,7 @@ export default function AccountSettings() {
     setIsUpdatingPassword(true);
     try {
       await changePasswordApi({ currentPassword, newPassword });
-      toast.success("Password changed successfully! Please log in with your new password.");
+      toast.success("Security credentials rotated! Please re-authenticate.");
       await logout();
       router.push("/auth");
     } catch (error: any) {
@@ -58,123 +65,166 @@ export default function AccountSettings() {
   };
 
   return (
-    <div className="space-y-12 animate-in fade-in slide-in-from-right-4 duration-500">
-      <section className="space-y-6">
-        <div>
-          <h3 className="text-xl font-bold flex items-center gap-2">
-            <Mail size={20} className="text-primary" />
-            Communication Channel
-          </h3>
-          <p className="text-sm text-foreground/40 mt-1">Manage your primary login and contact email.</p>
+    <div className="space-y-10 animate-in fade-in duration-300">
+      {/* Email Identification */}
+      <div>
+        <div className="flex items-center gap-2 mb-1">
+          <Mail className="w-5 h-5 text-primary" />
+          <h2 className="text-lg font-bold text-foreground">Authentication Endpoint</h2>
         </div>
+        <p className="text-xs text-foreground/50">
+          Your unique identifier used for authentication and Git commit attributions.
+        </p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
-          <div className="space-y-2">
-            <Label className="text-[10px] uppercase tracking-widest font-black text-foreground/40">Registered Email</Label>
-            <div className="relative">
-              <Input 
-                value={user?.email || ""} 
-                disabled
-                className="rounded-xl border-foreground/10 bg-foreground/[0.02] pl-4 pr-24 h-12" 
-              />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2 bg-emerald-500/10 text-emerald-600 text-[9px] font-bold px-2 py-1 rounded-md border border-emerald-500/20">
-                VERIFIED
-              </div>
+        <div className="mt-4 max-w-lg">
+          <Label className="text-xs font-mono uppercase tracking-wider text-foreground/60 font-semibold">
+            Registered Email
+          </Label>
+          <div className="relative mt-1.5">
+            <Input
+              value={user?.email || ""}
+              disabled
+              className="rounded-xl border-foreground/10 bg-foreground/[0.03] pl-4 pr-24 h-11 font-mono text-sm"
+            />
+            <div className="absolute right-2.5 top-1/2 -translate-y-1/2 inline-flex items-center gap-1 bg-primary/10 text-primary text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-md border border-primary/20">
+              <Check size={12} />
+              VERIFIED
             </div>
           </div>
         </div>
-      </section>
+      </div>
 
-      <Separator className="bg-foreground/5" />
+      <div className="h-px bg-foreground/10" />
 
-      <section className="space-y-6">
-        <div>
-          <h3 className="text-xl font-bold flex items-center gap-2">
-            <Key size={20} className="text-primary" />
-            Security Credentials
-          </h3>
-          <p className="text-sm text-foreground/40 mt-1">Ensure your account uses a complex architectural password.</p>
+      {/* Password Rotation */}
+      <div>
+        <div className="flex items-center gap-2 mb-1">
+          <KeyRound className="w-5 h-5 text-primary" />
+          <h2 className="text-lg font-bold text-foreground">Rotate Access Password</h2>
         </div>
+        <p className="text-xs text-foreground/50">
+          Enforces salt-12 bcrypt hashing and revokes stale refresh tokens across all active sessions.
+        </p>
 
-        <form onSubmit={handleUpdatePassword} className="space-y-4 max-w-md">
-          <div className="space-y-2">
-            <Label className="text-[10px] uppercase tracking-widest font-black text-foreground/40">Current Password</Label>
-            <Input 
-              type="password" 
+        <form onSubmit={handleUpdatePassword} className="mt-5 space-y-4 max-w-md">
+          <div className="space-y-1.5">
+            <Label className="text-xs font-mono uppercase tracking-wider text-foreground/60 font-semibold">
+              Current Password
+            </Label>
+            <Input
+              type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              placeholder="••••••••" 
+              placeholder="••••••••••••"
               disabled={isUpdatingPassword}
-              className="rounded-xl border-foreground/10 bg-foreground/[0.02] h-11" 
+              className="rounded-xl border-foreground/10 bg-background/50 h-11 text-sm font-mono"
             />
           </div>
-          <div className="space-y-2">
-            <Label className="text-[10px] uppercase tracking-widest font-black text-foreground/40">New Security String</Label>
-            <Input 
-              type="password" 
+
+          <div className="space-y-1.5">
+            <Label className="text-xs font-mono uppercase tracking-wider text-foreground/60 font-semibold">
+              New Password
+            </Label>
+            <Input
+              type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="••••••••" 
+              placeholder="••••••••••••"
               disabled={isUpdatingPassword}
-              className="rounded-xl border-foreground/10 bg-foreground/[0.02] h-11" 
+              className="rounded-xl border-foreground/10 bg-background/50 h-11 text-sm font-mono"
             />
           </div>
-          <Button 
+
+          <div className="space-y-1.5">
+            <Label className="text-xs font-mono uppercase tracking-wider text-foreground/60 font-semibold">
+              Confirm New Password
+            </Label>
+            <Input
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="••••••••••••"
+              disabled={isUpdatingPassword}
+              className="rounded-xl border-foreground/10 bg-background/50 h-11 text-sm font-mono"
+            />
+          </div>
+
+          <Button
             type="submit"
             disabled={isUpdatingPassword}
-            className="bg-foreground text-background hover:bg-foreground/90 rounded-xl px-6 h-11 font-bold text-xs uppercase tracking-widest transition-all cursor-pointer"
+            className="mt-2 bg-foreground text-background hover:bg-foreground/90 rounded-xl px-6 h-11 font-semibold text-xs uppercase tracking-wider transition-all cursor-pointer flex items-center gap-2"
           >
             {isUpdatingPassword ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Updating...
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Rotating Keys...
               </>
             ) : (
-              "Update Credentials"
+              <>
+                <Lock size={15} />
+                Rotate Credentials
+              </>
             )}
           </Button>
         </form>
-      </section>
+      </div>
 
+      <div className="h-px bg-foreground/10" />
 
-      <Separator className="bg-foreground/5" />
-
-      <section className="p-6 rounded-[2rem] bg-primary/[0.03] border border-primary/10 flex flex-col md:flex-row justify-between items-center gap-6">
+      {/* 2FA Section */}
+      <div className="p-6 rounded-2xl bg-foreground/[0.02] border border-foreground/10 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-start gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
-             <Smartphone size={24} />
+          <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
+            <Smartphone size={20} />
           </div>
           <div>
-            <h4 className="font-bold text-base">Two-Factor Authentication (2FA)</h4>
+            <h3 className="font-bold text-sm text-foreground flex items-center gap-2">
+              Two-Factor Authentication (TOTP)
+              <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded-full bg-foreground/5 border border-foreground/10 text-foreground/60">
+                Optional
+              </span>
+            </h3>
             <p className="text-xs text-foreground/50 mt-1 leading-relaxed">
-              Add an extra layer of security by requiring a verification code from your mobile device during login.
+              Require an authenticator code (Google Authenticator, 1Password) whenever logging into the DevShare console.
             </p>
           </div>
         </div>
-        <Button variant="outline" className="rounded-xl border-primary/20 text-primary hover:bg-primary/5 font-bold h-11 px-6 whitespace-nowrap">
-           Setup 2FA <ChevronRight size={16} className="ml-2" />
-        </Button>
-      </section>
 
-  
-      <section className="mt-20 border border-red-500/10 rounded-[2rem] overflow-hidden">
-        <div className="bg-red-500/5 px-8 py-4 border-b border-red-500/10 flex items-center gap-2 text-red-600">
-           <AlertTriangle size={16} />
-           <span className="text-[10px] font-black uppercase tracking-[0.2em]">Danger Zone // Nuclear Option</span>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => toast.info("Two-Factor Authentication configuration will be available in the upcoming security release.")}
+          className="rounded-xl border-foreground/20 hover:bg-foreground/5 text-xs font-semibold h-10 px-4 shrink-0"
+        >
+          Configure TOTP
+        </Button>
+      </div>
+
+      {/* Danger Zone */}
+      <div className="border border-red-500/20 rounded-2xl overflow-hidden bg-red-500/[0.02]">
+        <div className="px-6 py-3 border-b border-red-500/20 bg-red-500/5 flex items-center gap-2 text-red-600">
+          <AlertTriangle size={15} />
+          <span className="text-[11px] font-mono font-bold uppercase tracking-wider">
+            Critical Action // Danger Zone
+          </span>
         </div>
-        <div className="p-8 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="space-y-1">
-            <h4 className="font-bold text-foreground">Terminate Account</h4>
-            <p className="text-xs text-foreground/40">
-              Once deleted, all your technical blogs, drafts, and analytics will be purged from our servers.
+        <div className="p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h4 className="font-bold text-sm text-foreground">Deprovision Account</h4>
+            <p className="text-xs text-foreground/50 mt-1 leading-relaxed max-w-md">
+              Permanently purges your published articles, code snippets, drafts, and profile records from the MongoDB database.
             </p>
           </div>
-          <Button variant="ghost" className="text-red-500 hover:bg-red-50 hover:text-red-600 rounded-xl font-bold h-11 px-6 border border-red-500/10">
-            Purge All Records
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => toast.error("Account deprovisioning requires email confirmation link.")}
+            className="text-red-500 hover:bg-red-500/10 hover:text-red-600 rounded-xl font-semibold text-xs h-10 px-4 border border-red-500/20 shrink-0"
+          >
+            Purge Account Data
           </Button>
         </div>
-      </section>
-
+      </div>
     </div>
   );
 }

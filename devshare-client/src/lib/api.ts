@@ -187,6 +187,15 @@ export const updateProfileApi = async (
   });
 };
 
+export const uploadProfileAvatarApi = async (
+  avatar: string
+): Promise<ApiResponse<IUser>> => {
+  return apiFetch<ApiResponse<IUser>>("/users/profile/avatar", {
+    method: "PATCH",
+    body: JSON.stringify({ avatar }),
+  });
+};
+
 export const changePasswordApi = async (payload: {
   currentPassword: string;
   newPassword: string;
@@ -247,6 +256,16 @@ export interface ICreateBlogPayload {
   category: string;
   blocks: IBlogBlock[];
   status?: "Draft" | "Published";
+  coverImage?: string;
+  tags?: string[];
+}
+
+export interface IUpdateBlogPayload {
+  title?: string;
+  description?: string;
+  category?: string;
+  blocks?: IBlogBlock[];
+  status?: IBlog["status"];
   coverImage?: string;
   tags?: string[];
 }
@@ -315,6 +334,14 @@ export const getMyBlogsApi = async (
   });
 };
 
+export const getMyBlogByIdApi = async (
+  id: string
+): Promise<ApiResponse<IBlog>> => {
+  return apiFetch<ApiResponse<IBlog>>(`/blogs/my/blogs/${encodeURIComponent(id)}`, {
+    method: "GET",
+  });
+};
+
 export const deleteBlogApi = async (
   id: string
 ): Promise<ApiResponse<null>> => {
@@ -325,10 +352,17 @@ export const deleteBlogApi = async (
 
 export const updateBlogStatusApi = async (
   id: string,
-  status: "Published" | "Archived"
+  status: IBlog["status"]
+): Promise<ApiResponse<IBlog>> => {
+  return updateBlogApi(id, { status });
+};
+
+export const updateBlogApi = async (
+  id: string,
+  payload: IUpdateBlogPayload
 ): Promise<ApiResponse<IBlog>> => {
   return apiFetch<ApiResponse<IBlog>>(`/blogs/${encodeURIComponent(id)}`, {
     method: "PATCH",
-    body: JSON.stringify({ status }),
+    body: JSON.stringify(payload),
   });
 };

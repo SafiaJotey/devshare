@@ -139,6 +139,16 @@ const updateProfile = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateAvatar = catchAsync(async (req: Request, res: Response) => {
+  const result = await UserService.updateAvatar(req.user!.id, req.body.avatar);
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Profile photo updated successfully",
+    data: result,
+  });
+});
+
 const changePassword = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user!.id;
   await UserService.changePassword(userId, req.body);
@@ -162,6 +172,7 @@ export const UserController = {
   logout,
   getMe,
   updateProfile,
+  updateAvatar,
   changePassword,
 };
 

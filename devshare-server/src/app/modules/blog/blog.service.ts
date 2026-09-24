@@ -204,9 +204,9 @@ const getBlogByIdOrSlug = async (idOrSlug: string): Promise<IBlog> => {
   let filter: Filter<IBlog>;
 
   if (ObjectId.isValid(idOrSlug)) {
-    filter = { _id: new ObjectId(idOrSlug) };
+    filter = { _id: new ObjectId(idOrSlug), status: "Published" };
   } else {
-    filter = { slug: idOrSlug };
+    filter = { slug: idOrSlug, status: "Published" };
   }
 
   // Atomically increment views on read
@@ -282,6 +282,31 @@ const getMyBlogs = async (
   };
 };
 
+/** Fetches an editable article without exposing drafts or inflating view counts. */
+const getMyBlogById = async (
+  userId: string,
+  blogId: string,
+  role?: string
+): Promise<IBlog> => {
+  const blogCollection = getBlogCollection();
+
+  if (!ObjectId.isValid(userId) || !ObjectId.isValid(blogId)) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid ID format");
+  }
+
+  const filter: Filter<IBlog> = { _id: new ObjectId(blogId) };
+  if (role !== "admin") {
+    filter.authorId = new ObjectId(userId);
+  }
+
+  const blog = await blogCollection.findOne(filter);
+  if (!blog) {
+    throw new AppError(httpStatus.NOT_FOUND, "Article not found");
+  }
+
+  return blog;
+};
+
 // ─── Delete Blog ─────────────────────────────────────────────────────────────
 
 const updateBlog = async (
@@ -309,9 +334,26 @@ const updateBlog = async (
     );
   }
 
+  const nextBlocks = payload.blocks || blog.blocks;
+  const nextCategory = payload.category || blog.category;
+  const updatePayload: IUpdateBlogPayload & { updatedAt: Date; readTime?: string; coverImage?: string } = {
+    ...payload,
+    updatedAt: new Date(),
+  };
+  if (payload.title !== undefined) updatePayload.title = payload.title.trim();
+  if (payload.description !== undefined) updatePayload.description = payload.description.trim();
+
+  // Keep derived fields accurate after an author edits article content or its cover.
+  if (payload.blocks) {
+    updatePayload.readTime = calculateReadTime(nextBlocks);
+  }
+  if (payload.coverImage !== undefined || payload.blocks || payload.category) {
+    updatePayload.coverImage = resolveCoverImage(payload.coverImage, nextBlocks, nextCategory);
+  }
+
   const updated = await blogCollection.findOneAndUpdate(
     { _id: new ObjectId(blogId) },
-    { $set: { ...payload, updatedAt: new Date() } },
+    { $set: updatePayload },
     { returnDocument: "after" }
   );
 
@@ -353,6 +395,7 @@ export const BlogService = {
   getAllBlogs,
   getBlogByIdOrSlug,
   getMyBlogs,
+  getMyBlogById,
   updateBlog,
   deleteBlog,
 };

@@ -455,6 +455,24 @@ const updateProfile = async (
   return sanitizeUser(result);
 };
 
+/** Stores the compact base64 profile image directly in the user's MongoDB document. */
+const updateAvatar = async (userId: string, avatar: string): Promise<IUserResponse> => {
+  const collection = getUserCollection();
+  if (!ObjectId.isValid(userId)) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid user identifier");
+  }
+
+  const result = await collection.findOneAndUpdate(
+    { _id: new ObjectId(userId) },
+    { $set: { avatar, updatedAt: new Date() } },
+    { returnDocument: "after" }
+  );
+  if (!result) {
+    throw new AppError(httpStatus.NOT_FOUND, "User profile not found");
+  }
+  return sanitizeUser(result);
+};
+
 export const UserService = {
   registerUser,
   loginUser,
@@ -464,6 +482,7 @@ export const UserService = {
   changePassword,
   getMe,
   updateProfile,
+  updateAvatar,
 };
 
 export default UserService;

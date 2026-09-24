@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import {
   DndContext,
@@ -26,11 +26,13 @@ import { Toolbar } from "./_components/Toolbar";
 import { PreviewMode } from "./_components/PreviewMode";
 import { Block, BlockType } from "./type";
 import { useAuth } from "@/providers/auth-provider";
-import { createBlogApi } from "@/lib/api";
+import { createBlogApi, getMyBlogByIdApi, updateBlogApi } from "@/lib/api";
 
 export default function WriteNewPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, isLoggedIn } = useAuth();
+  const editId = searchParams.get("edit");
 
   const [isPreview, setIsPreview] = useState(false);
   const [category, setCategory] = useState("");
@@ -40,10 +42,45 @@ export default function WriteNewPage() {
   const [isSubmitting, setIsSubmitting] = useState<"publish" | "draft" | null>(
     null
   );
+  const [isLoadingArticle, setIsLoadingArticle] = useState(Boolean(editId));
+  const [editingBlogId, setEditingBlogId] = useState<string | null>(null);
 
   const [blocks, setBlocks] = useState<Block[]>([
     { id: "init-1", type: "p", content: "" },
   ]);
+
+  useEffect(() => {
+    let isCurrent = true;
+    if (!editId) {
+      setEditingBlogId(null);
+      setIsLoadingArticle(false);
+      return;
+    }
+
+    const loadArticle = async () => {
+      setIsLoadingArticle(true);
+      try {
+        const response = await getMyBlogByIdApi(editId);
+        if (!response.success || !response.data) throw new Error(response.message || "Could not load this article");
+        if (!isCurrent) return;
+        const article = response.data;
+        setEditingBlogId(article._id);
+        setCategory(article.category);
+        setTitle(article.title);
+        setDescription(article.description);
+        setCoverImage(article.coverImage || "");
+        setBlocks(article.blocks.length ? article.blocks : [{ id: "init-1", type: "p", content: "" }]);
+      } catch (error) {
+        if (!isCurrent) return;
+        toast.error(error instanceof Error ? error.message : "Could not load this article");
+        router.replace("/dashboard/blogs");
+      } finally {
+        if (isCurrent) setIsLoadingArticle(false);
+      }
+    };
+    loadArticle();
+    return () => { isCurrent = false; };
+  }, [editId, router]);
 
   const hasContentBlock = blocks.some((b) => b.content && b.content.trim().length > 0);
   const isReadyToPublish =
@@ -132,14 +169,17 @@ export default function WriteNewPage() {
     );
 
     try {
-      const response = await createBlogApi({
+      const payload = {
         title: title.trim(),
         description: description.trim(),
         category,
         blocks: cleanedBlocks,
         status,
         coverImage: coverImage.trim() || undefined,
-      });
+      };
+      const response = editingBlogId
+        ? await updateBlogApi(editingBlogId, { ...payload, coverImage: coverImage.trim() })
+        : await createBlogApi(payload);
 
       if (response.success && response.data) {
         toast.success(
@@ -148,13 +188,13 @@ export default function WriteNewPage() {
             : "Draft saved successfully! 📝",
           {
             id: toastId,
-            description: `"${response.data.title}" is now available in your workspace.`,
+            description: `"${response.data.title}" has been saved to your workspace.`,
           }
         );
 
         // Redirect to newly published blog reader or dashboard
         if (status === "Published" && response.data._id) {
-          router.push(`/blogs/${response.data._id}`);
+          router.push(`/blogs/${response.data.slug || response.data._id}`);
         } else {
           router.push("/dashboard/blogs");
         }
@@ -169,6 +209,15 @@ export default function WriteNewPage() {
       setIsSubmitting(null);
     }
   };
+
+  if (isLoadingArticle) {
+    return (
+      <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3 bg-background">
+        <Loader2 className="animate-spin text-primary" size={28} />
+        <p className="text-xs font-mono uppercase tracking-widest text-foreground/45">Loading article editor</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background pb-40">
@@ -185,7 +234,7 @@ export default function WriteNewPage() {
             >
               {isReadyToPublish ? <Rocket size={14} /> : <AlertCircle size={14} />}
               <span className="font-mono text-[10px] uppercase font-bold tracking-widest">
-                {isReadyToPublish ? "Ready to Publish" : "Incomplete Draft"}
+                {isReadyToPublish ? editingBlogId ? "Ready to Update" : "Ready to Publish" : "Incomplete Draft"}
               </span>
             </div>
             <span className="hidden md:block text-[10px] text-foreground/30 font-mono uppercase tracking-widest italic">
@@ -230,7 +279,7 @@ export default function WriteNewPage() {
               ) : (
                 <>
                   <Rocket size={18} />
-                  <span>Publish Article</span>
+                  <span>{editingBlogId ? "Update & Publish" : "Publish Article"}</span>
                 </>
               )}
             </Button>

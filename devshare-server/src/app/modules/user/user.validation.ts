@@ -88,6 +88,16 @@ const updateProfileValidationSchema = z.object({
     .optional(),
 });
 
+const avatarUploadValidationSchema = z.object({
+  avatar: z
+    .string({ error: "Profile image is required" })
+    .max(1_500_000, "Profile image must be 1 MB or smaller")
+    .regex(
+      /^data:image\/(png|jpe?g|webp|gif);base64,[a-zA-Z0-9+/=]+$/,
+      "Upload a PNG, JPG, WebP, or GIF image"
+    ),
+});
+
 // ─── Change Password ──────────────────────────────────────────────────────────
 
 const changePasswordValidationSchema = z.object({
@@ -104,6 +114,7 @@ export const UserValidation = {
   loginValidationSchema,
   socialLoginValidationSchema,
   updateProfileValidationSchema,
+  avatarUploadValidationSchema,
   changePasswordValidationSchema,
 };
 

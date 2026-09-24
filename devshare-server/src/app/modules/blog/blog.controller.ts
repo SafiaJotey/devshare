@@ -52,6 +52,21 @@ const getMyBlogs = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMyBlogById = catchAsync(async (req: Request, res: Response) => {
+  const result = await BlogService.getMyBlogById(
+    req.user!.id,
+    req.params.id as string,
+    req.user!.role
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Article retrieved successfully",
+    data: result,
+  });
+});
+
 const updateBlog = catchAsync(async (req: Request, res: Response) => {
   const userId = req.user!.id;
   const role = req.user!.role;
@@ -86,6 +101,7 @@ export const BlogController = {
   getAllBlogs,
   getBlogById,
   getMyBlogs,
+  getMyBlogById,
   updateBlog,
   deleteBlog,
 };

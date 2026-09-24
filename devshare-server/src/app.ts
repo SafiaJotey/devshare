@@ -67,7 +67,8 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 app.use(cookieParser());
-app.use(express.json());
+// Profile photos are sent as validated base64 data and stored in the user document.
+app.use(express.json({ limit: "2mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 // Health check endpoint
