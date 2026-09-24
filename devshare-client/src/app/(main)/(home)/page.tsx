@@ -225,29 +225,27 @@ export default function Home() {
                   fill
                   priority
                   sizes="(max-width: 1024px) 100vw, 58vw"
-                  className="opacity-100 transition-transform duration-700 ease-out group-hover:scale-105"
+                  className="opacity-40 transition-transform duration-700 ease-out group-hover:scale-105"
                   unoptimized
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-foreground via-foreground/55 to-foreground/5" />
+                <div className="absolute inset-0 bg-linear-to-t from-foreground via-foreground/55 to-foreground/5" />
 
                 <div className="relative z-10 flex w-full flex-col justify-between p-6 sm:p-8 md:p-10">
                   <div className="flex items-start justify-between gap-4">
                     <span className="rounded-full bg-accent px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-background">
                       {activeMainPost.category}
                     </span>
-                    <span className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-background/60">
-                      Featured / 01
-                    </span>
+                  
                   </div>
 
                   <div className="max-w-2xl pt-16">
-                    <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-accent">
+                    <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-accent text-shadow-xs text-shadow-accent/50">
                       Deep dive
                     </p>
-                    <h3 className="text-3xl font-extrabold leading-[1.05] tracking-tight sm:text-4xl md:text-5xl">
+                    <h3 className="text-3xl font-extrabold leading-[1.05] tracking-tight sm:text-4xl md:text-5xl  text-shadow-xs text-shadow-background/50">
                       {activeMainPost.title}
                     </h3>
-                    <p className="mt-5 max-w-xl text-sm leading-relaxed text-background/75 sm:text-base line-clamp-2">
+                    <p className="mt-5 max-w-xl text-sm leading-relaxed text-background/75 text-shadow-xs text-shadow-background/50 sm:text-base line-clamp-2">
                       {activeMainPost.description}
                     </p>
                   </div>
@@ -285,15 +283,15 @@ export default function Home() {
                     <Link
                       key={post.id}
                       href={`/blogs/${post.id}`}
-                      className="group relative flex min-h-[300px] overflow-hidden rounded-3xl border border-foreground/10 bg-foreground/[0.03] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10 sm:p-6 lg:min-h-0 lg:flex-1"
+                      className="group relative flex min-h-75 overflow-hidden rounded-3xl border border-foreground/10 bg-foreground/[0.03] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10 sm:p-6 lg:min-h-0 lg:flex-1"
                     >
-                      <div className="absolute inset-y-0 right-0 w-[100%] overflow-hidden">
+                      <div className="absolute inset-y-0 right-0 w-full overflow-hidden">
                         <Image
                           src={post.image}
                           alt="feature"
                           fill
                           sizes="(max-width: 640px) 42vw, (max-width: 1024px) 21vw, 18vw"
-                          className={`object-cover ${post.image ? "opacity-100" : "opacity-0"} transition-transform duration-700 group-hover:scale-110 group-hover:opacity-35`}
+                          className={`object-cover ${post.image ? "opacity-40" : "opacity-0"} transition-transform duration-700 group-hover:scale-110 group-hover:opacity-35`}
                           onError={(e) => {
                             e.currentTarget.style.opacity = "0";
                           }}
@@ -308,9 +306,7 @@ export default function Home() {
                             <span className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.15em] text-primary">
                               {post.category}
                             </span>
-                            <span className="font-mono text-[10px] font-bold text-foreground/35">
-                              0{index + 2}
-                            </span>
+                          
                           </div>
                           <h4 className="max-w-[82%] text-xl font-bold leading-tight tracking-tight transition-colors group-hover:text-primary sm:text-2xl line-clamp-3">
                             {post.title}

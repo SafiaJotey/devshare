@@ -91,7 +91,7 @@ export default function DashboardOverview() {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-foreground/5">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            {/* <span className="w-2 h-2 rounded-full bg-emerald-500" /> */}
             <span className="text-xs font-mono uppercase tracking-wider text-foreground/50">
               Workspace Overview
             </span>
@@ -432,7 +432,7 @@ export default function DashboardOverview() {
             <div className="pt-3 border-t border-foreground/5 flex items-center justify-between text-xs">
               <span className="text-foreground/50">Standing</span>
               <span className="font-semibold text-emerald-600 flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                {/* <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" /> */}
                 Active Contributor
               </span>
             </div>

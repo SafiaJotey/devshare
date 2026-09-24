@@ -152,7 +152,7 @@ export default function Blogs() {
         <PenLine size={120} />
       </div>
       <h4 className="font-bold text-sm mb-2 flex items-center gap-2">
-        <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+        {/* <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" /> */}
         Share what you learned
       </h4>
       <p className="text-[11px] opacity-50 mb-6 leading-relaxed">
@@ -171,7 +171,7 @@ export default function Blogs() {
     <main className="min-h-screen bg-background text-foreground">
       {/* 1. HERO SECTION & LEAD ARTICLE */}
       <section className="pt-22 pb-20 border-b border-foreground/5 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-[50%] h-full bg-primary/5 -skew-x-12 translate-x-20 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[50%] h-full bg-primary/6 -skew-x-12 translate-x-20 pointer-events-none" />
         <div className="container-box relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
             <div className="lg:col-span-6">
@@ -197,34 +197,41 @@ export default function Blogs() {
               {isInitialLoading ? (
                 <LeadCardSkeleton />
               ) : leadPost ? (
-                <Link href={`/blogs/${leadPost.id}`} className="group block">
-                  <div className="relative aspect-[4/5] md:aspect-video rounded-3xl overflow-hidden shadow-2xl">
-                    <Image
-                      src={leadPost.image}
-                      alt={leadPost.title}
-                      fill
-                      className="object-cover grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
-                      priority
-                      unoptimized
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-foreground via-transparent to-transparent opacity-60" />
-                    <div className="absolute bottom-0 left-0 p-6 md:p-10 text-background">
-                      <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-accent mb-4 block">
-                        Lead Article // {leadPost.tag}
-                      </span>
-                      <h2 className="text-2xl md:text-4xl font-bold mb-4 tracking-tight leading-tight line-clamp-2">
-                        {leadPost.title}
-                      </h2>
-                      <div className="flex items-center gap-4 text-xs font-mono opacity-60">
-                        <span>{leadPost.author}</span>
-                        <span>/</span>
-                        <span>{leadPost.readTime}</span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
+               <Link href={`/blogs/${leadPost.id}`} className="group block">
+  <div className="relative aspect-4/5 md:aspect-video rounded-3xl overflow-hidden shadow-2xl bg-black">
+    {/* Background Image */}
+    <Image
+      src={leadPost.image}
+      alt={leadPost.title}
+      fill
+      className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+      priority
+      unoptimized
+    />
+
+    {/* Guaranteed High-Contrast Dark Gradient Scrim */}
+    <div className="absolute inset-0 bg-linear-to-t from-black/95 via-black/60 to-black/20" />
+
+    {/* Text Content */}
+    <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-10 z-10">
+      <span className="text-[11px] font-mono uppercase tracking-[0.3em] text-accent font-semibold mb-3 drop-shadow-sm">
+        Lead Article | {leadPost.tag}
+      </span>
+      
+      <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 tracking-tight leading-snug line-clamp-2 text-white drop-shadow-md">
+        {leadPost.title}
+      </h2>
+
+      <div className="flex items-center gap-3 text-xs font-mono text-zinc-300">
+        <span className="font-medium">By {leadPost.author}</span>
+        <span className="text-zinc-500">•</span>
+        <span>{leadPost.readTime}</span>
+      </div>
+    </div>
+  </div>
+</Link>
               ) : (
-                <div className="relative aspect-[4/5] md:aspect-video rounded-3xl overflow-hidden border border-dashed border-foreground/15 bg-foreground/[0.02] flex flex-col items-center justify-center p-8 text-center">
+                <div className="relative aspect-4/5 md:aspect-video rounded-3xl overflow-hidden border border-dashed border-foreground/15 bg-foreground/[0.02] flex flex-col items-center justify-center p-8 text-center">
                   <div className="w-14 h-14 rounded-2xl bg-foreground/5 flex items-center justify-center mb-4 text-foreground/40">
                     <BookOpen size={28} />
                   </div>
@@ -241,9 +248,9 @@ export default function Blogs() {
 
       {/* 2. MAIN CATALOG WITH SEARCH & SIDEBAR */}
       <div className="container-box py-10 lg:py-20">
-        <div className="mb-10 flex flex-col gap-6 border-b border-foreground/10 pb-8 sm:flex-row sm:items-end sm:justify-between lg:mb-14">
+        <div className="mb-10 flex flex-col gap-6  pb-6 sm:flex-row sm:items-end sm:justify-between lg:mb-14">
           <div className="max-w-2xl">
-            <div className="mb-3 flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-accent">
+            <div className="mb-1 flex items-center gap-2 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-accent">
               <BookOpen size={13} />
               Explore the library
             </div>
@@ -253,13 +260,13 @@ export default function Blogs() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-3">
-            <span className="rounded-full border border-foreground/10 bg-foreground/[0.03] px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-foreground/50">
+            {/* <span className="rounded-full border border-foreground/10 bg-foreground/[0.03] px-3 py-2 font-mono text-[10px] font-bold uppercase tracking-[0.16em] text-foreground/50">
               {isLoading
                 ? "Loading..."
                 : searchQuery.trim()
                 ? `${displayPosts.length} matching search`
                 : `${categoriesWithCounts.find((category) => category.name === activeCategory)?.count ?? 0} in ${activeCategory}`}
-            </span>
+            </span> */}
             {hasActiveFilters && (
               <button
                 type="button"
@@ -282,7 +289,7 @@ export default function Blogs() {
                 placeholder="Search articles, topics, or authors..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-2xl border border-foreground/10 bg-foreground/[0.03] py-3.5 pl-11 pr-11 text-sm font-medium outline-none transition-all placeholder:text-foreground/35 focus:border-primary/50 focus:bg-background focus:ring-4 focus:ring-primary/5"
+                className="w-full rounded-2xl border border-foreground/10 bg-foreground/3 py-3.5 pl-11 pr-11 text-sm font-medium outline-none transition-all placeholder:text-foreground/35 focus:border-primary/50 focus:bg-background focus:ring-4 focus:ring-primary/5"
               />
               {searchQuery && (
                 <button
@@ -316,7 +323,7 @@ export default function Blogs() {
           {/* Desktop Sidebar */}
           <aside className="hidden lg:block lg:col-span-3 space-y-10">
             <div className="sticky top-32">
-              <div className="mb-8 rounded-3xl border border-foreground/10 bg-foreground/[0.025] p-5">
+              <div className="mb-8 rounded-3xl border border-foreground/10 bg-foreground/2.5 p-5">
                 <div className="mb-3 flex items-center gap-2 px-1 text-[10px] font-bold uppercase tracking-widest text-foreground/40">
                   <Search size={12} /> Search library
                 </div>
@@ -409,7 +416,7 @@ export default function Blogs() {
             <div className="mb-8 flex flex-col gap-4 border-b border-foreground/10 pb-6 sm:flex-row sm:items-end sm:justify-between lg:mb-10">
               <div>
                 <div className="flex items-center gap-3 text-[10px] font-mono font-bold uppercase tracking-widest text-foreground/40">
-                  <Terminal size={14} className="text-primary" />
+                  {/* <Terminal size={14} className="text-primary" /> */}
                   <span className="hidden sm:inline">Library</span>
                   <ChevronRight size={10} className="hidden sm:inline" />
                   <span className="text-foreground underline decoration-accent/50 underline-offset-4">

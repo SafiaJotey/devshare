@@ -354,10 +354,7 @@ const About = () => {
             </article>
           </div>
 
-          <div className="mt-8 flex flex-col items-center justify-between gap-4 rounded-2xl border border-background/10 bg-background/[0.04] px-5 py-4 text-center sm:flex-row sm:text-left">
-            <p className="text-sm text-background/60"><span className="font-semibold text-background">The result:</span> knowledge that gets more useful every time it&apos;s shared.</p>
-            <span className="shrink-0 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-accent">Repeat ∞</span>
-          </div>
+          
         </div>
       </section>
 
