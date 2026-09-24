@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -28,7 +28,7 @@ import { Block, BlockType } from "./type";
 import { useAuth } from "@/providers/auth-provider";
 import { createBlogApi, getMyBlogByIdApi, updateBlogApi } from "@/lib/api";
 
-export default function WriteNewPage() {
+function WriteNewEditor() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, isLoggedIn } = useAuth();
@@ -192,7 +192,6 @@ export default function WriteNewPage() {
           }
         );
 
-        // Redirect to newly published blog reader or dashboard
         if (status === "Published" && response.data._id) {
           router.push(`/blogs/${response.data.slug || response.data._id}`);
         } else {
@@ -349,5 +348,22 @@ export default function WriteNewPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function WriteNewPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3 bg-background">
+          <Loader2 className="animate-spin text-primary" size={28} />
+          <p className="text-xs font-mono uppercase tracking-widest text-foreground/45">
+            Loading article editor...
+          </p>
+        </div>
+      }
+    >
+      <WriteNewEditor />
+    </Suspense>
   );
 }

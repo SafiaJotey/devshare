@@ -3,27 +3,24 @@
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import { 
-  Terminal, 
-  CheckCircle2, 
-  Cpu, 
   BookOpen, 
-  PenTool, 
-  Zap, 
-  MessageSquare,
-  Code2,
-  Users,
-  GitBranch,
-  Rocket,
+  PenLine, 
+  Search, 
+  CheckCircle2, 
+  HelpCircle, 
+  ArrowRight, 
+  MessageSquare, 
+  Sparkles, 
+  FileText, 
+  Image as ImageIcon, 
+  Code, 
+  Compass, 
+  Bookmark, 
+  Share2, 
+  ThumbsUp, 
   ShieldCheck,
-  Search,
-  ArrowRight,
-  ExternalLink,
-  ChevronDown,
-  Layers,
-  FileCode,
-  Sparkles,
-  Command,
-  HelpCircle
+  Send,
+  Layers
 } from "lucide-react";
 import { 
   Accordion, 
@@ -34,150 +31,137 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+// Categories tailored for everyday readers and community authors
+const TOPIC_FILTERS = [
+  "All Topics",
+  "Reading & Bookmarks",
+  "Writing with Blocks",
+  "Picture & Code Uploads",
+  "Publishing & Guidelines",
+  "Profile & Account"
+];
+
 const READER_FAQS = [
   { 
     id: "r1",
-    tag: "Access",
-    q: "Is technical content on DevShare free to read?", 
-    a: "Yes. Our core mission is the open exchange of technical wisdom. All deep dives, architecture diagrams, and system implementation guides are accessible to the community without paywalls or forced subscription traps." 
+    tag: "Reading & Bookmarks",
+    q: "Is all content on DevShare free to read?", 
+    a: "Yes! DevShare is built on the philosophy of open, accessible knowledge sharing. Every technical article, deep dive, and tutorial across Frontend, Backend, DevOps, AI & Data, and Security is 100% free without paywalls or reading limits." 
   },
   { 
     id: "r2",
-    tag: "Quality",
-    q: "How are code snippets and architecture diagrams verified?", 
-    a: "Every article runs through our automated 'Signal Check' pipeline to ensure syntax validity, code formatting, and structure before going live. Community peer reviews and inline discussions further audit accuracy." 
+    tag: "Reading & Bookmarks",
+    q: "How can I save articles to read later?", 
+    a: "Once you sign in to your DevShare account, you can bookmark any article directly. All your saved insights appear neatly organized under your personal dashboard so you can reference them whenever you need." 
   },
   { 
     id: "r3",
-    tag: "Storage",
-    q: "Can I save articles and code blocks for reference?", 
-    a: "Yes. Registered engineers can bookmark publications directly to their personal DevShare Dashboard, organize topics by technology domain, and access author references whenever needed." 
+    tag: "Reading & Bookmarks",
+    q: "How do category filters and estimated read times work?", 
+    a: "Every article is categorized under a core technology track (Frontend, Backend, DevOps, AI & Data, Security). Our platform calculates reading time automatically so you know whether a piece is a 3-minute quick tip or a 15-minute comprehensive architectural breakdown." 
   },
   { 
     id: "r4",
-    tag: "RSS & API",
-    q: "Can I subscribe to category-specific feeds?", 
-    a: "You can filter feeds by categories such as Frontend, Backend, DevOps, AI & Data, and Security. Public API query endpoints are also available for headless consumption." 
+    tag: "Profile & Account",
+    q: "How do I follow or support my favorite authors?", 
+    a: "At the end of every article, you will find the author's card with their bio, GitHub, and Twitter links. You can explore their other published writings or connect with them across the developer community." 
   }
 ];
 
 const CONTRIBUTOR_FAQS = [
   { 
     id: "c1",
-    tag: "Standards",
-    q: "What defines 'No-Fluff' engineering content on DevShare?", 
-    a: "We prioritize implementation clarity over surface-level overviews. We ask authors to bypass generic dictionary definitions and dive straight into architectural trade-offs, benchmarks, code logic, and edge-case pitfalls." 
+    tag: "Writing with Blocks",
+    q: "How do I create an article using the Block Editor?", 
+    a: "Head over to your Dashboard and click 'Create Blog'. Our editor works with modular blocks—you can easily insert headings, write text, paste formatted code, add quotes, and rearrange sections simply by dragging and dropping them." 
   },
   { 
     id: "c2",
-    tag: "Editor",
-    q: "How does the DevShare Block Editor work?", 
-    a: "The editor is built with modular drag-and-drop primitives. You can interlock headings, markdown paragraphs, syntax-highlighted code blocks, blockquotes, and uploaded imagery stored natively in MongoDB." 
+    tag: "Picture & Code Uploads",
+    q: "How do I upload diagrams and photos into my posts?", 
+    a: "Select the 'Image Block' inside the editor and upload any JPG, PNG, or WebP diagram (up to 2.5MB). Our platform optimizes the image for lightning-fast loading and stores it safely alongside your article." 
   },
   { 
     id: "c3",
-    tag: "SEO",
-    q: "Can I cross-post articles from personal tech blogs?", 
-    a: "Yes. DevShare respects your original content authority. You can define canonical URLs and retain full authorship rights across personal publications and external platforms." 
+    tag: "Publishing & Guidelines",
+    q: "What is the difference between a Draft and a Published post?", 
+    a: "Drafts are completely private to you. You can save your work, return to it anytime, and preview how it looks for readers. Once you hit 'Publish', your article is reviewed and goes live on the public feed for the community to discover." 
   },
   { 
     id: "c4",
-    tag: "Review",
-    q: "How long does publication verification take?", 
-    a: "Once you hit 'Publish Article', our pipeline performs AST checks, plagiarism scans, and spam detection. Approved posts are indexed in our database and pushed to the global live feed within minutes." 
+    tag: "Publishing & Guidelines",
+    q: "Can I cross-post an article from my personal website or Substack?", 
+    a: "Yes! We welcome cross-posting as long as you are the original author. You maintain full ownership of your content and can include a canonical link or note back to your personal portfolio." 
+  },
+  { 
+    id: "c5",
+    tag: "Writing with Blocks",
+    q: "What languages are supported in code snippets?", 
+    a: "The code block automatically formats and highlights popular languages including JavaScript, TypeScript, Python, Go, Rust, HTML/CSS, Bash, and SQL." 
   }
 ];
 
-const CATEGORY_TAGS = ["All", "Reading", "Writing", "Editor", "Security", "Roadmap"];
-
 export default function HelpCenter() {
   const [searchQuery, setSearchQuery] = useState("");
-  const [activeCategory, setActiveCategory] = useState("All");
+  const [activeFilter, setActiveFilter] = useState("All Topics");
+  const [activePersona, setActivePersona] = useState<"all" | "readers" | "contributors">("all");
 
-  const filteredReaderFaqs = useMemo(() => {
-    return READER_FAQS.filter((faq) => {
-      const matchesSearch = 
-        faq.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        faq.a.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        faq.tag.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      const matchesTag = 
-        activeCategory === "All" || 
-        activeCategory === "Reading" || 
-        faq.tag.toLowerCase() === activeCategory.toLowerCase();
-
-      return matchesSearch && matchesTag;
-    });
-  }, [searchQuery, activeCategory]);
-
-  const filteredContributorFaqs = useMemo(() => {
-    return CONTRIBUTOR_FAQS.filter((faq) => {
+  const filterList = (list: typeof READER_FAQS) => {
+    return list.filter((faq) => {
       const matchesSearch = 
         faq.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
         faq.a.toLowerCase().includes(searchQuery.toLowerCase()) ||
         faq.tag.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchesTag = 
-        activeCategory === "All" || 
-        activeCategory === "Writing" || 
-        activeCategory === "Editor" || 
-        faq.tag.toLowerCase() === activeCategory.toLowerCase();
+      const matchesFilter = 
+        activeFilter === "All Topics" || 
+        faq.tag.toLowerCase() === activeFilter.toLowerCase();
 
-      return matchesSearch && matchesTag;
+      return matchesSearch && matchesFilter;
     });
-  }, [searchQuery, activeCategory]);
+  };
+
+  const filteredReaderFaqs = useMemo(() => filterList(READER_FAQS), [searchQuery, activeFilter]);
+  const filteredContributorFaqs = useMemo(() => filterList(CONTRIBUTOR_FAQS), [searchQuery, activeFilter]);
 
   return (
     <main className="min-h-screen bg-background text-foreground pb-24 selection:bg-primary selection:text-white">
-      {/* HERO SECTION */}
-      <section className="relative pt-28 pb-20 md:pt-36 md:pb-28 border-b border-foreground/10 overflow-hidden bg-gradient-to-b from-foreground/[0.03] to-transparent">
-        {/* Subtle Engineering Grid Background */}
-        <div className="absolute inset-0 opacity-[0.03] pointer-events-none">
-          <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="help-grid" width="32" height="32" patternUnits="userSpaceOnUse">
-                <path d="M 32 0 L 0 0 0 32" fill="none" stroke="currentColor" strokeWidth="1" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#help-grid)" />
-          </svg>
-        </div>
+      
+      {/* 1. WELCOME HERO */}
+      <section className="relative pt-24 pb-16 md:pt-32 md:pb-24 border-b border-foreground/10 overflow-hidden bg-gradient-to-b from-primary/[0.04] via-transparent to-transparent">
+        {/* Soft Ambient Glow */}
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
 
-        {/* Ambient Gradient Blur */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-primary/10 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="container-box relative z-10 text-center max-w-4xl mx-auto px-4">
+        <div className="container-box relative z-10 text-center max-w-3xl mx-auto px-4">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary mb-6 shadow-xs">
-            <Terminal size={13} className="animate-pulse" />
-            <span className="text-[11px] font-mono font-bold uppercase tracking-widest">
-              DevShare Docs // Ops v2.4
+            <Sparkles size={14} />
+            <span className="text-xs font-semibold tracking-wide uppercase">
+              DevShare Community Guide & Help
             </span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl md:text-7xl font-black tracking-tight text-foreground uppercase leading-[1.05] mb-6">
-            Developer Operations &{" "}
-            <span className="text-primary italic font-serif lowercase">Knowledge Base</span>
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-foreground leading-[1.15] mb-4">
+            How can we help you today?
           </h1>
 
-          <p className="text-sm sm:text-base md:text-lg text-foreground/60 max-w-2xl mx-auto leading-relaxed mb-8">
-            Complete technical guide to reading architecture deep dives, using our modular block editor, and publishing validated engineering blogs.
+          <p className="text-sm sm:text-base md:text-lg text-foreground/60 max-w-xl mx-auto leading-relaxed mb-8">
+            Learn how to read insightful technical articles, bookmark your favorites, and write your own stories with our modular block editor.
           </p>
 
-          {/* Interactive Search Console */}
-          <div className="max-w-xl mx-auto relative group">
-            <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity blur-md" />
-            <div className="relative flex items-center bg-background/80 backdrop-blur-xl border border-foreground/15 rounded-2xl shadow-xl overflow-hidden px-4 h-13">
+          {/* Clean User-Friendly Search Bar */}
+          <div className="max-w-lg mx-auto relative group">
+            <div className="relative flex items-center bg-background border border-foreground/15 rounded-2xl shadow-lg px-4 h-13 focus-within:border-primary focus-within:ring-2 focus-within:ring-primary/20 transition-all">
               <Search size={18} className="text-foreground/40 shrink-0 mr-3" />
               <Input
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search troubleshooting, editor keys, verification protocols..."
-                className="border-0 shadow-none focus-visible:ring-0 text-sm h-full bg-transparent px-0 placeholder:text-foreground/40 font-mono"
+                placeholder="Search asking about reading, writing, pictures, editor..."
+                className="border-0 shadow-none focus-visible:ring-0 text-sm h-full bg-transparent px-0 placeholder:text-foreground/40"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery("")}
-                  className="text-xs font-mono text-foreground/40 hover:text-foreground ml-2 px-2 py-1 rounded bg-foreground/5 cursor-pointer"
+                  className="text-xs font-medium text-foreground/40 hover:text-foreground ml-2 px-2.5 py-1 rounded-lg bg-foreground/5"
                 >
                   Clear
                 </button>
@@ -185,409 +169,319 @@ export default function HelpCenter() {
             </div>
           </div>
 
-          {/* Filter Pills */}
+          {/* Quick Topic Chips */}
           <div className="flex items-center justify-center flex-wrap gap-2 mt-6">
-            {CATEGORY_TAGS.map((tag) => (
+            {TOPIC_FILTERS.map((topic) => (
               <button
-                key={tag}
-                onClick={() => setActiveCategory(tag)}
-                className={`px-3 py-1 rounded-full text-xs font-mono transition-all cursor-pointer ${
-                  activeCategory === tag
-                    ? "bg-foreground text-background font-bold shadow-md"
+                key={topic}
+                onClick={() => setActiveFilter(topic)}
+                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
+                  activeFilter === topic
+                    ? "bg-foreground text-background font-bold shadow-sm"
                     : "bg-foreground/[0.04] text-foreground/60 hover:text-foreground hover:bg-foreground/10 border border-foreground/5"
                 }`}
               >
-                {tag}
+                {topic}
               </button>
             ))}
           </div>
         </div>
       </section>
 
-      {/* QUICK WORKFLOW CARDS */}
-      <section className="container-box py-16 -mt-8 relative z-20 px-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-          
-          {/* Reader Track Card */}
-          <div className="group relative rounded-3xl bg-background/80 backdrop-blur-md border border-foreground/10 hover:border-primary/40 p-8 sm:p-10 shadow-xl transition-all duration-300 flex flex-col justify-between overflow-hidden">
-            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-2xl group-hover:bg-primary/10 transition-colors pointer-events-none" />
-            
+      {/* 2. READER VS CONTRIBUTOR SWITCHER TABS */}
+      <section className="container-box pt-12 pb-4 px-4">
+        <div className="flex justify-center mb-10">
+          <div className="inline-flex p-1.5 rounded-2xl bg-foreground/[0.05] border border-foreground/10">
+            <button
+              onClick={() => setActivePersona("all")}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                activePersona === "all" ? "bg-background text-foreground shadow-sm" : "text-foreground/60 hover:text-foreground"
+              }`}
+            >
+              All Questions
+            </button>
+            <button
+              onClick={() => setActivePersona("readers")}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                activePersona === "readers" ? "bg-background text-primary shadow-sm" : "text-foreground/60 hover:text-foreground"
+              }`}
+            >
+              <BookOpen size={15} /> For Readers
+            </button>
+            <button
+              onClick={() => setActivePersona("contributors")}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                activePersona === "contributors" ? "bg-background text-primary shadow-sm" : "text-foreground/60 hover:text-foreground"
+              }`}
+            >
+              <PenLine size={15} /> For Writers & Authors
+            </button>
+          </div>
+        </div>
+
+        {/* Action Pathway Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+          {/* Reader Guide Card */}
+          <div className="p-6 sm:p-8 rounded-3xl bg-background border border-foreground/10 hover:border-primary/40 shadow-sm transition-all flex flex-col justify-between">
             <div>
-              <div className="w-13 h-13 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-6 group-hover:scale-105 transition-transform border border-primary/20">
-                <BookOpen size={24} />
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-5">
+                <BookOpen size={22} />
               </div>
-
-              <div className="flex items-center gap-2 mb-2 font-mono text-[11px] text-primary font-bold uppercase tracking-wider">
-                <span>Phase 01</span>
-                <span>//</span>
-                <span>Consumption</span>
-              </div>
-
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">
-                Consume <span className="text-primary italic">Deep Logic</span>
-              </h2>
-
+              <h3 className="text-xl font-bold mb-2">Reading on DevShare</h3>
               <p className="text-sm text-foreground/60 leading-relaxed mb-6">
-                Curated for developers who prioritize architecture over hype. Navigate by technology stacks and master real-world production setups.
+                Discover in-depth engineering breakdowns, learn new frameworks, and bookmark your go-to guides.
               </p>
-
-              <div className="space-y-3 font-sans text-sm">
-                {[
-                  "Domain Filter: Filter by Frontend, DevOps, Backend, and AI",
-                  "Bookmark Pipeline: Save insights to your personal workspace",
-                  "Verified Code: Inspect syntax-checked snippets and benchmarks",
-                  "Author Signals: Follow architects to track new system releases"
-                ].map((item, idx) => (
-                  <div key={idx} className="flex items-start gap-3 text-foreground/80">
-                    <CheckCircle2 size={16} className="text-primary shrink-0 mt-0.5" />
-                    <span className="text-xs sm:text-sm">{item}</span>
-                  </div>
-                ))}
-              </div>
+              <ul className="space-y-3 text-sm text-foreground/80 mb-6">
+                <li className="flex items-center gap-2.5">
+                  <CheckCircle2 size={16} className="text-primary shrink-0" />
+                  Explore Frontend, Backend, DevOps, AI & Security
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <CheckCircle2 size={16} className="text-primary shrink-0" />
+                  Save key articles to your private workspace
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <CheckCircle2 size={16} className="text-primary shrink-0" />
+                  Clear estimated read times on every post
+                </li>
+              </ul>
             </div>
-
-            <div className="pt-8 mt-6 border-t border-foreground/10 flex items-center justify-between">
-              <span className="text-xs font-mono text-foreground/40">Read Guidelines</span>
-              <Link 
-                href="/blogs"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:underline font-mono"
-              >
-                Browse Articles <ArrowRight size={13} />
+            <Button asChild className="rounded-xl bg-foreground text-background hover:bg-foreground/90 font-semibold text-xs h-11">
+              <Link href="/blogs" className="flex items-center justify-center gap-2">
+                Browse Popular Articles <ArrowRight size={14} />
               </Link>
-            </div>
+            </Button>
           </div>
 
-          {/* Contributor Track Card */}
-          <div className="group relative rounded-3xl bg-foreground text-background p-8 sm:p-10 shadow-2xl transition-all duration-300 flex flex-col justify-between overflow-hidden">
-            <div className="absolute top-4 right-4 opacity-5 rotate-12 group-hover:rotate-6 transition-transform duration-500 pointer-events-none">
-              <Code2 size={160} />
-            </div>
-
+          {/* Writer Guide Card */}
+          <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-primary/[0.06] to-transparent border border-primary/20 shadow-sm transition-all flex flex-col justify-between">
             <div>
-              <div className="w-13 h-13 rounded-2xl bg-accent/20 text-accent flex items-center justify-center mb-6 group-hover:scale-105 transition-transform border border-accent/30">
-                <PenTool size={24} />
+              <div className="w-12 h-12 rounded-2xl bg-primary/20 text-primary flex items-center justify-center mb-5">
+                <PenLine size={22} />
               </div>
-
-              <div className="flex items-center gap-2 mb-2 font-mono text-[11px] text-accent font-bold uppercase tracking-wider">
-                <span>Phase 02</span>
-                <span>//</span>
-                <span>Contribution</span>
-              </div>
-
-              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-3">
-                Publish <span className="text-accent italic">Architecture</span>
-              </h2>
-
-              <p className="text-sm text-background/70 leading-relaxed mb-6">
-                Turn your debugging scars and design specs into high-signal publications with our drag-and-drop block editor.
+              <h3 className="text-xl font-bold mb-2">Writing & Publishing</h3>
+              <p className="text-sm text-foreground/60 leading-relaxed mb-6">
+                Share your technical wisdom, architecture case studies, and tutorials with a passionate community.
               </p>
-
-              <div className="space-y-3 font-sans text-sm">
-                {[
-                  "Modular Blocks: Reorder headings, code, and images intuitively",
-                  "MongoDB Media: Store diagrams and screenshots directly",
-                  "Automated Linter: Run real-time checks on code blocks",
-                  "Canonical URLs: Preserve existing search authority seamlessly"
-                ].map((item, idx) => (
-                  <div key={idx} className="flex items-start gap-3 text-background/90">
-                    <CheckCircle2 size={16} className="text-accent shrink-0 mt-0.5" />
-                    <span className="text-xs sm:text-sm">{item}</span>
-                  </div>
-                ))}
-              </div>
+              <ul className="space-y-3 text-sm text-foreground/80 mb-6">
+                <li className="flex items-center gap-2.5">
+                  <CheckCircle2 size={16} className="text-primary shrink-0" />
+                  Modular drag-and-drop block editor
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <CheckCircle2 size={16} className="text-primary shrink-0" />
+                  Seamless diagram and screenshot picture uploads
+                </li>
+                <li className="flex items-center gap-2.5">
+                  <CheckCircle2 size={16} className="text-primary shrink-0" />
+                  Live reader preview before publishing
+                </li>
+              </ul>
             </div>
-
-            <div className="pt-8 mt-6 border-t border-background/15 flex items-center justify-between">
-              <span className="text-xs font-mono text-background/50">Author Workspace</span>
-              <Link 
-                href="/dashboard/create-blog"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-accent hover:underline font-mono"
-              >
-                Launch Block Editor <ArrowRight size={13} />
+            <Button asChild className="rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-semibold text-xs h-11">
+              <Link href="/dashboard/create-blog" className="flex items-center justify-center gap-2">
+                Write a New Post <ArrowRight size={14} />
               </Link>
-            </div>
+            </Button>
           </div>
-
         </div>
       </section>
 
-      {/* FREQUENTLY ASKED LOGIC (ACCORDION SECTION) */}
+      {/* 3. STEP-BY-STEP WRITER WORKFLOW */}
       <section className="container-box py-16 px-4">
-        <div className="text-center max-w-xl mx-auto mb-16">
-          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-widest bg-foreground/[0.04] text-primary border border-foreground/10 mb-3">
-            <HelpCircle size={13} />
-            Query_Repository
+        <div className="max-w-4xl mx-auto rounded-3xl bg-foreground/[0.02] border border-foreground/10 p-6 sm:p-10">
+          <div className="text-center max-w-xl mx-auto mb-10">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight">
+              Writing an article in 4 simple steps
+            </h2>
+            <p className="text-xs sm:text-sm text-foreground/50 mt-1">
+              Here is how the DevShare publishing experience works from start to finish.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="space-y-2 text-center sm:text-left">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-sm mx-auto sm:mx-0">
+                1
+              </div>
+              <h4 className="font-bold text-sm text-foreground">Choose a Topic</h4>
+              <p className="text-xs text-foreground/60 leading-relaxed">
+                Pick your technology track (Frontend, Backend, DevOps, AI, Security) and set a catchy, clear title.
+              </p>
+            </div>
+
+            <div className="space-y-2 text-center sm:text-left">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-sm mx-auto sm:mx-0">
+                2
+              </div>
+              <h4 className="font-bold text-sm text-foreground">Assemble Blocks</h4>
+              <p className="text-xs text-foreground/60 leading-relaxed">
+                Add text paragraphs, format code snippets, and upload architectural diagrams using the toolbar.
+              </p>
+            </div>
+
+            <div className="space-y-2 text-center sm:text-left">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-sm mx-auto sm:mx-0">
+                3
+              </div>
+              <h4 className="font-bold text-sm text-foreground">Preview Your Post</h4>
+              <p className="text-xs text-foreground/60 leading-relaxed">
+                Switch to Preview Mode anytime to see exactly how readers will experience your blog post.
+              </p>
+            </div>
+
+            <div className="space-y-2 text-center sm:text-left">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center font-bold text-sm mx-auto sm:mx-0">
+                4
+              </div>
+              <h4 className="font-bold text-sm text-foreground">Publish to Feed</h4>
+              <p className="text-xs text-foreground/60 leading-relaxed">
+                Hit 'Publish' to make it live for the entire community, or save it as a draft to finish later.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. FREQUENTLY ASKED QUESTIONS */}
+      <section className="container-box py-8 px-4 max-w-4xl mx-auto">
+        <div className="text-center mb-12">
+          <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20 mb-3">
+            <HelpCircle size={14} />
+            Common Inquiries
           </span>
-          <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight">
-            Frequently Asked <span className="text-primary italic font-serif lowercase">Questions</span>
+          <h2 className="text-3xl sm:text-4xl font-black tracking-tight">
+            Frequently Asked Questions
           </h2>
-          <p className="text-xs sm:text-sm text-foreground/50 mt-2">
-            Instant answers for readers and contributing software engineers.
+          <p className="text-xs sm:text-sm text-foreground/50 mt-1">
+            Find immediate answers for both everyday readers and article authors.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          
-          {/* Reader Track FAQ */}
-          <div className="p-6 sm:p-8 rounded-3xl bg-foreground/[0.015] border border-foreground/10 shadow-xs">
-            <div className="flex items-center justify-between pb-4 mb-4 border-b border-foreground/10">
-              <div className="flex items-center gap-2.5">
-                <Users size={18} className="text-primary" />
-                <h3 className="font-bold text-sm sm:text-base uppercase tracking-wider font-mono">
-                  For Knowledge Seekers
-                </h3>
-              </div>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-primary/10 text-primary">
-                {filteredReaderFaqs.length} Entries
-              </span>
-            </div>
-
-            {filteredReaderFaqs.length === 0 ? (
-              <p className="text-xs font-mono text-foreground/40 py-8 text-center">
-                No matching reader queries found.
-              </p>
-            ) : (
-              <Accordion type="single" collapsible className="w-full space-y-2">
-                {filteredReaderFaqs.map((faq) => (
-                  <AccordionItem 
-                    key={faq.id} 
-                    value={faq.id}
-                    className="border border-foreground/5 rounded-2xl px-4 bg-background/50 hover:border-foreground/15 transition-all"
-                  >
-                    <AccordionTrigger className="text-left font-semibold text-xs sm:text-sm py-4 hover:no-underline text-foreground hover:text-primary transition-colors">
-                      <span className="flex items-center gap-2">
-                        <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-foreground/5 text-foreground/50 border border-foreground/10">
-                          {faq.tag}
-                        </span>
-                        {faq.q}
-                      </span>
-                    </AccordionTrigger>
-                    <AccordionContent className="text-foreground/70 text-xs sm:text-sm leading-relaxed pb-4 pt-1 font-sans">
-                      {faq.a}
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            )}
-          </div>
-
-          {/* Contributor Track FAQ */}
-          <div className="p-6 sm:p-8 rounded-3xl bg-foreground/[0.015] border border-foreground/10 shadow-xs">
-            <div className="flex items-center justify-between pb-4 mb-4 border-b border-foreground/10">
-              <div className="flex items-center gap-2.5">
-                <Zap size={18} className="text-accent" />
-                <h3 className="font-bold text-sm sm:text-base uppercase tracking-wider font-mono">
-                  For Insight Architects
-                </h3>
-              </div>
-              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-accent/10 text-accent">
-                {filteredContributorFaqs.length} Entries
-              </span>
-            </div>
-
-            {filteredContributorFaqs.length === 0 ? (
-              <p className="text-xs font-mono text-foreground/40 py-8 text-center">
-                No matching author queries found.
-              </p>
-            ) : (
-              <Accordion type="single" collapsible className="w-full space-y-2">
-                {filteredContributorFaqs.map((faq) => (
-                  <AccordionItem 
-                    key={faq.id} 
-                    value={faq.id}
-                    className="border border-foreground/5 rounded-2xl px-4 bg-background/50 hover:border-foreground/15 transition-all"
-                  >
-                    <AccordionTrigger className="text-left font-semibold text-xs sm:text-sm py-4 hover:no-underline text-foreground hover:text-accent transition-colors">
-                      <span className="flex items-center gap-2">
-                        <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-foreground/5 text-foreground/50 border border-foreground/10">
-                          {faq.tag}
-                        </span>
-                        {faq.q}
-                      </span>
-                    </AccordionTrigger>
-                    <AccordionContent className="text-foreground/70 text-xs sm:text-sm leading-relaxed pb-4 pt-1 font-sans">
-                      {faq.a}
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
-            )}
-          </div>
-
-        </div>
-      </section>
-
-      {/* VERIFICATION PIPELINE & TERMINAL DEMO */}
-      <section className="container-box py-16 px-4">
-        <div className="rounded-3xl bg-foreground/[0.02] border border-foreground/10 p-6 sm:p-12">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            
-            <div className="lg:col-span-5 space-y-4">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-mono font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-500 border border-emerald-500/20">
-                <ShieldCheck size={14} />
-                Protocol // Quality Engine
-              </div>
-
-              <h2 className="text-3xl sm:text-4xl font-black uppercase tracking-tight">
-                Automated <span className="text-primary italic font-serif lowercase">Signal Check</span>
-              </h2>
-
-              <p className="text-sm text-foreground/60 leading-relaxed">
-                To guarantee zero clickbait, every piece of content submitted through our block editor is audited via our automated pipeline.
-              </p>
-
-              <div className="space-y-3 pt-2">
-                {[
-                  { title: "Deterministic Validation", desc: "Zod schemas validate article structures, read-time, and metadata." },
-                  { title: "Clean Code Guarantee", desc: "Markdown code snippets are parsed to prevent broken layouts." },
-                  { title: "Plagiarism & Spam Guard", desc: "Heuristic checks verify original technical thinking." }
-                ].map((item, idx) => (
-                  <div key={idx} className="flex gap-3">
-                    <CheckCircle2 size={16} className="text-primary shrink-0 mt-1" />
-                    <div>
-                      <h4 className="text-xs font-bold text-foreground font-mono">{item.title}</h4>
-                      <p className="text-xs text-foreground/50">{item.desc}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Simulated Live Pipeline Terminal */}
-            <div className="lg:col-span-7 bg-[#07120D] border border-emerald-500/20 rounded-2xl p-5 sm:p-6 shadow-2xl font-mono text-xs overflow-hidden text-emerald-400">
-              <div className="flex items-center justify-between pb-4 border-b border-emerald-500/10 mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-amber-500/60" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/60" />
-                  <span className="text-[10px] text-emerald-500/50 ml-2">devshare-verify-daemon.sh</span>
-                </div>
-                <span className="text-[10px] text-emerald-500/40">node_v22.4 // active</span>
-              </div>
-
-              <div className="space-y-2 leading-relaxed">
-                <p className="text-emerald-500/40">{"//"} 1. Ingesting publication payload from Block Editor...</p>
-                <p className="text-foreground">
-                  <span className="text-emerald-500">[AST_PARSER]</span> parsing blocks (headings, code, media)... <span className="text-emerald-300 font-bold">OK</span>
-                </p>
-                <p className="text-foreground">
-                  <span className="text-emerald-500">[DB_DRIVER]</span> validating native MongoDB document schema... <span className="text-emerald-300 font-bold">200 OK</span>
-                </p>
-                <p className="text-foreground">
-                  <span className="text-emerald-500">[SYNTAX_LINT]</span> scanning TypeScript & Go code snippets... <span className="text-emerald-300 font-bold">PASS (0 errors)</span>
-                </p>
-                <p className="text-foreground">
-                  <span className="text-emerald-500">[CANONICAL]</span> checking SEO meta and author attribution... <span className="text-emerald-300 font-bold">VALIDATED</span>
-                </p>
-                <div className="mt-4 p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 flex items-center justify-between">
-                  <span className="font-bold text-[11px]">BUILD RESULT: READY_FOR_FEED</span>
-                  <span className="text-[10px] opacity-75">LATENCY: 12ms</span>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* PLATFORM ROADMAP */}
-      <section className="container-box py-16 px-4">
-        <div className="rounded-3xl bg-primary/[0.03] border border-primary/15 p-8 sm:p-12 relative overflow-hidden">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+        <div className="space-y-10">
+          {/* Reader Track FAQs */}
+          {(activePersona === "all" || activePersona === "readers") && (
             <div>
-              <div className="flex items-center gap-2 text-primary text-xs font-mono font-bold uppercase tracking-wider mb-1">
-                <Rocket size={15} />
-                <span>Ecosystem Evolution</span>
-              </div>
-              <h3 className="text-2xl sm:text-3xl font-black uppercase tracking-tight">
-                Platform Roadmap
-              </h3>
-            </div>
-            <span className="text-xs font-mono text-foreground/50 self-start sm:self-auto px-3 py-1 rounded-full bg-foreground/5 border border-foreground/10">
-              DevShare Core v3.0 Specs
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {[
-              {
-                quarter: "MILESTONE 01",
-                title: "Dynamic Canvas Architecture",
-                desc: "Direct integration of interactive Mermaid.js diagrams inside the dynamic block editor.",
-                status: "Live in Core"
-              },
-              {
-                quarter: "MILESTONE 02",
-                title: "Live Collaborative Pair-Writing",
-                desc: "Real-time presence and concurrent draft editing with operational transformation primitives.",
-                status: "In Staging"
-              },
-              {
-                quarter: "MILESTONE 03",
-                title: "DevShare Headless API",
-                desc: "Expose your published articles via REST & GraphQL to embed directly into personal portfolio sites.",
-                status: "Planned"
-              },
-            ].map((milestone, idx) => (
-              <div 
-                key={idx} 
-                className="p-6 rounded-2xl bg-background/60 border border-foreground/10 flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-[10px] font-mono font-bold text-primary">
-                      {milestone.quarter}
-                    </span>
-                    <span className="text-[9px] font-mono px-2 py-0.5 rounded-full bg-foreground/5 text-foreground/60 border border-foreground/10">
-                      {milestone.status}
-                    </span>
-                  </div>
-                  <h4 className="font-bold text-sm sm:text-base text-foreground mb-1">
-                    {milestone.title}
-                  </h4>
-                  <p className="text-xs text-foreground/50 leading-relaxed">
-                    {milestone.desc}
-                  </p>
+              <div className="flex items-center justify-between pb-3 mb-4 border-b border-foreground/10">
+                <div className="flex items-center gap-2">
+                  <BookOpen size={18} className="text-primary" />
+                  <h3 className="font-bold text-base text-foreground">
+                    Reader Questions
+                  </h3>
                 </div>
+                <span className="text-xs text-foreground/40">
+                  {filteredReaderFaqs.length} answers
+                </span>
               </div>
-            ))}
-          </div>
+
+              {filteredReaderFaqs.length === 0 ? (
+                <p className="text-xs text-foreground/40 py-6 text-center">
+                  No matching reader questions found for "{searchQuery}".
+                </p>
+              ) : (
+                <Accordion type="single" collapsible className="w-full space-y-3">
+                  {filteredReaderFaqs.map((faq) => (
+                    <AccordionItem 
+                      key={faq.id} 
+                      value={faq.id}
+                      className="border border-foreground/10 rounded-2xl px-5 bg-foreground/[0.015] hover:border-foreground/20 transition-all"
+                    >
+                      <AccordionTrigger className="text-left font-semibold text-sm py-4 hover:no-underline text-foreground hover:text-primary transition-colors">
+                        <span className="flex items-center gap-2.5">
+                          <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-primary/10 text-primary">
+                            {faq.tag}
+                          </span>
+                          {faq.q}
+                        </span>
+                      </AccordionTrigger>
+                      <AccordionContent className="text-foreground/70 text-sm leading-relaxed pb-4 pt-1 font-sans">
+                        {faq.a}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              )}
+            </div>
+          )}
+
+          {/* Contributor Track FAQs */}
+          {(activePersona === "all" || activePersona === "contributors") && (
+            <div>
+              <div className="flex items-center justify-between pb-3 mb-4 border-b border-foreground/10">
+                <div className="flex items-center gap-2">
+                  <PenLine size={18} className="text-primary" />
+                  <h3 className="font-bold text-base text-foreground">
+                    Writer & Publishing Questions
+                  </h3>
+                </div>
+                <span className="text-xs text-foreground/40">
+                  {filteredContributorFaqs.length} answers
+                </span>
+              </div>
+
+              {filteredContributorFaqs.length === 0 ? (
+                <p className="text-xs text-foreground/40 py-6 text-center">
+                  No matching writer questions found for "{searchQuery}".
+                </p>
+              ) : (
+                <Accordion type="single" collapsible className="w-full space-y-3">
+                  {filteredContributorFaqs.map((faq) => (
+                    <AccordionItem 
+                      key={faq.id} 
+                      value={faq.id}
+                      className="border border-foreground/10 rounded-2xl px-5 bg-foreground/[0.015] hover:border-foreground/20 transition-all"
+                    >
+                      <AccordionTrigger className="text-left font-semibold text-sm py-4 hover:no-underline text-foreground hover:text-primary transition-colors">
+                        <span className="flex items-center gap-2.5">
+                          <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-primary/10 text-primary">
+                            {faq.tag}
+                          </span>
+                          {faq.q}
+                        </span>
+                      </AccordionTrigger>
+                      <AccordionContent className="text-foreground/70 text-sm leading-relaxed pb-4 pt-1 font-sans">
+                        {faq.a}
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              )}
+            </div>
+          )}
         </div>
       </section>
 
-      {/* SUPPORT & CONTACT CTA */}
-      <section className="container-box px-4">
-        <div className="rounded-3xl bg-foreground text-background p-8 sm:p-16 text-center relative overflow-hidden shadow-2xl">
-          <Cpu className="absolute -bottom-16 -right-16 text-background/[0.04] pointer-events-none" size={320} />
-
-          <div className="max-w-2xl mx-auto relative z-10 space-y-6">
-            <span className="inline-block text-[11px] font-mono uppercase tracking-widest px-3 py-1 rounded-full bg-background/10 text-accent border border-background/20 font-bold">
-              Engineering Support Node
+      {/* 5. COMMUNITY SUPPORT & CONTACT CARD */}
+      <section className="container-box px-4 pt-12">
+        <div className="rounded-3xl bg-foreground text-background p-8 sm:p-14 text-center max-w-4xl mx-auto relative overflow-hidden shadow-2xl">
+          <div className="relative z-10 space-y-5">
+            <span className="inline-block text-xs uppercase tracking-widest px-3 py-1 rounded-full bg-background/10 text-primary font-bold">
+              Community Support
             </span>
 
-            <h3 className="text-3xl sm:text-5xl font-black uppercase tracking-tight leading-tight">
-              Still encountering <span className="text-primary italic">anomalies?</span>
+            <h3 className="text-2xl sm:text-4xl font-black tracking-tight">
+              Have a question that isn't answered here?
             </h3>
 
             <p className="text-sm sm:text-base text-background/70 leading-relaxed max-w-lg mx-auto">
-              Our support architects can help resolve publication pipeline errors, auth session issues, or author account configurations.
+              Whether you need help formatting your post, managing your account, or reporting an issue, our community moderators are here to help.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
               <Button 
                 onClick={() => window.location.href = "mailto:support@devshare.io"}
-                className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl h-12 px-8 font-mono text-xs uppercase tracking-wider font-bold transition-all shadow-lg cursor-pointer flex items-center justify-center gap-2"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl h-12 px-8 font-semibold text-xs uppercase tracking-wider transition-all shadow-md cursor-pointer flex items-center justify-center gap-2"
               >
                 <MessageSquare size={16} /> Contact Support
               </Button>
 
               <Button 
                 asChild
-             
-                className="rounded-xl h-12 px-8 font-mono text-xs uppercase tracking-wider font-bold bg-background/10 cursor-pointer"
+                variant="outline" 
+                className="rounded-xl h-12 px-8 font-semibold text-xs uppercase tracking-wider border-background/20 text-background hover:bg-background/10 cursor-pointer"
               >
-                <Link href="/dashboard">
-                  Open Workspace
+                <Link href="/blogs">
+                  Explore DevShare
                 </Link>
               </Button>
             </div>
