@@ -2,8 +2,6 @@
 
 /* 
   1. THE THEME DEFINITION
-  This block connects Tailwind's utility classes (like bg-primary) 
-  to the CSS variables we define below.
 */
 @theme {
   --color-background: var(--background);
@@ -13,18 +11,15 @@
   --color-primary-foreground: var(--primary-foreground);
   
   --color-accent: var(--accent);
-  
-  /* Adding a secondary color based on your foreground for UI elements */
   --color-secondary: var(--foreground);
 
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
+@custom-variant dark (&:where(.dark, .dark *));
 
-
- :root {
-
+:root {
   --background: #F4F8F6;
   --foreground: #0A1C14;
   --primary: #0F5132;
@@ -34,7 +29,6 @@
 }
 
 .dark {
-
   --background: #07120D;
   --foreground: #E6F4ED;
   --primary: #10B981;
@@ -44,31 +38,113 @@
 } 
 
 /* 
- 
-
-3. BASE STYLES
+  2. BASE STYLES & GHOST SCROLLBAR
 */
 @layer base {
   html {
     scroll-behavior: smooth;
+    /* Firefox Ghost: Transparent idle, reveals on hover */
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color 0.3s ease;
+  }
+
+  html:hover {
+    scrollbar-color: color-mix(in srgb, var(--foreground) 16%, transparent) transparent;
   }
   
   body {
-    /* This ensures the whole site changes color when the .dark class is toggled */
     @apply bg-background text-foreground transition-colors duration-300;
+  }
+
+  /* ── Chrome / Edge / Safari Ghost Scrollbar ── */
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+
+  /* Track is always invisible */
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* Ghost state: Invisible thumb by default */
+  ::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 9999px;
+    transition: background-color 0.25s ease-in-out;
+  }
+
+  /* Reveal thumb smoothly when the cursor is in the window */
+  html:hover::-webkit-scrollbar-thumb {
+    background-color: color-mix(in srgb, var(--foreground) 16%, transparent);
+  }
+
+  /* Subtle darkening on active thumb drag/hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(in srgb, var(--foreground) 35%, transparent) !important;
+  }
+
+  ::-webkit-scrollbar-corner {
+    background: transparent;
   }
 }
 
 /* 
-  4. CUSTOM UTILITIES
+  3. CUSTOM UTILITIES
 */
 @layer components {
   .container-box {
-    /* Using 90% width for a better look, centered */
     @apply max-w-[90%] mx-auto;
+  }
+
+  /* Hide scrollbar completely (useful for horizontal chips/carousels) */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Ghost scrollbar utility for inner containers (sidebars, tables, modals) */
+  .ghost-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+    transition: scrollbar-color 0.25s ease;
+  }
+  
+  .ghost-scroll:hover {
+    scrollbar-color: color-mix(in srgb, var(--foreground) 16%, transparent) transparent;
+  }
+
+  .ghost-scroll::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+
+  .ghost-scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .ghost-scroll::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 9999px;
+    transition: background-color 0.25s ease;
+  }
+
+  .ghost-scroll:hover::-webkit-scrollbar-thumb {
+    background-color: color-mix(in srgb, var(--foreground) 16%, transparent);
+  }
+
+  .ghost-scroll::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(in srgb, var(--foreground) 35%, transparent) !important;
   }
 }
 
+/* 
+  4. ANIMATIONS
+*/
 @keyframes marquee {
   0% {
     transform: translateX(0);
@@ -79,12 +155,11 @@
 }
 
 .animate-marquee {
-  display: flex; /* Ensures the row is flexed */
-  width: max-content; /* Vital for infinite width */
+  display: flex;
+  width: max-content;
   animation: marquee 40s linear infinite;
 }
 
-/* This is the magic fix for pausing */
 .animate-marquee:hover {
   animation-play-state: paused !important;
 }

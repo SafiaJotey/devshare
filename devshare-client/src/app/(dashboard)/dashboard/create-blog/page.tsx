@@ -221,14 +221,14 @@ function WriteNewEditor() {
   return (
     <div className="min-h-screen bg-background pb-40">
       {/* Top action header bar */}
-      <div className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-foreground/5 h-20">
+      <div className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-foreground/5 h-20 ">
         <div className="max-w-6xl mx-auto h-full flex justify-between items-center px-6">
           <div className="flex items-center gap-4">
             <div
               className={`flex items-center gap-2 px-3 py-1 rounded-full border transition-all ${
                 isReadyToPublish
-                  ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-600"
-                  : "bg-amber-500/10 border-amber-500/20 text-amber-600"
+                  ? " border-emerald-500/20 text-emerald-600"
+                  : " border-amber-500/20 text-amber-600"
               }`}
             >
               {isReadyToPublish ? <Rocket size={14} /> : <AlertCircle size={14} />}
@@ -236,8 +236,8 @@ function WriteNewEditor() {
                 {isReadyToPublish ? editingBlogId ? "Ready to Update" : "Ready to Publish" : "Incomplete Draft"}
               </span>
             </div>
-            <span className="hidden md:block text-[10px] text-foreground/30 font-mono uppercase tracking-widest italic">
-              Auto-saved // {new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            <span className="hidden md:block text-[10px] text-foreground/30 font-mono uppercase tracking-widest">
+              Auto-saved | {new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
             </span>
           </div>
 

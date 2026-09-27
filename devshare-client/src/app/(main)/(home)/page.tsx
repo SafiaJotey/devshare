@@ -215,7 +215,7 @@ export default function Home() {
               {/* Lead story */}
               <Link
                 href={`/blogs/${activeMainPost.id}`}
-                className={`group relative isolate flex min-h-[440px] overflow-hidden rounded-3xl bg-foreground text-background shadow-sm lg:min-h-[540px] ${
+                className={`group relative isolate flex min-h-110 overflow-hidden rounded-3xl bg-foreground text-background shadow-sm lg:min-h-135 ${
                   activeSidePosts.length > 0 ? "lg:col-span-7" : "lg:col-span-12"
                 }`}
               >
@@ -239,16 +239,17 @@ export default function Home() {
                   </div>
 
                   <div className="max-w-2xl pt-16">
-                    <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-accent text-shadow-xs text-shadow-accent/50">
+                    <p className="mb-3 font-mono text-[10px] font-bold uppercase tracking-[0.22em] text-accent dark:text-black drop-shadow-sm ">
                       Deep dive
                     </p>
-                    <h3 className="text-3xl font-extrabold leading-[1.05] tracking-tight sm:text-4xl md:text-5xl  text-shadow-xs text-shadow-background/50">
+                    <h3 className="text-3xl font-extrabold leading-[1.05] tracking-tight sm:text-4xl md:text-5xl  text-shadow-xs drop-shadow-sm text-shadow-background/50">
                       {activeMainPost.title}
                     </h3>
-                    <p className="mt-5 max-w-xl text-sm leading-relaxed text-background/75 text-shadow-xs text-shadow-background/50 sm:text-base line-clamp-2">
+                    <p className="mt-5 max-w-xl text-sm leading-relaxed text-background/75 text-shadow-xs drop-shadow-sm  sm:text-base line-clamp-2">
                       {activeMainPost.description}
                     </p>
                   </div>
+                  
 
                   <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-background/20 pt-5">
                     <div className="flex items-center gap-3">
@@ -534,7 +535,7 @@ export default function Home() {
             {[...authors, ...authors].map((author, i) => (
               <Link
                 key={`${author.name}-${i}`}
-                href="/blogs"
+                href={`/author/${author.name}-${i}`}
                 className="group relative flex w-[290px] shrink-0 flex-col overflow-hidden rounded-3xl border border-foreground/10 bg-background p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/25 hover:shadow-xl hover:shadow-primary/10 sm:w-[320px]"
               >
                 <div className="absolute right-0 top-0 h-24 w-24 rounded-bl-[4rem] bg-primary/[0.08] transition-colors group-hover:bg-accent/15" />
