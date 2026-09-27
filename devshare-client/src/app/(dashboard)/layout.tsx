@@ -133,20 +133,20 @@ export default function DashboardLayout({
                   className={`flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                     isActive
                       ? "bg-primary text-primary-foreground font-bold shadow-sm shadow-primary/20"
-                      : "text-foreground/70 hover:bg-foreground/[0.04] hover:text-foreground"
+                      : "text-foreground/70 hover:bg-foreground/4 hover:text-foreground"
                   }`}
                 >
                   <Icon
-                    size={18}
+                    size={14}
                     className={
                       isActive
                         ? "text-primary-foreground"
                         : "text-foreground/50"
                     }
                   />
-                  <span className="flex-1">{item.name}</span>
+                  <span className="flex-1 text-xs">{item.name}</span>
                   {isActive && (
-                    <ChevronRight size={14} className="opacity-80" />
+                    <ChevronRight size={12} className="opacity-80" />
                   )}
                 </div>
               </Link>

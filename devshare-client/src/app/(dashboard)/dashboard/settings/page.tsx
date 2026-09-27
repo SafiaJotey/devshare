@@ -1,15 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import { User, Shield, Sliders, Terminal, Cpu } from "lucide-react";
+import { User, Shield, Terminal } from "lucide-react";
 import ProfileSettings from "./_components/ProfileSettings";
 import AccountSettings from "./_components/AccountSettings";
 import DevSettings from "./_components/DevSettings";
 
 const TABS = [
-  { id: "profile", label: " Profile", icon: User},
-  { id: "account", label: "Security ", icon: Shield },
-  { id: "dev", label: " Preferences", icon: Sliders },
+  { id: "profile", label: "Profile", icon: User },
+  { id: "account", label: "Security", icon: Shield },
+  { id: "dev", label: "Developer", icon: Terminal },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -18,65 +18,55 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<TabId>("profile");
 
   return (
-    <div className="space-y-8 pb-16">
-      {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-foreground/10 pb-6">
-        <div>
-         
-          <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-foreground">
-            Account & Workspace
+    <div className="min-h-screen bg-background text-foreground antialiased selection:bg-foreground selection:text-background">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-14 space-y-8">
+        
+        {/* Page Header */}
+        <div className="space-y-1">
+          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            Settings
           </h1>
-          <p className="text-sm text-foreground/60 mt-1">
-            Configure your public engineer profile, security policies, and IDE preferences.
+          <p className="text-sm text-muted-foreground font-normal">
+            Manage your personal profile details, authentication keys, and editor behavior.
           </p>
         </div>
 
-        
-      </div>
-
-      {/* Main Grid: Nav + Dynamic Panel */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        {/* Navigation Sidebar */}
-        <aside className="lg:col-span-3 space-y-4">
-          <nav className="flex lg:flex-col gap-2 overflow-x-auto pb-2 lg:pb-0 scrollbar-none">
+        {/* Tab Switcher (Linear / Raycast Style) */}
+        <div className="border-b border-foreground/10  ">
+          <nav className="flex gap-6 -mb-px overflow-x-auto scrollbar-none" aria-label="Settings tabs">
             {TABS.map((tab) => {
               const Icon = tab.icon;
               const isActive = activeTab === tab.id;
-
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`group relative flex items-center justify-between gap-3 px-4 py-3.5 rounded-2xl font-semibold text-sm transition-all duration-200 shrink-0 lg:w-full text-left ${
+                  type="button"
+                  className={`group inline-flex items-center gap-2 pb-3 pt-1 text-sm font-medium transition-all relative border-b-2 cursor-pointer ${
                     isActive
-                      ? "bg-foreground text-background shadow-lg shadow-foreground/5"
-                      : "text-foreground/60 hover:text-foreground hover:bg-foreground/[0.04]"
+                      ? "border-foreground text-foreground font-semibold"
+                      : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    <Icon
-                      size={18}
-                      className={`transition-colors ${
-                        isActive ? "text-primary" : "text-foreground/50 group-hover:text-foreground"
-                      }`}
-                    />
-                    <span>{tab.label}</span>
-                  </div>
-                  
+                  <Icon
+                    size={16}
+                    className={`transition-colors ${
+                      isActive ? "text-foreground" : "text-muted-foreground group-hover:text-foreground"
+                    }`}
+                  />
+                  <span>{tab.label}</span>
                 </button>
               );
             })}
           </nav>
+        </div>
 
-        
-        </aside>
-
-        {/* Dynamic Content Panel */}
-        <section className="lg:col-span-9 bg-background/60 backdrop-blur-xl border border-foreground/10 rounded-3xl p-6 sm:p-10 shadow-xl shadow-foreground/[0.01]">
+        {/* Dynamic Section Outlet */}
+        <div className="pt-2">
           {activeTab === "profile" && <ProfileSettings />}
           {activeTab === "account" && <AccountSettings />}
           {activeTab === "dev" && <DevSettings />}
-        </section>
+        </div>
       </div>
     </div>
   );

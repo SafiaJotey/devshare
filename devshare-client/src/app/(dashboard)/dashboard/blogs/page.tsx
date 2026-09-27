@@ -224,10 +224,10 @@ export default function MyBlogsDashboard() {
           </div>
         </div>
 
-        {selected.length > 0 && <div className="flex items-center justify-between gap-3 border-b border-primary/15 bg-primary/5 px-4 py-3 sm:px-5"><p className="text-sm font-semibold text-foreground">{selected.length} selected</p><Button variant="ghost" onClick={deleteSelected} disabled={busy.length > 0} className="h-8 rounded-lg px-2.5 text-xs font-semibold text-red-600 hover:bg-red-500/10 hover:text-red-600"><Trash2 size={14} /> Delete selected</Button></div>}
+        {selected.length > 0 && <div className="flex items-center justify-between gap-3 border-b  border-foreground/10 bg-primary/5 px-4 py-3 sm:px-5"><p className="text-sm font-semibold text-foreground">{selected.length} selected</p><Button variant="ghost" onClick={deleteSelected} disabled={busy.length > 0} className="h-8 rounded-lg px-2.5 text-xs font-semibold text-red-600 hover:bg-red-500/10 hover:text-red-600"><Trash2 size={14} /> Delete selected</Button></div>}
 
         <Table>
-          <TableHeader className="bg-foreground/[0.025]"><TableRow className="hover:bg-transparent">
+          <TableHeader className="bg-foreground/2.5 border-b border-foreground/10!"><TableRow className="hover:bg-transparent border-b  border-foreground/10">
             <TableHead className="w-12 px-4 sm:px-5"><Checkbox checked={allSelected} onCheckedChange={(checked) => setSelected(checked ? blogs.map((blog) => blog._id) : [])} aria-label="Select all articles" /></TableHead>
             <TableHead className="min-w-[300px] py-4 text-xs font-bold text-foreground/50">ARTICLE</TableHead>
             <TableHead className="hidden py-4 text-xs font-bold text-foreground/50 md:table-cell">STATUS</TableHead>
@@ -253,7 +253,7 @@ function Summary({ icon: Icon, label, value, detail }: { icon: typeof Eye; label
 function BlogRow({ blog, selected, busy, onSelect, onDelete, onStatus, onCopy }: { blog: IBlog; selected: boolean; busy: boolean; onSelect: (checked: boolean) => void; onDelete: (id: string, title: string) => void; onStatus: (blog: IBlog, status: IBlog["status"]) => void; onCopy: (blog: IBlog) => void }) {
   const publicHref = "/blogs/" + (blog.slug || blog._id);
   const editHref = "/dashboard/create-blog?edit=" + encodeURIComponent(blog._id);
-  return <TableRow data-state={selected ? "selected" : undefined} className="group border-foreground/8">
+  return <TableRow data-state={selected ? "selected" : undefined} className="group border border-foreground/10">
     <TableCell className="px-4 py-4 sm:px-5"><Checkbox checked={selected} onCheckedChange={(checked) => onSelect(checked === true)} aria-label={"Select " + blog.title} /></TableCell>
     <TableCell className="py-4"><div className="flex min-w-0 items-start gap-3"><span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"><FileText size={17} /></span><div className="min-w-0"><Link href={blog.status === "Published" ? publicHref : editHref} className="block truncate text-sm font-bold text-foreground transition-colors hover:text-primary">{blog.title}</Link><p className="mt-1 line-clamp-1 text-xs text-foreground/50">{blog.description}</p><div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-foreground/45"><span className="rounded-md bg-foreground/[0.05] px-1.5 py-0.5 font-medium">{blog.category}</span><span>{blog.readTime || "Quick read"}</span><span className="md:hidden"><StatusPill status={blog.status} /></span></div></div></div></TableCell>
     <TableCell className="hidden py-4 md:table-cell"><StatusPill status={blog.status} /></TableCell>

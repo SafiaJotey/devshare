@@ -3,12 +3,12 @@
 import React, { useState } from "react";
 import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Key, Copy, Check, Terminal, Eye, Code2, BellRing } from "lucide-react";
+import { Copy, Check, Eye, EyeOff, RotateCw } from "lucide-react";
 
 export default function DevSettings() {
   const [copied, setCopied] = useState(false);
+  const [showKey, setShowKey] = useState(false);
   const [ghostMode, setGhostMode] = useState(false);
   const [monospaceEditor, setMonospaceEditor] = useState(true);
   const [digest, setDigest] = useState(true);
@@ -18,122 +18,113 @@ export default function DevSettings() {
   const handleCopy = () => {
     navigator.clipboard.writeText(mockApiKey);
     setCopied(true);
-    toast.success("API key copied to clipboard!");
+    toast.success("API key copied to clipboard");
     setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <div className="space-y-10 animate-in fade-in duration-300">
-      {/* Workspace Switches */}
-      <div>
-        <div className="flex items-center gap-2 mb-1">
-          <Terminal className="w-5 h-5 text-primary" />
-          <h2 className="text-lg font-bold text-foreground">IDE & Workspace Defaults</h2>
+    <div className="space-y-8">
+      {/* Switches Card */}
+      <div className="rounded-xl  border border-foreground/10 shadow-xs overflow-hidden">
+        <div className="p-6 border-b   border-foreground/10">
+          <h2 className="text-base font-semibold text-foreground">Editor & Privacy</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            Tailor code formatting, telemetry, and email notification feeds.
+          </p>
         </div>
-        <p className="text-xs text-foreground/50">
-          Tailor how technical blogs, draft editors, and code snippets render across your workspace.
-        </p>
 
-        <div className="mt-5 space-y-3">
-          {/* Item 1 */}
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 hover:border-foreground/15 transition-all">
-            <div className="flex items-start gap-3">
-              <div className="p-2 rounded-xl bg-primary/10 text-primary mt-0.5">
-                <Code2 size={16} />
-              </div>
-              <div>
-                <Label htmlFor="mono-toggle" className="font-bold text-sm text-foreground cursor-pointer">
-                  Monospace Typography in Block Editor
-                </Label>
-                <p className="text-xs text-foreground/50 mt-0.5">
-                  Switches all text block editing areas to Fira Code / JetBrains Mono font faces.
-                </p>
-              </div>
+        <div className="divide-y divide-foreground/10">
+          {/* Row 1 */}
+          <div className="p-4 sm:p-5 flex items-center justify-between gap-4">
+            <div className="space-y-0.5 pr-4">
+              <span className="text-sm font-medium text-foreground">Monospace Typography</span>
+              <p className="text-xs text-muted-foreground">
+                Display code snippets, technical blocks, and draft inputs in Fira Code / JetBrains Mono.
+              </p>
             </div>
-            <Switch
-              id="mono-toggle"
-              checked={monospaceEditor}
-              onCheckedChange={setMonospaceEditor}
-            />
+            <Switch checked={monospaceEditor} onCheckedChange={setMonospaceEditor} />
           </div>
 
-          {/* Item 2 */}
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 hover:border-foreground/15 transition-all">
-            <div className="flex items-start gap-3">
-              <div className="p-2 rounded-xl bg-primary/10 text-primary mt-0.5">
-                <Eye size={16} />
-              </div>
-              <div>
-                <Label htmlFor="ghost-toggle" className="font-bold text-sm text-foreground cursor-pointer">
-                  Ghost / Telemetry Privacy Mode
-                </Label>
-                <p className="text-xs text-foreground/50 mt-0.5">
-                  Mask your real-time reading status and cursor presence in collaborative technical blogs.
-                </p>
-              </div>
+          {/* Row 2 */}
+          <div className="p-4 sm:p-5 flex items-center justify-between gap-4">
+            <div className="space-y-0.5 pr-4">
+              <span className="text-sm font-medium text-foreground">Telemetry Privacy Mode</span>
+              <p className="text-xs text-muted-foreground">
+                Mask your live cursor and real-time active reader status in collaborative technical notes.
+              </p>
             </div>
-            <Switch
-              id="ghost-toggle"
-              checked={ghostMode}
-              onCheckedChange={setGhostMode}
-            />
+            <Switch checked={ghostMode} onCheckedChange={setGhostMode} />
           </div>
 
-          {/* Item 3 */}
-          <div className="flex items-center justify-between p-4 rounded-2xl bg-foreground/[0.02] border border-foreground/10 hover:border-foreground/15 transition-all">
-            <div className="flex items-start gap-3">
-              <div className="p-2 rounded-xl bg-primary/10 text-primary mt-0.5">
-                <BellRing size={16} />
-              </div>
-              <div>
-                <Label htmlFor="digest-toggle" className="font-bold text-sm text-foreground cursor-pointer">
-                  Weekly Engineering Digest
-                </Label>
-                <p className="text-xs text-foreground/50 mt-0.5">
-                  Curated updates covering DevOps, System Design, and High-Performance Frontend.
-                </p>
-              </div>
+          {/* Row 3 */}
+          <div className="p-4 sm:p-5 flex items-center justify-between gap-4">
+            <div className="space-y-0.5 pr-4">
+              <span className="text-sm font-medium text-foreground">Weekly Digest</span>
+              <p className="text-xs text-muted-foreground">
+                Receive a curated weekly email summary of trending articles, discussions, and releases.
+              </p>
             </div>
-            <Switch
-              id="digest-toggle"
-              checked={digest}
-              onCheckedChange={setDigest}
-            />
+            <Switch checked={digest} onCheckedChange={setDigest} />
           </div>
         </div>
       </div>
 
-      <div className="h-px bg-foreground/10" />
-
-      {/* Access Token Card */}
-      <div>
-        <div className="flex items-center gap-2 mb-1">
-          <Key className="w-5 h-5 text-primary" />
-          <h2 className="text-lg font-bold text-foreground">Public Developer Key</h2>
-        </div>
-        <p className="text-xs text-foreground/50">
-          Use this secret key to publish articles directly from your CI/CD pipelines (GitHub Actions / GitLab CI).
-        </p>
-
-        <div className="mt-4 p-5 rounded-2xl bg-foreground text-background border border-foreground/20 relative">
-          <div className="flex items-center justify-between gap-2 mb-2">
-            <span className="text-[10px] font-mono uppercase tracking-widest text-accent font-bold">
-              Production_API_Key
-            </span>
+      {/* Secret Token Management Card */}
+      <div className="rounded-xl  border border-foreground/10 bg-card shadow-xs">
+        <div className="p-6 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h2 className="text-base font-semibold text-foreground">Personal Access Token</h2>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                Use this token to authenticate CLI tooling and automated GitHub Actions publishers.
+              </p>
+            </div>
             <Button
-              type="button"
-              variant="ghost"
+              variant="outline"
               size="sm"
-              onClick={handleCopy}
-              className="h-8 px-3 text-background/80 hover:text-accent hover:bg-background/10 font-mono text-xs cursor-pointer"
+              onClick={() => toast.info("New key generated.")}
+              className="h-8 text-xs font-medium gap-1.5 shrink-0"
             >
-              {copied ? <Check size={14} className="text-accent" /> : <Copy size={14} />}
-              <span className="ml-1.5">{copied ? "Copied" : "Copy"}</span>
+              <RotateCw size={12} />
+              Rotate Token
             </Button>
           </div>
-          <code className="block font-mono text-xs break-all text-background/80 select-all">
-            {mockApiKey}
-          </code>
+
+          {/* Monospace Key Display */}
+          <div className="flex items-center gap-2 p-1.5 pl-3 rounded-lg  border border-foreground/10">
+            <code className="text-xs font-mono flex-1 truncate text-foreground/90 select-all">
+              {showKey ? mockApiKey : "•".repeat(40) + mockApiKey.slice(-8)}
+            </code>
+
+            <div className="flex items-center gap-1 shrink-0">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowKey(!showKey)}
+                className="h-7 w-7 p-0 text-muted-foreground hover:text-foreground"
+                title={showKey ? "Hide key" : "Show key"}
+              >
+                {showKey ? <EyeOff size={13} /> : <Eye size={13} />}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleCopy}
+                className="h-7 px-2.5 text-xs font-medium gap-1"
+              >
+                {copied ? <Check size={12} className="text-emerald-500" /> : <Copy size={12} />}
+                <span>{copied ? "Copied" : "Copy"}</span>
+              </Button>
+            </div>
+          </div>
+        </div>
+
+        <div className="px-6 py-3 bg-muted/30 ">
+          <p className="text-[11px] text-muted-foreground">
+            Do not share this token in public Git repositories.
+          </p>
         </div>
       </div>
     </div>
