@@ -284,7 +284,7 @@ export default function Home() {
                     <Link
                       key={post.id}
                       href={`/blogs/${post.id}`}
-                      className="group relative flex min-h-75 overflow-hidden rounded-3xl border border-foreground/10 bg-foreground/[0.03] p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10 sm:p-6 lg:min-h-0 lg:flex-1"
+                      className="group relative flex min-h-75 overflow-hidden rounded-3xl border border-foreground/10 bg-foreground/3 p-5 transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10 sm:p-6 lg:min-h-0 lg:flex-1"
                     >
                       <div className="absolute inset-y-0 right-0 w-full overflow-hidden">
                         <Image
@@ -298,7 +298,7 @@ export default function Home() {
                           }}
                           unoptimized
                         />
-                        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-transparent" />
+                        <div className="absolute inset-0 bg-linear-to-r from-background via-background/95 to-transparent" />
                       </div>
 
                       <div className="relative z-10 flex w-full flex-col justify-between gap-8">
@@ -343,7 +343,7 @@ export default function Home() {
               )}
             </>
           ) : (
-            <div className="col-span-12 rounded-3xl border border-dashed border-foreground/15 bg-foreground/[0.02] p-12 text-center">
+            <div className="col-span-12 rounded-3xl border border-dashed border-foreground/15 bg-foreground/2 p-12 text-center">
               <p className="text-sm font-medium text-foreground/50">No featured deep dives published yet.</p>
             </div>
           )}
@@ -450,7 +450,7 @@ export default function Home() {
             {benefits.map((item, index) => (
               <div
                 key={index}
-                className="p-6 rounded-2xl border border-foreground/5 bg-foreground/[0.02] hover:bg-foreground/[0.04] transition-colors group"
+                className="p-6 rounded-2xl border border-foreground/5 bg-foreground/2 hover:bg-foreground/[0.04] transition-colors group"
               >
                 <div className="w-10 h-10 rounded-lg bg-accent/10 text-accent flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
                   {item.icon}
@@ -529,8 +529,8 @@ export default function Home() {
         </div>
 
         <div className="relative w-full overflow-hidden">
-          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-primary/[0.06] to-transparent sm:w-32" />
-          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-primary/[0.06] to-transparent sm:w-32" />
+          <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-linear-to-r from-primary/6 to-transparent sm:w-32" />
+          <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-linear-to-l from-primary/6 to-transparent sm:w-32" />
           <div className="animate-marquee flex gap-5 px-4 py-4 sm:gap-6">
             {[...authors, ...authors].map((author, i) => (
               <Link

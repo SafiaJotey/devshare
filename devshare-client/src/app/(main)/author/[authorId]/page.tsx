@@ -3,7 +3,6 @@
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
 import {
-  FileText,
   Eye,
   Heart,
   Clock,
@@ -24,7 +23,6 @@ import {
   Zap,
   Cpu,
   Shield,
-  ExternalLink,
   Mail,
   UserPlus,
   UserCheck,
@@ -75,7 +73,8 @@ const MOCK_AUTHOR: IAuthor = {
   username: "asterling",
   title: "Principal Distributed Systems Engineer",
   company: "CloudNative Labs",
-  avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80",
+  avatar:
+    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80",
   bio: "Writing about resilient backend microservices, high-throughput message brokers, and distributed caching in Go and Rust. Advocate for open telemetry and zero-trust infrastructure.",
   location: "San Francisco, CA (Remote)",
   joinedDate: "Member since Jan 2024",
@@ -155,12 +154,40 @@ const MOCK_ARTICLES: IAuthorArticle[] = [
   },
 ];
 
-const CATEGORY_MAP: Record<string, { icon: React.ElementType; color: string; bg: string }> = {
-  Frontend: { icon: Monitor, color: "text-blue-500", bg: "bg-blue-500/10" },
-  Backend: { icon: Server, color: "text-emerald-500", bg: "bg-emerald-500/10" },
-  DevOps: { icon: Zap, color: "text-purple-500", bg: "bg-purple-500/10" },
-  "AI & Data": { icon: Cpu, color: "text-amber-500", bg: "bg-amber-500/10" },
-  Security: { icon: Shield, color: "text-red-500", bg: "bg-red-500/10" },
+const CATEGORY_MAP: Record<
+  string,
+  { icon: React.ElementType; color: string; bg: string; border: string }
+> = {
+  Frontend: {
+    icon: Monitor,
+    color: "text-blue-500",
+    bg: "bg-blue-500/10",
+    border: "border-blue-500/20",
+  },
+  Backend: {
+    icon: Server,
+    color: "text-emerald-500",
+    bg: "bg-emerald-500/10",
+    border: "border-emerald-500/20",
+  },
+  DevOps: {
+    icon: Zap,
+    color: "text-purple-500",
+    bg: "bg-purple-500/10",
+    border: "border-purple-500/20",
+  },
+  "AI & Data": {
+    icon: Cpu,
+    color: "text-amber-500",
+    bg: "bg-amber-500/10",
+    border: "border-amber-500/20",
+  },
+  Security: {
+    icon: Shield,
+    color: "text-rose-500",
+    bg: "bg-rose-500/10",
+    border: "border-rose-500/20",
+  },
 };
 
 export default function AuthorDetailsPage() {
@@ -170,6 +197,9 @@ export default function AuthorDetailsPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isFollowing, setIsFollowing] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+  const [bookmarkedArticles, setBookmarkedArticles] = useState<string[]>([]);
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [isSubscribed, setIsSubscribed] = useState(false);
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
@@ -178,9 +208,28 @@ export default function AuthorDetailsPage() {
   };
 
   const handleShare = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopiedLink(true);
-    setTimeout(() => setCopiedLink(false), 2000);
+    if (typeof window !== "undefined") {
+      navigator.clipboard.writeText(window.location.href);
+      setCopiedLink(true);
+      setTimeout(() => setCopiedLink(false), 2000);
+    }
+  };
+
+  const toggleBookmark = (id: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setBookmarkedArticles((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const handleSubscribe = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail) return;
+    setIsSubscribed(true);
+    setTimeout(() => {
+      setNewsletterEmail("");
+    }, 2000);
   };
 
   // Filtered publications
@@ -198,20 +247,20 @@ export default function AuthorDetailsPage() {
   const categories = ["All", "Backend", "Frontend", "DevOps", "AI & Data"];
 
   return (
-    <div className="min-h-screen pb-20 animate-in fade-in-50 duration-500">
+    <div className="min-h-screen pb-20">
       {/* ─── 1. AMBIENT HERO BANNER ────────────────────────────────────────── */}
-      <div className="relative h-48 sm:h-64 w-full overflow-hidden border-b border-foreground/[0.08] bg-gradient-to-r from-primary/20 via-primary/5 to-transparent">
-        {/* Subtle generative tech grid */}
+      <div className="relative h-48 sm:h-64 w-full overflow-hidden border-b border-foreground/[0.08] bg-gradient-to-r from-primary/15 via-primary/5 to-transparent">
+        {/* Generative tech grid with radial mask fade */}
         <div
-          className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05]"
+          className="absolute inset-0 opacity-[0.04] dark:opacity-[0.06] [mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)] pointer-events-none"
           style={{
-            backgroundImage: `radial-gradient(currentColor 1px, transparent 1px)`,
+            backgroundImage: `radial-gradient(currentColor 1.2px, transparent 1.2px)`,
             backgroundSize: "24px 24px",
           }}
         />
-        {/* Ambient glow flare */}
-        <div className="pointer-events-none absolute -right-10 top-0 h-96 w-96 rounded-full bg-primary/15 blur-3xl" />
-        <div className="pointer-events-none absolute -left-10 bottom-0 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl" />
+        {/* Ambient glow flares */}
+        <div className="pointer-events-none absolute -right-16 -top-16 h-96 w-96 rounded-full bg-primary/20 blur-3xl" />
+        <div className="pointer-events-none absolute -left-16 bottom-0 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl" />
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
@@ -219,7 +268,7 @@ export default function AuthorDetailsPage() {
         <div className="relative -mt-16 sm:-mt-20 mb-8 z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-5 pb-6 border-b border-foreground/[0.08]">
           <div className="flex flex-col sm:flex-row sm:items-end gap-5">
             {/* Avatar with Verified Ring */}
-            <div className="relative">
+            <div className="relative shrink-0">
               <div className="h-28 w-28 sm:h-32 sm:w-32 rounded-3xl p-1 bg-background border-2 border-foreground/10 shadow-xl overflow-hidden">
                 <img
                   src={author.avatar}
@@ -228,7 +277,7 @@ export default function AuthorDetailsPage() {
                 />
               </div>
               <div
-                className="absolute -bottom-1.5 -right-1.5 h-7 w-7 rounded-full bg-primary text-primary-foreground border-2 border-background flex items-center justify-center shadow-md"
+                className="absolute -bottom-1 -right-1 h-7 w-7 rounded-full bg-primary text-primary-foreground border-2 border-background flex items-center justify-center shadow-md"
                 title="Verified Technical Contributor"
               >
                 <CheckCircle2 size={15} strokeWidth={2.5} />
@@ -241,7 +290,7 @@ export default function AuthorDetailsPage() {
                 <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
                   {author.name}
                 </h1>
-                <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                <span className="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
                   Staff Author
                 </span>
               </div>
@@ -255,18 +304,18 @@ export default function AuthorDetailsPage() {
             </div>
           </div>
 
-          {/* Action Buttons: Follow & Share */}
+          {/* Action Buttons: Share & Follow */}
           <div className="flex items-center gap-2.5 self-start sm:self-end">
             <Button
               variant="outline"
               size="sm"
               onClick={handleShare}
-              className="h-9.5 px-3.5 rounded-xl border-foreground/10 bg-background/80 hover:bg-foreground/5 text-xs text-foreground/80 cursor-pointer transition-all"
+              className="h-9 px-3.5 rounded-xl border-foreground/10 bg-background/80 hover:bg-foreground/5 text-xs text-foreground/80 cursor-pointer transition-all shadow-xs"
             >
               {copiedLink ? (
                 <>
                   <Check size={14} className="mr-1.5 text-primary" />
-                  <span>Copied</span>
+                  <span className="text-primary font-medium">Copied</span>
                 </>
               ) : (
                 <>
@@ -279,7 +328,7 @@ export default function AuthorDetailsPage() {
             <Button
               onClick={() => setIsFollowing(!isFollowing)}
               size="sm"
-              className={`h-9.5 px-4 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
+              className={`h-9 px-4 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
                 isFollowing
                   ? "bg-foreground/10 text-foreground hover:bg-foreground/15 border border-foreground/10"
                   : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
@@ -337,7 +386,7 @@ export default function AuthorDetailsPage() {
                 {author.skills.map((skill) => (
                   <span
                     key={skill}
-                    className="px-2.5 py-1 rounded-lg border border-foreground/[0.08] bg-foreground/[0.02] text-xs font-mono font-medium text-foreground/70"
+                    className="px-2.5 py-1 rounded-lg border border-foreground/[0.08] bg-foreground/[0.02] hover:border-foreground/20 text-xs font-mono font-medium text-foreground/70 transition-colors"
                   >
                     #{skill}
                   </span>
@@ -348,7 +397,7 @@ export default function AuthorDetailsPage() {
 
           {/* Quick Metrics Bar */}
           <div className="grid grid-cols-2 gap-3 self-start">
-            <div className="p-4 rounded-2xl border border-foreground/[0.08] bg-foreground/[0.02]">
+            <div className="p-4 rounded-2xl border border-foreground/[0.08] bg-foreground/[0.02] hover:border-foreground/15 transition-colors">
               <span className="text-[11px] font-mono uppercase tracking-wider text-foreground/40">
                 Articles
               </span>
@@ -360,7 +409,7 @@ export default function AuthorDetailsPage() {
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl border border-foreground/[0.08] bg-foreground/[0.02]">
+            <div className="p-4 rounded-2xl border border-foreground/[0.08] bg-foreground/[0.02] hover:border-foreground/15 transition-colors">
               <span className="text-[11px] font-mono uppercase tracking-wider text-foreground/40">
                 Total Reads
               </span>
@@ -371,7 +420,7 @@ export default function AuthorDetailsPage() {
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl border border-foreground/[0.08] bg-foreground/[0.02]">
+            <div className="p-4 rounded-2xl border border-foreground/[0.08] bg-foreground/[0.02] hover:border-foreground/15 transition-colors">
               <span className="text-[11px] font-mono uppercase tracking-wider text-foreground/40">
                 Appreciation
               </span>
@@ -383,7 +432,7 @@ export default function AuthorDetailsPage() {
               </div>
             </div>
 
-            <div className="p-4 rounded-2xl border border-foreground/[0.08] bg-foreground/[0.02]">
+            <div className="p-4 rounded-2xl border border-foreground/[0.08] bg-foreground/[0.02] hover:border-foreground/15 transition-colors">
               <span className="text-[11px] font-mono uppercase tracking-wider text-foreground/40">
                 Community
               </span>
@@ -431,7 +480,7 @@ export default function AuthorDetailsPage() {
                   placeholder="Search articles..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full h-8.5 pl-8.5 pr-3 text-xs rounded-xl bg-foreground/[0.02] border border-foreground/[0.08] focus:border-primary/40 focus:outline-none transition-all placeholder:text-foreground/40 text-foreground"
+                  className="w-full h-9 pl-9 pr-3 text-xs rounded-xl bg-foreground/[0.02] border border-foreground/[0.08] focus:border-primary/40 focus:outline-none transition-all placeholder:text-foreground/40 text-foreground"
                 />
               </div>
             </div>
@@ -445,30 +494,48 @@ export default function AuthorDetailsPage() {
                       icon: Layers,
                       color: "text-foreground",
                       bg: "bg-foreground/5",
+                      border: "border-foreground/10",
                     };
                   const CategoryIcon = CategoryConfig.icon;
+                  const isSaved = bookmarkedArticles.includes(article.id);
 
                   return (
                     <article
                       key={article.id}
-                      className="group relative p-5 sm:p-6 rounded-2xl border border-foreground/[0.08] bg-foreground/[0.02] hover:bg-foreground/[0.03] hover:border-primary/30 transition-all duration-300 shadow-xs"
+                      className="group relative p-5 sm:p-6 rounded-2xl border border-foreground/[0.08] bg-foreground/[0.02] hover:bg-foreground/[0.03] hover:border-primary/30 transition-all duration-200 shadow-xs"
                     >
-                      <div className="flex items-center gap-2 mb-2">
-                        <span
-                          className={`inline-flex items-center gap-1 text-[10px] font-bold font-mono px-2 py-0.5 rounded-md ${CategoryConfig.bg} ${CategoryConfig.color}`}
+                      <div className="flex items-center justify-between gap-2 mb-2">
+                        <div className="flex items-center gap-2">
+                          <span
+                            className={`inline-flex items-center gap-1 text-[10px] font-bold font-mono px-2 py-0.5 rounded-md border ${CategoryConfig.bg} ${CategoryConfig.color} ${CategoryConfig.border}`}
+                          >
+                            <CategoryIcon size={11} />
+                            {article.category}
+                          </span>
+
+                          <span className="text-[11px] font-mono text-foreground/40 flex items-center gap-1">
+                            <Clock size={11} />
+                            {article.readTime}
+                          </span>
+
+                          <span className="text-[11px] font-mono text-foreground/30">
+                            &bull; {article.publishedAt}
+                          </span>
+                        </div>
+
+                        {/* Interactive Bookmark Button */}
+                        <button
+                          onClick={(e) => toggleBookmark(article.id, e)}
+                          className="text-foreground/30 hover:text-foreground p-1 transition-colors cursor-pointer"
+                          title={isSaved ? "Saved" : "Save article"}
                         >
-                          <CategoryIcon size={11} />
-                          {article.category}
-                        </span>
-
-                        <span className="text-[11px] font-mono text-foreground/40 flex items-center gap-1">
-                          <Clock size={11} />
-                          {article.readTime}
-                        </span>
-
-                        <span className="text-[11px] font-mono text-foreground/30">
-                          &bull; {article.publishedAt}
-                        </span>
+                          <Bookmark
+                            size={14}
+                            className={
+                              isSaved ? "fill-primary text-primary" : "stroke-current"
+                            }
+                          />
+                        </button>
                       </div>
 
                       <Link href={`/blogs/${article.slug}`}>
@@ -521,7 +588,7 @@ export default function AuthorDetailsPage() {
           {/* RIGHT 1 COLUMN: SIDEBAR (Credentials, Newsletter, Pinned) */}
           <div className="space-y-6">
             {/* Pinned Top-Read Story */}
-            <div className="p-5 rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/10 via-card to-card relative overflow-hidden">
+            <div className="p-5 rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/10 via-card to-card relative overflow-hidden">
               <div className="flex items-center gap-1.5 text-primary text-xs font-mono font-semibold mb-2">
                 <Sparkles size={13} />
                 <span>Featured Masterpiece</span>
@@ -588,16 +655,29 @@ export default function AuthorDetailsPage() {
                 Receive notifications whenever Alex publishes a new architecture breakdown or code walkthrough.
               </p>
 
-              <div className="space-y-2">
-                <input
-                  type="email"
-                  placeholder="engineer@company.com"
-                  className="w-full h-9 px-3 rounded-xl bg-background border border-foreground/10 text-xs text-foreground placeholder:text-foreground/40 focus:border-primary/40 focus:outline-none"
-                />
-                <Button className="w-full h-9 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-semibold cursor-pointer">
-                  Join 3.8k Subscribers
-                </Button>
-              </div>
+              {isSubscribed ? (
+                <div className="p-3 rounded-xl bg-primary/10 border border-primary/20 text-primary text-xs font-semibold flex items-center gap-2">
+                  <CheckCircle2 size={15} />
+                  <span>Subscribed! You&apos;ll receive new publications.</span>
+                </div>
+              ) : (
+                <form onSubmit={handleSubscribe} className="space-y-2">
+                  <input
+                    type="email"
+                    required
+                    placeholder="engineer@company.com"
+                    value={newsletterEmail}
+                    onChange={(e) => setNewsletterEmail(e.target.value)}
+                    className="w-full h-9 px-3 rounded-xl bg-background border border-foreground/10 text-xs text-foreground placeholder:text-foreground/40 focus:border-primary/40 focus:outline-none"
+                  />
+                  <Button
+                    type="submit"
+                    className="w-full h-9 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-semibold cursor-pointer"
+                  >
+                    Join 3.8k Subscribers
+                  </Button>
+                </form>
+              )}
             </div>
           </div>
         </div>
