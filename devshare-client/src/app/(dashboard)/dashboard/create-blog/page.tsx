@@ -186,19 +186,19 @@ function WriteNewEditor() {
   type LocationInfo =
     | { type: "root"; index: number; block: Block }
     | {
-        type: "subBlock";
-        layoutIndex: number;
-        colIndex: number;
-        subIndex: number;
-        cols: ColumnData[];
-        subBlock: ColumnItem;
-      }
+      type: "subBlock";
+      layoutIndex: number;
+      colIndex: number;
+      subIndex: number;
+      cols: ColumnData[];
+      subBlock: ColumnItem;
+    }
     | {
-        type: "column";
-        layoutIndex: number;
-        colIndex: number;
-        cols: ColumnData[];
-      };
+      type: "column";
+      layoutIndex: number;
+      colIndex: number;
+      cols: ColumnData[];
+    };
 
   const findLocation = (id: string, currentBlocks: Block[]): LocationInfo | null => {
     const rootIndex = currentBlocks.findIndex((b) => b.id === id);
@@ -320,10 +320,10 @@ function WriteNewEditor() {
             dest.type === "column"
               ? [...col.blocks, newSubItem]
               : [
-                  ...col.blocks.slice(0, dest.subIndex),
-                  newSubItem,
-                  ...col.blocks.slice(dest.subIndex),
-                ];
+                ...col.blocks.slice(0, dest.subIndex),
+                newSubItem,
+                ...col.blocks.slice(dest.subIndex),
+              ];
           return { ...col, blocks: insertedBlocks };
         });
 
@@ -363,10 +363,10 @@ function WriteNewEditor() {
               dest.type === "column"
                 ? [...col.blocks, movedItem]
                 : [
-                    ...col.blocks.slice(0, dest.subIndex),
-                    movedItem,
-                    ...col.blocks.slice(dest.subIndex),
-                  ];
+                  ...col.blocks.slice(0, dest.subIndex),
+                  movedItem,
+                  ...col.blocks.slice(dest.subIndex),
+                ];
             return { ...col, blocks };
           });
           return currentBlocks.map((b) =>
@@ -387,10 +387,10 @@ function WriteNewEditor() {
               dest.type === "column"
                 ? [...col.blocks, movedItem]
                 : [
-                    ...col.blocks.slice(0, dest.subIndex),
-                    movedItem,
-                    ...col.blocks.slice(dest.subIndex),
-                  ];
+                  ...col.blocks.slice(0, dest.subIndex),
+                  movedItem,
+                  ...col.blocks.slice(dest.subIndex),
+                ];
             return { ...col, blocks: insertedBlocks };
           });
           return currentBlocks.map((b) => {
@@ -465,9 +465,9 @@ function WriteNewEditor() {
       };
       const response = editingBlogId
         ? await updateBlogApi(editingBlogId, {
-            ...payload,
-            coverImage: coverImage.trim(),
-          })
+          ...payload,
+          coverImage: coverImage.trim(),
+        })
         : await createBlogApi(payload);
 
       if (response.success && response.data) {
@@ -516,11 +516,10 @@ function WriteNewEditor() {
         <div className="max-w-6xl mx-auto h-full flex justify-between items-center px-6">
           <div className="flex items-center gap-4">
             <div
-              className={`flex items-center gap-2 px-3 py-1 rounded-full border transition-all ${
-                isReadyToPublish
-                  ? " border-emerald-500/20 text-emerald-600"
-                  : " border-amber-500/20 text-amber-600"
-              }`}
+              className={`flex items-center gap-2 px-3 py-1 rounded-full border transition-all ${isReadyToPublish
+                ? " border-emerald-500/20 text-emerald-600"
+                : " border-amber-500/20 text-amber-600"
+                }`}
             >
               {isReadyToPublish ? <Rocket size={14} /> : <AlertCircle size={14} />}
               <span className="font-mono text-[10px] uppercase font-bold tracking-widest">
@@ -586,7 +585,7 @@ function WriteNewEditor() {
       </div>
 
       {/* Editor Content Area */}
-      <div className="w-full mx-auto  mt-16">
+      <div className="w-full mx-auto px-8  mt-16">
         {!isPreview ? (
           <div className="animate-in fade-in duration-500">
             <FixedHeader
