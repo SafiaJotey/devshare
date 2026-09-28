@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useState, useMemo } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -10,15 +10,18 @@ import {
   rectIntersection,
   CollisionDetection,
   PointerSensor,
+  KeyboardSensor,
   useSensor,
   useSensors,
   DragStartEvent,
   DragEndEvent,
+  DragOverEvent,
   DragOverlay,
 } from "@dnd-kit/core";
 import {
   arrayMove,
   SortableContext,
+  sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 
@@ -131,8 +134,11 @@ function WriteNewEditor() {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 4, // Low distance for instant responsive drag feel
+        distance: 6, // Avoid accidental drags on text editing
       },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
     })
   );
 
@@ -237,150 +243,166 @@ function WriteNewEditor() {
     else if (location?.type === "subBlock") setActiveItem(location.subBlock);
   };
 
+  /**
+   * handleDragOver fires continuously while dragging.
+   * We use it to give LIVE visual feedback when a root block is hovered
+   * over a layout column (or vice-versa), so the drop target highlights
+   * immediately — the actual data mutation happens in handleDragEnd.
+   */
+  const handleDragOver = (event: DragOverEvent) => {
+    // No state mutation here: LayoutBlock's useDroppable isOver handles
+    // per-column highlighting natively via dnd-kit. This hook is a hook-in
+    // point for future animations or cross-container preview.
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveItem(null);
 
     if (!over || active.id === over.id) return;
 
-    const source = findLocation(String(active.id), blocks);
-    const dest = findLocation(String(over.id), blocks);
+    // Use a snapshot of blocks at the time drag ended
+    setBlocks((currentBlocks) => {
+      const source = findLocation(String(active.id), currentBlocks);
+      const dest = findLocation(String(over.id), currentBlocks);
 
-    if (!source || !dest) return;
+      if (!source || !dest) return currentBlocks;
 
-    // 1. Reordering top-level root blocks
-    if (source.type === "root" && dest.type === "root") {
-      setBlocks((items) => arrayMove(items, source.index, dest.index));
-      return;
-    }
+      // 1. Reordering top-level root blocks
+      if (source.type === "root" && dest.type === "root") {
+        return arrayMove(currentBlocks, source.index, dest.index);
+      }
 
-    // 2. Dragging from inside any column -> outside into root
-    if (source.type === "subBlock" && dest.type === "root") {
-      const movedItem = source.subBlock;
-      const newCols = [...source.cols];
+      // 2. Dragging from inside any column -> outside into root
+      if (source.type === "subBlock" && dest.type === "root") {
+        const movedItem = source.subBlock;
+        const newCols = source.cols.map((col, i) =>
+          i === source.colIndex
+            ? { ...col, blocks: col.blocks.filter((b) => b.id !== movedItem.id) }
+            : col
+        );
 
-      newCols[source.colIndex].blocks = newCols[source.colIndex].blocks.filter(
-        (b) => b.id !== movedItem.id
-      );
+        const next = currentBlocks.map((b, i) =>
+          i === source.layoutIndex
+            ? { ...b, content: JSON.stringify(newCols) }
+            : b
+        );
 
-      setBlocks((prev) => {
-        const next = [...prev];
-        next[source.layoutIndex] = {
-          ...next[source.layoutIndex],
-          content: JSON.stringify(newCols),
-        };
         const newRootBlock: Block = {
           id: movedItem.id,
           type: movedItem.type,
           content: movedItem.content,
           metadata: movedItem.metadata,
         };
-        next.splice(dest.index, 0, newRootBlock);
+        // Insert AFTER the destination root block
+        next.splice(dest.index + 1, 0, newRootBlock);
         return next;
-      });
-      return;
-    }
-
-    // 3. Dragging from outside (root) -> into any column
-    if (
-      source.type === "root" &&
-      (dest.type === "column" || dest.type === "subBlock")
-    ) {
-      const draggedBlock = source.block;
-      if (draggedBlock.type === "layout") return; // Avoid nesting layouts
-
-      const newCols = [...dest.cols];
-      const targetColIdx = dest.colIndex;
-      const targetLayoutIdx = dest.layoutIndex;
-
-      const newSubItem: ColumnItem = {
-        id: draggedBlock.id,
-        type: draggedBlock.type,
-        content: draggedBlock.content,
-        metadata: draggedBlock.metadata,
-      };
-
-      if (dest.type === "column") {
-        newCols[targetColIdx].blocks.push(newSubItem);
-      } else {
-        newCols[targetColIdx].blocks.splice(dest.subIndex, 0, newSubItem);
       }
 
-      setBlocks((prev) => {
-        const next = prev.filter((b) => b.id !== draggedBlock.id);
-        const lIndex = next.findIndex(
-          (_, idx) =>
-            idx === targetLayoutIdx ||
-            next[idx]?.id === prev[targetLayoutIdx]?.id
+      // 3. Dragging from outside (root) -> into any layout column
+      if (
+        source.type === "root" &&
+        (dest.type === "column" || dest.type === "subBlock")
+      ) {
+        const draggedBlock = source.block;
+        if (draggedBlock.type === "layout") return currentBlocks; // No nesting
+
+        const newSubItem: ColumnItem = {
+          id: draggedBlock.id,
+          type: draggedBlock.type,
+          content: draggedBlock.content,
+          metadata: draggedBlock.metadata,
+        };
+
+        const newCols = dest.cols.map((col, i) => {
+          if (i !== dest.colIndex) return col;
+          const insertedBlocks =
+            dest.type === "column"
+              ? [...col.blocks, newSubItem]
+              : [
+                  ...col.blocks.slice(0, dest.subIndex),
+                  newSubItem,
+                  ...col.blocks.slice(dest.subIndex),
+                ];
+          return { ...col, blocks: insertedBlocks };
+        });
+
+        // Remove from root, then update the layout block (look up by id, not index)
+        const targetLayoutId = currentBlocks[dest.layoutIndex]?.id;
+        const withoutDragged = currentBlocks.filter(
+          (b) => b.id !== draggedBlock.id
         );
-        if (lIndex !== -1) {
-          next[lIndex] = {
-            ...next[lIndex],
-            content: JSON.stringify(newCols),
-          };
-        }
-        return next;
-      });
-      return;
-    }
+        return withoutDragged.map((b) =>
+          b.id === targetLayoutId
+            ? { ...b, content: JSON.stringify(newCols) }
+            : b
+        );
+      }
 
-    // 4. Moving between columns in the same layout OR across different layouts
-    if (
-      source.type === "subBlock" &&
-      (dest.type === "column" || dest.type === "subBlock")
-    ) {
-      const movedItem = source.subBlock;
+      // 4. Moving within or between layout columns
+      if (
+        source.type === "subBlock" &&
+        (dest.type === "column" || dest.type === "subBlock")
+      ) {
+        const movedItem = source.subBlock;
+        const srcLayoutId = currentBlocks[source.layoutIndex]?.id;
+        const dstLayoutId = currentBlocks[dest.layoutIndex]?.id;
 
-      setBlocks((prev) => {
-        const next = [...prev];
-
-        // Same Layout
-        if (source.layoutIndex === dest.layoutIndex) {
-          const layoutCols = [...source.cols];
-          // Remove from source column
-          layoutCols[source.colIndex].blocks = layoutCols[source.colIndex].blocks.filter(
-            (b) => b.id !== movedItem.id
+        if (srcLayoutId === dstLayoutId) {
+          // Same layout: move between columns or reorder within column
+          const layoutCols = source.cols.map((col, i) => {
+            if (i === source.colIndex) {
+              return { ...col, blocks: col.blocks.filter((b) => b.id !== movedItem.id) };
+            }
+            return col;
+          });
+          // Now insert into dest column
+          const finalCols = layoutCols.map((col, i) => {
+            if (i !== dest.colIndex) return col;
+            const blocks =
+              dest.type === "column"
+                ? [...col.blocks, movedItem]
+                : [
+                    ...col.blocks.slice(0, dest.subIndex),
+                    movedItem,
+                    ...col.blocks.slice(dest.subIndex),
+                  ];
+            return { ...col, blocks };
+          });
+          return currentBlocks.map((b) =>
+            b.id === srcLayoutId
+              ? { ...b, content: JSON.stringify(finalCols) }
+              : b
           );
-
-          // Add to dest column
-          if (dest.type === "column") {
-            layoutCols[dest.colIndex].blocks.push(movedItem);
-          } else {
-            layoutCols[dest.colIndex].blocks.splice(dest.subIndex, 0, movedItem);
-          }
-
-          next[source.layoutIndex] = {
-            ...next[source.layoutIndex],
-            content: JSON.stringify(layoutCols),
-          };
         } else {
-          // Different Layout blocks: Transfer cleanly
-          const srcCols = [...source.cols];
-          const dstCols = [...dest.cols];
-
-          srcCols[source.colIndex].blocks = srcCols[source.colIndex].blocks.filter(
-            (b) => b.id !== movedItem.id
+          // Different layouts
+          const srcCols = source.cols.map((col, i) =>
+            i === source.colIndex
+              ? { ...col, blocks: col.blocks.filter((b) => b.id !== movedItem.id) }
+              : col
           );
-
-          if (dest.type === "column") {
-            dstCols[dest.colIndex].blocks.push(movedItem);
-          } else {
-            dstCols[dest.colIndex].blocks.splice(dest.subIndex, 0, movedItem);
-          }
-
-          next[source.layoutIndex] = {
-            ...next[source.layoutIndex],
-            content: JSON.stringify(srcCols),
-          };
-          next[dest.layoutIndex] = {
-            ...next[dest.layoutIndex],
-            content: JSON.stringify(dstCols),
-          };
+          const dstCols = dest.cols.map((col, i) => {
+            if (i !== dest.colIndex) return col;
+            const insertedBlocks =
+              dest.type === "column"
+                ? [...col.blocks, movedItem]
+                : [
+                    ...col.blocks.slice(0, dest.subIndex),
+                    movedItem,
+                    ...col.blocks.slice(dest.subIndex),
+                  ];
+            return { ...col, blocks: insertedBlocks };
+          });
+          return currentBlocks.map((b) => {
+            if (b.id === srcLayoutId) return { ...b, content: JSON.stringify(srcCols) };
+            if (b.id === dstLayoutId) return { ...b, content: JSON.stringify(dstCols) };
+            return b;
+          });
         }
+      }
 
-        return next;
-      });
-    }
+      return currentBlocks;
+    });
   };
 
   const handleSubmit = async (status: "Published" | "Draft") => {
@@ -582,6 +604,7 @@ function WriteNewEditor() {
               sensors={sensors}
               collisionDetection={customCollisionStrategy}
               onDragStart={handleDragStart}
+              onDragOver={handleDragOver}
               onDragEnd={handleDragEnd}
             >
               <SortableContext
@@ -621,8 +644,14 @@ function WriteNewEditor() {
                 </div>
               </SortableContext>
 
-              {/* Drag Overlay: Eliminates stutter & visual jump across containers */}
-              <DragOverlay dropAnimation={null}>
+              {/* Drag Overlay — renders the ghost at cursor position, eliminates
+                  stuttering and visual jumps when moving blocks across containers */}
+              <DragOverlay
+                dropAnimation={{
+                  duration: 180,
+                  easing: "cubic-bezier(0.18, 0.67, 0.6, 1.22)",
+                }}
+              >
                 {activeItem ? <DragItemGhost item={activeItem} /> : null}
               </DragOverlay>
             </DndContext>

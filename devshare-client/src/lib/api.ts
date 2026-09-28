@@ -366,3 +366,85 @@ export const updateBlogApi = async (
     body: JSON.stringify(payload),
   });
 };
+
+// ─── Blog Interactions ──────────────────────────────────────────────────────────
+
+export interface IBlogInteractionState {
+  liked: boolean;
+  saved: boolean;
+  likes: number;
+}
+
+export const getBlogInteractionStateApi = async (
+  id: string
+): Promise<ApiResponse<IBlogInteractionState>> => {
+  return apiFetch<ApiResponse<IBlogInteractionState>>(
+    `/blogs/${encodeURIComponent(id)}/interactions`,
+    { method: "GET" }
+  );
+};
+
+export const toggleLikeApi = async (
+  id: string
+): Promise<ApiResponse<{ liked: boolean; likes: number }>> => {
+  return apiFetch<ApiResponse<{ liked: boolean; likes: number }>>(
+    `/blogs/${encodeURIComponent(id)}/like`,
+    { method: "POST" }
+  );
+};
+
+export const toggleSaveApi = async (
+  id: string
+): Promise<ApiResponse<{ saved: boolean }>> => {
+  return apiFetch<ApiResponse<{ saved: boolean }>>(
+    `/blogs/${encodeURIComponent(id)}/save`,
+    { method: "POST" }
+  );
+};
+
+// ─── Blog Comments ─────────────────────────────────────────────────────────────
+
+export interface IBlogComment {
+  id: string;
+  userId: string;
+  userName: string;
+  userAvatar?: string;
+  content: string;
+  createdAt: string;
+}
+
+export const addCommentApi = async (
+  blogId: string,
+  content: string
+): Promise<ApiResponse<IBlogComment[]>> => {
+  return apiFetch<ApiResponse<IBlogComment[]>>(
+    `/blogs/${encodeURIComponent(blogId)}/comments`,
+    {
+      method: "POST",
+      body: JSON.stringify({ content }),
+    }
+  );
+};
+
+export const deleteCommentApi = async (
+  blogId: string,
+  commentId: string
+): Promise<ApiResponse<null>> => {
+  return apiFetch<ApiResponse<null>>(
+    `/blogs/${encodeURIComponent(blogId)}/comments/${encodeURIComponent(commentId)}`,
+    { method: "DELETE" }
+  );
+};
+
+// ─── Related Blogs ─────────────────────────────────────────────────────────────
+
+export const getRelatedBlogsApi = async (
+  blogId: string,
+  category: string,
+  limit = 3
+): Promise<ApiResponse<IBlog[]>> => {
+  return apiFetch<ApiResponse<IBlog[]>>(
+    `/blogs/${encodeURIComponent(blogId)}/related?category=${encodeURIComponent(category)}&limit=${limit}`,
+    { method: "GET" }
+  );
+};

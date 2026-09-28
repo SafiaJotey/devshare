@@ -5,6 +5,7 @@ import { getUserCollection } from "../user/user.model";
 import { getBlogCollection } from "./blog.model";
 import {
   IBlog,
+  IBlogComment,
   ICreateBlogPayload,
   IUpdateBlogPayload,
   IBlogFilterQuery,
@@ -390,6 +391,207 @@ const deleteBlog = async (
   await blogCollection.deleteOne({ _id: new ObjectId(blogId) });
 };
 
+// ─── Toggle Like ─────────────────────────────────────────────────────────────
+
+const toggleLike = async (
+  userId: string,
+  blogId: string
+): Promise<{ liked: boolean; likes: number }> => {
+  const blogCollection = getBlogCollection();
+
+  if (!ObjectId.isValid(blogId)) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid blog ID");
+  }
+
+  const blog = await blogCollection.findOne({ _id: new ObjectId(blogId) });
+  if (!blog) {
+    throw new AppError(httpStatus.NOT_FOUND, "Article not found");
+  }
+
+  const alreadyLiked = (blog.likesBy || []).includes(userId);
+
+  if (alreadyLiked) {
+    const updated = await blogCollection.findOneAndUpdate(
+      { _id: new ObjectId(blogId) },
+      { $pull: { likesBy: userId }, $inc: { likes: -1 } },
+      { returnDocument: "after" }
+    );
+    return { liked: false, likes: updated?.likes ?? 0 };
+  } else {
+    const updated = await blogCollection.findOneAndUpdate(
+      { _id: new ObjectId(blogId) },
+      { $addToSet: { likesBy: userId }, $inc: { likes: 1 } },
+      { returnDocument: "after" }
+    );
+    return { liked: true, likes: updated?.likes ?? 0 };
+  }
+};
+
+// ─── Toggle Save ─────────────────────────────────────────────────────────────
+
+const toggleSave = async (
+  userId: string,
+  blogId: string
+): Promise<{ saved: boolean }> => {
+  const blogCollection = getBlogCollection();
+
+  if (!ObjectId.isValid(blogId)) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid blog ID");
+  }
+
+  const blog = await blogCollection.findOne({ _id: new ObjectId(blogId) });
+  if (!blog) {
+    throw new AppError(httpStatus.NOT_FOUND, "Article not found");
+  }
+
+  const alreadySaved = (blog.savedBy || []).includes(userId);
+
+  if (alreadySaved) {
+    await blogCollection.updateOne(
+      { _id: new ObjectId(blogId) },
+      { $pull: { savedBy: userId } }
+    );
+    return { saved: false };
+  } else {
+    await blogCollection.updateOne(
+      { _id: new ObjectId(blogId) },
+      { $addToSet: { savedBy: userId } }
+    );
+    return { saved: true };
+  }
+};
+
+// ─── Add Comment ─────────────────────────────────────────────────────────────
+
+const addComment = async (
+  userId: string,
+  blogId: string,
+  content: string
+): Promise<IBlog> => {
+  const blogCollection = getBlogCollection();
+  const userCollection = getUserCollection();
+
+  if (!ObjectId.isValid(blogId) || !ObjectId.isValid(userId)) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid ID format");
+  }
+
+  const user = await userCollection.findOne({ _id: new ObjectId(userId) });
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User not found");
+  }
+
+  const comment: IBlogComment = {
+    id: new ObjectId().toString(),
+    userId,
+    userName: user.name,
+    userAvatar:
+      user.avatar ||
+      `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name)}`,
+    content: content.trim(),
+    createdAt: new Date(),
+  };
+
+  const updated = await blogCollection.findOneAndUpdate(
+    { _id: new ObjectId(blogId) },
+    { $push: { comments: comment } },
+    { returnDocument: "after" }
+  );
+
+  if (!updated) {
+    throw new AppError(httpStatus.NOT_FOUND, "Article not found");
+  }
+
+  return updated as IBlog;
+};
+
+// ─── Delete Comment ───────────────────────────────────────────────────────────
+
+const deleteComment = async (
+  userId: string,
+  blogId: string,
+  commentId: string,
+  role?: string
+): Promise<void> => {
+  const blogCollection = getBlogCollection();
+
+  if (!ObjectId.isValid(blogId)) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid blog ID");
+  }
+
+  const blog = await blogCollection.findOne({ _id: new ObjectId(blogId) });
+  if (!blog) {
+    throw new AppError(httpStatus.NOT_FOUND, "Article not found");
+  }
+
+  const comment = (blog.comments || []).find((c) => c.id === commentId);
+  if (!comment) {
+    throw new AppError(httpStatus.NOT_FOUND, "Comment not found");
+  }
+
+  if (comment.userId !== userId && role !== "admin") {
+    throw new AppError(
+      httpStatus.FORBIDDEN,
+      "You do not have permission to delete this comment"
+    );
+  }
+
+  await blogCollection.updateOne(
+    { _id: new ObjectId(blogId) },
+    { $pull: { comments: { id: commentId } } }
+  );
+};
+
+// ─── Get Related Blogs ─────────────────────────────────────────────────────────
+
+const getRelatedBlogs = async (
+  blogId: string,
+  category: string,
+  limit = 3
+): Promise<IBlog[]> => {
+  const blogCollection = getBlogCollection();
+
+  const filter: Filter<IBlog> = {
+    status: "Published",
+    category: category as BlogCategory,
+  };
+
+  if (ObjectId.isValid(blogId)) {
+    filter._id = { $ne: new ObjectId(blogId) } as any;
+  }
+
+  const blogs = await blogCollection
+    .find(filter)
+    .sort({ createdAt: -1 })
+    .limit(limit)
+    .toArray();
+
+  return blogs;
+};
+
+// ─── Get Blog Interaction State ────────────────────────────────────────────────
+
+const getBlogInteractionState = async (
+  userId: string,
+  blogId: string
+): Promise<{ liked: boolean; saved: boolean; likes: number }> => {
+  const blogCollection = getBlogCollection();
+
+  if (!ObjectId.isValid(blogId)) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid blog ID");
+  }
+
+  const blog = await blogCollection.findOne({ _id: new ObjectId(blogId) });
+  if (!blog) {
+    throw new AppError(httpStatus.NOT_FOUND, "Article not found");
+  }
+
+  return {
+    liked: (blog.likesBy || []).includes(userId),
+    saved: (blog.savedBy || []).includes(userId),
+    likes: blog.likes,
+  };
+};
+
 export const BlogService = {
   createBlog,
   getAllBlogs,
@@ -398,6 +600,12 @@ export const BlogService = {
   getMyBlogById,
   updateBlog,
   deleteBlog,
+  toggleLike,
+  toggleSave,
+  addComment,
+  deleteComment,
+  getRelatedBlogs,
+  getBlogInteractionState,
 };
 
 export default BlogService;

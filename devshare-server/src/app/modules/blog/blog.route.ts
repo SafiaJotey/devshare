@@ -23,8 +23,31 @@ router.get("/my/blogs", auth(), BlogController.getMyBlogs);
 // Get one of the current user's articles for editing (does not increment views)
 router.get("/my/blogs/:id", auth(), BlogController.getMyBlogById);
 
+// Get related blogs by category (Public)
+router.get("/:id/related", BlogController.getRelatedBlogs);
+
 // Get single blog by ID or slug (Public)
 router.get("/:id", BlogController.getBlogById);
+
+// Get interaction state for logged-in user (liked, saved, likes count)
+router.get("/:id/interactions", auth(), BlogController.getBlogInteractionState);
+
+// Toggle like (Protected)
+router.post("/:id/like", auth(), BlogController.toggleLike);
+
+// Toggle save (Protected)
+router.post("/:id/save", auth(), BlogController.toggleSave);
+
+// Add comment (Protected)
+router.post(
+  "/:id/comments",
+  auth(),
+  validateRequest(BlogValidation.addCommentValidationSchema),
+  BlogController.addComment
+);
+
+// Delete comment (Protected - Author or Admin)
+router.delete("/:id/comments/:commentId", auth(), BlogController.deleteComment);
 
 // Update a blog (Protected - Author or Admin)
 router.patch(

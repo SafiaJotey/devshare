@@ -96,6 +96,101 @@ const deleteBlog = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const toggleLike = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user!.id;
+  const { id } = req.params;
+  const result = await BlogService.toggleLike(userId, id as string);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: result.liked ? "Article liked!" : "Like removed",
+    data: result,
+  });
+});
+
+const toggleSave = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user!.id;
+  const { id } = req.params;
+  const result = await BlogService.toggleSave(userId, id as string);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: result.saved ? "Article saved for later!" : "Removed from saved",
+    data: result,
+  });
+});
+
+const addComment = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user!.id;
+  const { id } = req.params;
+  const { content } = req.body;
+
+  if (!content || content.trim().length === 0) {
+    return sendResponse(res, {
+      statusCode: httpStatus.BAD_REQUEST,
+      success: false,
+      message: "Comment content is required",
+    });
+  }
+
+  const result = await BlogService.addComment(userId, id as string, content);
+
+  sendResponse(res, {
+    statusCode: httpStatus.CREATED,
+    success: true,
+    message: "Comment added successfully",
+    data: result.comments,
+  });
+});
+
+const deleteComment = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user!.id;
+  const role = req.user!.role;
+  const { id, commentId } = req.params;
+
+  await BlogService.deleteComment(userId, id as string, commentId as string, role);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Comment deleted successfully",
+    data: null,
+  });
+});
+
+const getRelatedBlogs = catchAsync(async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { category, limit } = req.query;
+
+  const result = await BlogService.getRelatedBlogs(
+    id as string,
+    category as string,
+    limit ? Number(limit) : 3
+  );
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Related articles retrieved",
+    data: result,
+  });
+});
+
+const getBlogInteractionState = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user!.id;
+  const { id } = req.params;
+  const result = await BlogService.getBlogInteractionState(userId, id as string);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Interaction state retrieved",
+    data: result,
+  });
+});
+
 export const BlogController = {
   createBlog,
   getAllBlogs,
@@ -104,6 +199,12 @@ export const BlogController = {
   getMyBlogById,
   updateBlog,
   deleteBlog,
+  toggleLike,
+  toggleSave,
+  addComment,
+  deleteComment,
+  getRelatedBlogs,
+  getBlogInteractionState,
 };
 
 export default BlogController;
