@@ -1,15 +1,20 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useState, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import {
   DndContext,
-  closestCenter,
+  closestCorners,
+  pointerWithin,
+  rectIntersection,
+  CollisionDetection,
   PointerSensor,
   useSensor,
   useSensors,
+  DragStartEvent,
   DragEndEvent,
+  DragOverlay,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -18,15 +23,31 @@ import {
 } from "@dnd-kit/sortable";
 
 import { Button } from "@/components/ui/button";
-import { Eye, Rocket, AlertCircle, Edit3, Loader2, Bookmark } from "lucide-react";
+import { Eye, Rocket, AlertCircle, Edit3, Loader2, Bookmark, GripVertical } from "lucide-react";
 
 import { FixedHeader } from "./_components/FixedHeader";
 import { EditorBlock } from "./_components/EditorBlock";
 import { Toolbar } from "./_components/Toolbar";
 import { PreviewMode } from "./_components/PreviewMode";
-import { Block, BlockType } from "./type";
+import { Block, BlockType, ColumnData, ColumnItem } from "./type";
 import { useAuth } from "@/providers/auth-provider";
 import { createBlogApi, getMyBlogByIdApi, updateBlogApi } from "@/lib/api";
+
+// Simple Preview badge while dragging
+const DragItemGhost = ({ item }: { item: Block | ColumnItem | null }) => {
+  if (!item) return null;
+  return (
+    <div className="flex items-center gap-2 p-3 bg-background border-2 border-primary/60 shadow-2xl rounded-xl opacity-95 max-w-sm pointer-events-none scale-105 transition-transform">
+      <GripVertical size={16} className="text-primary shrink-0" />
+      <span className="text-xs font-mono font-bold uppercase text-primary/80 bg-primary/10 px-1.5 py-0.5 rounded">
+        {item.type}
+      </span>
+      <span className="text-xs text-foreground/80 truncate">
+        {item.content ? item.content.slice(0, 40) : "Empty block"}
+      </span>
+    </div>
+  );
+};
 
 function WriteNewEditor() {
   const router = useRouter();
@@ -35,19 +56,20 @@ function WriteNewEditor() {
   const editId = searchParams.get("edit");
 
   const [isPreview, setIsPreview] = useState(false);
-  const [category, setCategory] = useState("");
+  const [activeItem, setActiveItem] = useState<Block | ColumnItem | null>(null);
+
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [coverImage, setCoverImage] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState<"publish" | "draft" | null>(
-    null
-  );
+  const [isSubmitting, setIsSubmitting] = useState<"publish" | "draft" | null>(null);
   const [isLoadingArticle, setIsLoadingArticle] = useState(Boolean(editId));
   const [editingBlogId, setEditingBlogId] = useState<string | null>(null);
 
   const [blocks, setBlocks] = useState<Block[]>([
     { id: "init-1", type: "p", content: "" },
   ]);
+  const categoryParam = searchParams.get("category");
+  const [category, setCategory] = useState(categoryParam || "");
 
   useEffect(() => {
     let isCurrent = true;
@@ -61,7 +83,8 @@ function WriteNewEditor() {
       setIsLoadingArticle(true);
       try {
         const response = await getMyBlogByIdApi(editId);
-        if (!response.success || !response.data) throw new Error(response.message || "Could not load this article");
+        if (!response.success || !response.data)
+          throw new Error(response.message || "Could not load this article");
         if (!isCurrent) return;
         const article = response.data;
         setEditingBlogId(article._id);
@@ -69,20 +92,36 @@ function WriteNewEditor() {
         setTitle(article.title);
         setDescription(article.description);
         setCoverImage(article.coverImage || "");
-        setBlocks(article.blocks.length ? article.blocks : [{ id: "init-1", type: "p", content: "" }]);
+        setBlocks(
+          article.blocks.length
+            ? article.blocks
+            : [{ id: "init-1", type: "p", content: "" }]
+        );
       } catch (error) {
         if (!isCurrent) return;
-        toast.error(error instanceof Error ? error.message : "Could not load this article");
+        toast.error(
+          error instanceof Error ? error.message : "Could not load this article"
+        );
         router.replace("/dashboard/blogs");
       } finally {
         if (isCurrent) setIsLoadingArticle(false);
       }
     };
     loadArticle();
-    return () => { isCurrent = false; };
+    return () => {
+      isCurrent = false;
+    };
   }, [editId, router]);
 
-  const hasContentBlock = blocks.some((b) => b.content && b.content.trim().length > 0);
+  useEffect(() => {
+    if (!editId && categoryParam) {
+      setCategory(categoryParam);
+    }
+  }, [categoryParam, editId]);
+
+  const hasContentBlock = blocks.some(
+    (b) => b.content && b.content.trim().length > 0
+  );
   const isReadyToPublish =
     category !== "" &&
     title.trim().length >= 3 &&
@@ -92,28 +131,254 @@ function WriteNewEditor() {
   const sensors = useSensors(
     useSensor(PointerSensor, {
       activationConstraint: {
-        distance: 8,
+        distance: 4, // Low distance for instant responsive drag feel
       },
     })
   );
 
-  const addBlock = (type: BlockType) => {
+  // Smooth multi-container collision strategy
+  const customCollisionStrategy: CollisionDetection = (args) => {
+    const pointerCollisions = pointerWithin(args);
+    if (pointerCollisions.length > 0) return pointerCollisions;
+    const rectCollisions = rectIntersection(args);
+    if (rectCollisions.length > 0) return rectCollisions;
+    return closestCorners(args);
+  };
+
+  const addBlock = (type: BlockType, metadata?: string, content?: string) => {
+    let initialContent = content || "";
+    let initialMetadata = metadata || (type === "code" ? "index.ts" : "");
+
+    if (type === "layout" && !initialContent) {
+      const colCount = Number(metadata) === 3 ? 3 : 2;
+      const defaultCols: ColumnData[] = Array.from(
+        { length: colCount },
+        (_, i) => ({
+          id: `col-${Date.now()}-${i + 1}`,
+          blocks: [
+            {
+              id: `sub-${Date.now()}-${i + 1}-${Math.random().toString(36).slice(2, 6)}`,
+              type: "p",
+              content: "",
+            },
+          ],
+        })
+      );
+      initialContent = JSON.stringify(defaultCols);
+      initialMetadata = String(colCount);
+    }
+
     const newBlock: Block = {
-      id: Date.now().toString(),
+      id: `block-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       type,
-      content: "",
-      metadata: type === "code" ? "index.ts" : "",
+      content: initialContent,
+      metadata: initialMetadata,
     };
-    setBlocks([...blocks, newBlock]);
+    setBlocks((prev) => [...prev, newBlock]);
+  };
+
+  type LocationInfo =
+    | { type: "root"; index: number; block: Block }
+    | {
+        type: "subBlock";
+        layoutIndex: number;
+        colIndex: number;
+        subIndex: number;
+        cols: ColumnData[];
+        subBlock: ColumnItem;
+      }
+    | {
+        type: "column";
+        layoutIndex: number;
+        colIndex: number;
+        cols: ColumnData[];
+      };
+
+  const findLocation = (id: string, currentBlocks: Block[]): LocationInfo | null => {
+    const rootIndex = currentBlocks.findIndex((b) => b.id === id);
+    if (rootIndex !== -1) {
+      return { type: "root", index: rootIndex, block: currentBlocks[rootIndex] };
+    }
+
+    for (let lIdx = 0; lIdx < currentBlocks.length; lIdx++) {
+      const blk = currentBlocks[lIdx];
+      if (blk.type === "layout" && blk.content) {
+        try {
+          const cols: ColumnData[] = JSON.parse(blk.content);
+          if (Array.isArray(cols)) {
+            for (let cIdx = 0; cIdx < cols.length; cIdx++) {
+              if (cols[cIdx].id === id) {
+                return { type: "column", layoutIndex: lIdx, colIndex: cIdx, cols };
+              }
+              const sIdx = cols[cIdx].blocks.findIndex((sb) => sb.id === id);
+              if (sIdx !== -1) {
+                return {
+                  type: "subBlock",
+                  layoutIndex: lIdx,
+                  colIndex: cIdx,
+                  subIndex: sIdx,
+                  cols,
+                  subBlock: cols[cIdx].blocks[sIdx],
+                };
+              }
+            }
+          }
+        } catch {
+          // ignore invalid json
+        }
+      }
+    }
+    return null;
+  };
+
+  const handleDragStart = (event: DragStartEvent) => {
+    const location = findLocation(String(event.active.id), blocks);
+    if (location?.type === "root") setActiveItem(location.block);
+    else if (location?.type === "subBlock") setActiveItem(location.subBlock);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (over && active.id !== over.id) {
-      setBlocks((items) => {
-        const oldIdx = items.findIndex((i) => i.id === active.id);
-        const newIdx = items.findIndex((i) => i.id === over.id);
-        return arrayMove(items, oldIdx, newIdx);
+    setActiveItem(null);
+
+    if (!over || active.id === over.id) return;
+
+    const source = findLocation(String(active.id), blocks);
+    const dest = findLocation(String(over.id), blocks);
+
+    if (!source || !dest) return;
+
+    // 1. Reordering top-level root blocks
+    if (source.type === "root" && dest.type === "root") {
+      setBlocks((items) => arrayMove(items, source.index, dest.index));
+      return;
+    }
+
+    // 2. Dragging from inside any column -> outside into root
+    if (source.type === "subBlock" && dest.type === "root") {
+      const movedItem = source.subBlock;
+      const newCols = [...source.cols];
+
+      newCols[source.colIndex].blocks = newCols[source.colIndex].blocks.filter(
+        (b) => b.id !== movedItem.id
+      );
+
+      setBlocks((prev) => {
+        const next = [...prev];
+        next[source.layoutIndex] = {
+          ...next[source.layoutIndex],
+          content: JSON.stringify(newCols),
+        };
+        const newRootBlock: Block = {
+          id: movedItem.id,
+          type: movedItem.type,
+          content: movedItem.content,
+          metadata: movedItem.metadata,
+        };
+        next.splice(dest.index, 0, newRootBlock);
+        return next;
+      });
+      return;
+    }
+
+    // 3. Dragging from outside (root) -> into any column
+    if (
+      source.type === "root" &&
+      (dest.type === "column" || dest.type === "subBlock")
+    ) {
+      const draggedBlock = source.block;
+      if (draggedBlock.type === "layout") return; // Avoid nesting layouts
+
+      const newCols = [...dest.cols];
+      const targetColIdx = dest.colIndex;
+      const targetLayoutIdx = dest.layoutIndex;
+
+      const newSubItem: ColumnItem = {
+        id: draggedBlock.id,
+        type: draggedBlock.type,
+        content: draggedBlock.content,
+        metadata: draggedBlock.metadata,
+      };
+
+      if (dest.type === "column") {
+        newCols[targetColIdx].blocks.push(newSubItem);
+      } else {
+        newCols[targetColIdx].blocks.splice(dest.subIndex, 0, newSubItem);
+      }
+
+      setBlocks((prev) => {
+        const next = prev.filter((b) => b.id !== draggedBlock.id);
+        const lIndex = next.findIndex(
+          (_, idx) =>
+            idx === targetLayoutIdx ||
+            next[idx]?.id === prev[targetLayoutIdx]?.id
+        );
+        if (lIndex !== -1) {
+          next[lIndex] = {
+            ...next[lIndex],
+            content: JSON.stringify(newCols),
+          };
+        }
+        return next;
+      });
+      return;
+    }
+
+    // 4. Moving between columns in the same layout OR across different layouts
+    if (
+      source.type === "subBlock" &&
+      (dest.type === "column" || dest.type === "subBlock")
+    ) {
+      const movedItem = source.subBlock;
+
+      setBlocks((prev) => {
+        const next = [...prev];
+
+        // Same Layout
+        if (source.layoutIndex === dest.layoutIndex) {
+          const layoutCols = [...source.cols];
+          // Remove from source column
+          layoutCols[source.colIndex].blocks = layoutCols[source.colIndex].blocks.filter(
+            (b) => b.id !== movedItem.id
+          );
+
+          // Add to dest column
+          if (dest.type === "column") {
+            layoutCols[dest.colIndex].blocks.push(movedItem);
+          } else {
+            layoutCols[dest.colIndex].blocks.splice(dest.subIndex, 0, movedItem);
+          }
+
+          next[source.layoutIndex] = {
+            ...next[source.layoutIndex],
+            content: JSON.stringify(layoutCols),
+          };
+        } else {
+          // Different Layout blocks: Transfer cleanly
+          const srcCols = [...source.cols];
+          const dstCols = [...dest.cols];
+
+          srcCols[source.colIndex].blocks = srcCols[source.colIndex].blocks.filter(
+            (b) => b.id !== movedItem.id
+          );
+
+          if (dest.type === "column") {
+            dstCols[dest.colIndex].blocks.push(movedItem);
+          } else {
+            dstCols[dest.colIndex].blocks.splice(dest.subIndex, 0, movedItem);
+          }
+
+          next[source.layoutIndex] = {
+            ...next[source.layoutIndex],
+            content: JSON.stringify(srcCols),
+          };
+          next[dest.layoutIndex] = {
+            ...next[dest.layoutIndex],
+            content: JSON.stringify(dstCols),
+          };
+        }
+
+        return next;
       });
     }
   };
@@ -148,7 +413,6 @@ function WriteNewEditor() {
       return;
     }
 
-    // Filter out completely blank blocks unless it's the only block
     const cleanedBlocks = blocks.filter(
       (b) => b.content && b.content.trim().length > 0
     );
@@ -178,7 +442,10 @@ function WriteNewEditor() {
         coverImage: coverImage.trim() || undefined,
       };
       const response = editingBlogId
-        ? await updateBlogApi(editingBlogId, { ...payload, coverImage: coverImage.trim() })
+        ? await updateBlogApi(editingBlogId, {
+            ...payload,
+            coverImage: coverImage.trim(),
+          })
         : await createBlogApi(payload);
 
       if (response.success && response.data) {
@@ -213,15 +480,17 @@ function WriteNewEditor() {
     return (
       <div className="flex min-h-[60vh] flex-col items-center justify-center gap-3 bg-background">
         <Loader2 className="animate-spin text-primary" size={28} />
-        <p className="text-xs font-mono uppercase tracking-widest text-foreground/45">Loading article editor</p>
+        <p className="text-xs font-mono uppercase tracking-widest text-foreground/45">
+          Loading article editor
+        </p>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-background pb-40">
-      {/* Top action header bar */}
-      <div className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-foreground/5 h-20 ">
+      {/* Top Header */}
+      <div className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md border-b border-foreground/5 h-20">
         <div className="max-w-6xl mx-auto h-full flex justify-between items-center px-6">
           <div className="flex items-center gap-4">
             <div
@@ -233,11 +502,19 @@ function WriteNewEditor() {
             >
               {isReadyToPublish ? <Rocket size={14} /> : <AlertCircle size={14} />}
               <span className="font-mono text-[10px] uppercase font-bold tracking-widest">
-                {isReadyToPublish ? editingBlogId ? "Ready to Update" : "Ready to Publish" : "Incomplete Draft"}
+                {isReadyToPublish
+                  ? editingBlogId
+                    ? "Ready to Update"
+                    : "Ready to Publish"
+                  : "Incomplete Draft"}
               </span>
             </div>
             <span className="hidden md:block text-[10px] text-foreground/30 font-mono uppercase tracking-widest">
-              Auto-saved | {new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+              Auto-saved |{" "}
+              {new Date().toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              })}
             </span>
           </div>
 
@@ -286,8 +563,8 @@ function WriteNewEditor() {
         </div>
       </div>
 
-      {/* Editor or Preview Content Container */}
-      <div className="max-w-4xl mx-auto px-6 mt-16">
+      {/* Editor Content Area */}
+      <div className="w-full mx-auto  mt-16">
         {!isPreview ? (
           <div className="animate-in fade-in duration-500">
             <FixedHeader
@@ -303,7 +580,8 @@ function WriteNewEditor() {
 
             <DndContext
               sensors={sensors}
-              collisionDetection={closestCenter}
+              collisionDetection={customCollisionStrategy}
+              onDragStart={handleDragStart}
               onDragEnd={handleDragEnd}
             >
               <SortableContext
@@ -316,23 +594,37 @@ function WriteNewEditor() {
                       key={block.id}
                       block={block}
                       onUpdate={(content: string, metadata?: string) => {
-                        setBlocks(
-                          blocks.map((b) =>
-                            b.id === block.id
-                              ? { ...b, content, metadata }
-                              : b
+                        setBlocks((prev) =>
+                          prev.map((b) =>
+                            b.id === block.id ? { ...b, content, metadata } : b
+                          )
+                        );
+                      }}
+                      onTypeChange={(type: BlockType) => {
+                        setBlocks((prev) =>
+                          prev.map((b) =>
+                            b.id === block.id ? { ...b, type } : b
                           )
                         );
                       }}
                       onDelete={() => {
                         if (blocks.length > 1) {
-                          setBlocks(blocks.filter((b) => b.id !== block.id));
+                          setBlocks((prev) => prev.filter((b) => b.id !== block.id));
+                        } else {
+                          setBlocks([
+                            { id: `init-${Date.now()}`, type: "p", content: "" },
+                          ]);
                         }
                       }}
                     />
                   ))}
                 </div>
               </SortableContext>
+
+              {/* Drag Overlay: Eliminates stutter & visual jump across containers */}
+              <DragOverlay dropAnimation={null}>
+                {activeItem ? <DragItemGhost item={activeItem} /> : null}
+              </DragOverlay>
             </DndContext>
 
             <Toolbar addBlock={addBlock} />

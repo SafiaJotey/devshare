@@ -1,19 +1,32 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-// Import your helper if you want to reuse it, 
-// but we'll call the resize logic inside useEffect
-import { handleAutoResize } from "../../helper";
+
+export type HeadingLevel = "h2" | "h3" | "h4" | "h5" | "h6";
 
 interface HeadingBlockProps {
+  type: HeadingLevel;
   content: string;
   onUpdate: (content: string, metadata?: string) => void;
+  onTypeChange?: (type: HeadingLevel) => void;
 }
 
-export const HeadingBlock = ({ content, onUpdate }: HeadingBlockProps) => {
+const headingStyles: Record<HeadingLevel, string> = {
+  h2: "text-3xl font-bold",
+  h3: "text-2xl font-bold",
+  h4: "text-xl font-bold",
+  h5: "text-lg font-bold",
+  h6: "text-base font-semibold uppercase tracking-wider text-foreground/75",
+};
+
+export const HeadingBlock = ({
+  type = "h2",
+  content,
+  onUpdate,
+  onTypeChange,
+}: HeadingBlockProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // Function to perform the resize logic
   const adjustHeight = () => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
@@ -21,22 +34,24 @@ export const HeadingBlock = ({ content, onUpdate }: HeadingBlockProps) => {
     }
   };
 
-  // Trigger adjustment on mount and when content changes
   useEffect(() => {
     adjustHeight();
-  }, [content]);
+  }, [content, type]);
 
   return (
-    <textarea
-      ref={textareaRef} // 1. Attach the ref
-      rows={1}
-      className="text-3xl font-bold w-full bg-transparent border-none outline-none placeholder:text-foreground/10 resize-none overflow-hidden leading-tight"
-      value={content}
-      onChange={(e) => {
-        onUpdate(e.target.value);
-        // adjustHeight(); // This handles live typing
-      }}
-      placeholder="Section Heading"
-    />
+    <div className="space-y-1.5">
+     
+
+      <textarea
+        ref={textareaRef}
+        rows={1}
+        className={`w-full bg-transparent border-none outline-none placeholder:text-foreground/15 resize-none overflow-hidden leading-tight ${
+          headingStyles[type] || headingStyles.h2
+        }`}
+        value={content}
+        onChange={(e) => onUpdate(e.target.value)}
+        placeholder={`Heading (${type.toUpperCase()})`}
+      />
+    </div>
   );
 };

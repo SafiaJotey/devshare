@@ -6,3 +6,5 @@ export const handleAutoResize = (e: React.FormEvent<HTMLTextAreaElement>) => {
   target.style.height = "auto";
   target.style.height = `${target.scrollHeight}px`;
 };
+
+

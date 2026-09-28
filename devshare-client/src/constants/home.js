@@ -1,4 +1,4 @@
-import {PenTool, GitPullRequest, Users, Code2, Cpu, Globe, Layout, Server, Smartphone } from "lucide-react";
+import {PenTool, GitPullRequest, Users, Code2, Cpu, Globe, Layout, Server, Smartphone, ShieldCheck } from "lucide-react";
 
  export const mainPost = {
     id: 1,
@@ -38,9 +38,10 @@ export const categories = [
     { name: 'Frontend', icon: <Layout />, count: 42, color: 'bg-primary/20 text-primary ' },
     { name: 'Backend', icon: <Server />, count: 28,  color: 'bg-primary/20 text-primary ' },
     { name: 'DevOps', icon: <Cpu />, count: 15,color: 'bg-primary/20 text-primary '  },
-    { name: 'Mobile', icon: <Smartphone />, count: 12, color: 'bg-primary/20 text-primary ' },
-    { name: 'Web3', icon: <Globe />, count: 9, color: 'bg-primary/20 text-primary ' },
+
+
     { name: 'AI & ML', icon: <Code2 />, count: 21, color: 'bg-primary/20 text-primary '  },
+        { name: 'Security', icon: <ShieldCheck />, count: 12, color: 'bg-primary/20 text-primary ' }
   ];
 
 

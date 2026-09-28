@@ -182,7 +182,7 @@ export default function MyBlogsDashboard() {
   const pageLikes = blogs.reduce((sum, blog) => sum + (blog.likes || 0), 0);
 
   return (
-    <div className="space-y-6 pb-16">
+    <div className="space-y-6  p-4 sm:p-6 lg:p-8  pb-16">
       <header className="flex flex-col justify-between gap-5 sm:flex-row sm:items-end">
         <div>
           <p className="mb-2 flex items-center gap-2 text-xs font-semibold text-primary"><Globe2 size={14} /> DevShare Studio</p>
@@ -219,17 +219,18 @@ export default function MyBlogsDashboard() {
               </Select>
             </div>
           </div>
-          <div className="mt-4 flex flex-wrap gap-2" aria-label="Filter by publication status">
-            {statuses.map((item) => <button key={item} onClick={() => changeFilter(() => setStatus(item))} className={["rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors", status === item ? "bg-primary text-primary-foreground" : "bg-foreground/[0.04] text-foreground/60 hover:bg-foreground/[0.08]"].join(" ")}>{item}</button>)}
+          <div className="flex justify-between items-center" >
+           <div className="mt-4 flex flex-wrap  gap-2" aria-label="Filter by publication status"> {statuses.map((item) => <button key={item} onClick={() => changeFilter(() => setStatus(item))} className={["rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors", status === item ? "bg-primary text-primary-foreground" : "bg-foreground/[0.04] text-foreground/60 hover:bg-foreground/[0.08]"].join(" ")}>{item}</button>)}</div>
+             {selected.length > 0 && <div className="flex items-center justify-between gap-3  sm:px-5"><p className="text-sm  text-foreground">{selected.length} selected</p><Button variant="ghost" onClick={deleteSelected} disabled={busy.length > 0} className="h-8 rounded-lg px-2.5 text-xs font-semibold text-red-600 hover:bg-red-500/10 hover:text-red-600"><Trash2 size={14} /> Delete selected</Button></div>}
           </div>
         </div>
 
-        {selected.length > 0 && <div className="flex items-center justify-between gap-3 border-b  border-foreground/10 bg-primary/5 px-4 py-3 sm:px-5"><p className="text-sm font-semibold text-foreground">{selected.length} selected</p><Button variant="ghost" onClick={deleteSelected} disabled={busy.length > 0} className="h-8 rounded-lg px-2.5 text-xs font-semibold text-red-600 hover:bg-red-500/10 hover:text-red-600"><Trash2 size={14} /> Delete selected</Button></div>}
+       
 
         <Table>
           <TableHeader className="bg-foreground/2.5 border-b border-foreground/10!"><TableRow className="hover:bg-transparent border-b  border-foreground/10">
             <TableHead className="w-12 px-4 sm:px-5"><Checkbox checked={allSelected} onCheckedChange={(checked) => setSelected(checked ? blogs.map((blog) => blog._id) : [])} aria-label="Select all articles" /></TableHead>
-            <TableHead className="min-w-[300px] py-4 text-xs font-bold text-foreground/50">ARTICLE</TableHead>
+            <TableHead className="min-w-75 py-4 text-xs font-bold text-foreground/50">ARTICLE</TableHead>
             <TableHead className="hidden py-4 text-xs font-bold text-foreground/50 md:table-cell">STATUS</TableHead>
             <TableHead className="hidden py-4 text-xs font-bold text-foreground/50 lg:table-cell">REACH</TableHead>
             <TableHead className="hidden py-4 text-xs font-bold text-foreground/50 xl:table-cell">UPDATED</TableHead>
@@ -255,8 +256,8 @@ function BlogRow({ blog, selected, busy, onSelect, onDelete, onStatus, onCopy }:
   const editHref = "/dashboard/create-blog?edit=" + encodeURIComponent(blog._id);
   return <TableRow data-state={selected ? "selected" : undefined} className="group border border-foreground/10">
     <TableCell className="px-4 py-4 sm:px-5"><Checkbox checked={selected} onCheckedChange={(checked) => onSelect(checked === true)} aria-label={"Select " + blog.title} /></TableCell>
-    <TableCell className="py-4"><div className="flex min-w-0 items-start gap-3"><span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"><FileText size={17} /></span><div className="min-w-0"><Link href={blog.status === "Published" ? publicHref : editHref} className="block truncate text-sm font-bold text-foreground transition-colors hover:text-primary">{blog.title}</Link><p className="mt-1 line-clamp-1 text-xs text-foreground/50">{blog.description}</p><div className="mt-2 flex flex-wrap items-center gap-2 text-[11px] text-foreground/45"><span className="rounded-md bg-foreground/[0.05] px-1.5 py-0.5 font-medium">{blog.category}</span><span>{blog.readTime || "Quick read"}</span><span className="md:hidden"><StatusPill status={blog.status} /></span></div></div></div></TableCell>
-    <TableCell className="hidden py-4 md:table-cell"><StatusPill status={blog.status} /></TableCell>
+    <TableCell className="py-4"><div className="flex min-w-0 items-start gap-3"><span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary"><FileText size={17} /></span><div className="min-w-0"><Link href={blog.status === "Published" ? publicHref : editHref} className="block truncate text-sm font-bold text-foreground transition-colors hover:text-primary">{blog.title}</Link><div className="flex flex-wrap items-center gap-2 text-[11px] text-foreground/45"><span className="rounded-md bg-foreground/[0.05] px-1.5 py-0.5 font-medium">{blog.category}</span><span>{blog.readTime || "Quick read"}</span><span className="md:hidden"><StatusPill status={blog.status} /></span></div></div></div></TableCell>
+    <TableCell className="hidden  md:table-cell"><StatusPill status={blog.status} /></TableCell>
     <TableCell className="hidden py-4 lg:table-cell"><div className="flex gap-3 text-xs text-foreground/60"><span className="flex items-center gap-1"><Eye size={13} />{(blog.views || 0).toLocaleString()}</span><span className="flex items-center gap-1"><Users size={13} />{(blog.likes || 0).toLocaleString()}</span></div></TableCell>
     <TableCell className="hidden py-4 text-xs text-foreground/55 xl:table-cell">{formatDate(blog.updatedAt || blog.createdAt)}</TableCell>
     <TableCell className="py-4 pr-4 text-right sm:pr-5"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" disabled={busy} className="size-8 rounded-lg"><MoreHorizontal size={18} /></Button></DropdownMenuTrigger><DropdownMenuContent align="end" className="w-52 rounded-xl !border-emerald-400/25 !bg-[#06130e] p-1.5 text-foreground shadow-[0_20px_50px_rgba(0,0,0,0.65)]"><DropdownMenuLabel className="px-2.5 text-xs text-foreground/50">Actions</DropdownMenuLabel><DropdownMenuItem asChild><Link href={editHref}><Pencil size={15} /> Edit article</Link></DropdownMenuItem>{blog.status === "Published" && <><DropdownMenuItem asChild><Link href={publicHref}><Eye size={15} /> View live article</Link></DropdownMenuItem><DropdownMenuItem onClick={() => onCopy(blog)}><Copy size={15} /> Copy public link</DropdownMenuItem></>}{blog.status !== "Published" && <DropdownMenuItem onClick={() => onStatus(blog, "Published")}><Send size={15} /> {blog.status === "Archived" ? "Republish article" : "Publish now"}</DropdownMenuItem>}{blog.status === "Published" && <DropdownMenuItem onClick={() => onStatus(blog, "Draft")}><Pencil size={15} /> Move to draft</DropdownMenuItem>}{blog.status === "Archived" && <DropdownMenuItem onClick={() => onStatus(blog, "Draft")}><Pencil size={15} /> Restore as draft</DropdownMenuItem>}{blog.status !== "Archived" && <DropdownMenuItem onClick={() => onStatus(blog, "Archived")}><Archive size={15} /> Archive article</DropdownMenuItem>}<DropdownMenuSeparator className="bg-emerald-50/10" /><DropdownMenuItem onClick={() => onDelete(blog._id, blog.title)} className="text-red-500 focus:bg-red-500/10 focus:text-red-400"><Trash2 size={15} /> Delete article</DropdownMenuItem></DropdownMenuContent></DropdownMenu></TableCell>
@@ -272,5 +273,5 @@ function LoadingRow() {
 }
 
 function EmptyRow({ activeFilter, onClear }: { activeFilter: boolean; onClear: () => void }) {
-  return <TableRow><TableCell colSpan={6} className="py-20 text-center"><div className="mx-auto max-w-sm"><span className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary"><FileText size={22} /></span><h2 className="mt-4 font-bold text-foreground">{activeFilter ? "No matching articles" : "Your writing space is ready"}</h2><p className="mt-2 text-sm leading-6 text-foreground/55">{activeFilter ? "Try a different search or filter to find an article." : "Publish a technical walkthrough, lesson, or project story for the DevShare community."}</p>{activeFilter ? <Button variant="outline" onClick={onClear} className="mt-5 rounded-lg">Clear filters</Button> : <Button asChild className="mt-5 rounded-lg"><Link href="/dashboard/create-blog"><Plus size={16} /> Write your first article</Link></Button>}</div></TableCell></TableRow>;
+  return <TableRow><TableCell colSpan={6} className="py-20 text-center"><div className="mx-auto max-w-sm"><span className="mx-auto flex size-12 items-center justify-center rounded-2xl bg-primary/10 text-primary"><FileText size={22} /></span><h2 className="mt-4 font-bold text-foreground">{activeFilter ? "No matching articles" : "Your writing space is ready"}</h2><p className=" text-sm leading-6 text-foreground/55">{activeFilter ? "Try a different search or filter to find an article." : "Publish a technical walkthrough, lesson, or project story for the DevShare community."}</p>{activeFilter ? <Button variant="outline" onClick={onClear} className="mt-5 rounded-lg">Clear filters</Button> : <Button asChild className="mt-5 rounded-lg"><Link href="/dashboard/create-blog"><Plus size={16} /> Write your first article</Link></Button>}</div></TableCell></TableRow>;
 }

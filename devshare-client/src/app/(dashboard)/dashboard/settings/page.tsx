@@ -19,7 +19,7 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground antialiased selection:bg-foreground selection:text-background">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-14 space-y-8">
+      <div className="max-w-8xl mx-auto p-4 sm:p-6 lg:p-8  py-10 sm:py-14 space-y-8">
         
         {/* Page Header */}
         <div className="space-y-1">

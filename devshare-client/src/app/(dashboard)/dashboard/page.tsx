@@ -86,7 +86,7 @@ export default function DashboardOverview() {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in-50 duration-500">
+    <div className="space-y-8  p-4 sm:p-6 lg:p-8  animate-in fade-in-50 duration-500">
       {/* ─── 1. HERO WELCOME CARD WITH AUTHOR VECTOR ─────────────────────── */}
       <div className="relative overflow-hidden  p-6 sm:p-8 lg:py-0 lg:px-6 shadow-sm rounded-lg">
         {/* Soft background ambient blurs */}

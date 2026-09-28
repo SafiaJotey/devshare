@@ -1,45 +1,106 @@
-
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Trash2 } from "lucide-react";
 import { CodeBlock } from "./blocks/CodeBlock";
 import { QuoteBlock } from "./blocks/QuoteBlock";
-import { HeadingBlock } from "./blocks/HeadingBlock";
+import { HeadingBlock, HeadingLevel } from "./blocks/HeadingBlock";
 import { TextBlock } from "./blocks/TextBlock";
 import { ImageBlock } from "./blocks/ImageBlock";
-import { Block } from "../type";
+import { ListBlock } from "./blocks/ListBlock";
+import { LayoutBlock } from "./blocks/LayoutBlock";
+import { Block, BlockType } from "../type";
+
 interface EditorBlockProps {
   block: Block;
-  onUpdate: (content: string, metadata?: string) => void; 
-onDelete: () => void;
+  onUpdate: (content: string, metadata?: string) => void;
+  onTypeChange?: (type: BlockType) => void;
+  onDelete: () => void;
 }
 
+export const EditorBlock = ({
+  block,
+  onUpdate,
+  onTypeChange,
+  onDelete,
+}: EditorBlockProps) => {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: block.id });
 
-export const EditorBlock = ({ block, onUpdate, onDelete }: EditorBlockProps) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: block.id });
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    zIndex: isDragging ? 50 : 0,
+  };
 
-  const style = { transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 50 : 0 };
+  const isHeading = ["h2", "h3", "h4", "h5", "h6"].includes(block.type);
+  const isList = block.type === "ul" || block.type === "ol";
 
   return (
-    <div ref={setNodeRef} style={style} className={`group relative mb-2 flex gap-2 items-start ${isDragging ? "opacity-50" : ""}`}>
-      <div {...attributes} {...listeners} className="mt-4 cursor-grab opacity-0 group-hover:opacity-100 transition-all text-foreground/20 hover:text-primary shrink-0">
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`group relative mb-2 flex gap-2 items-start ${
+        isDragging ? "opacity-50" : ""
+      }`}
+    >
+      <div
+        {...attributes}
+        {...listeners}
+        className="mt-4 cursor-grab opacity-0 group-hover:opacity-100 transition-all text-foreground/20 hover:text-primary shrink-0"
+      >
         <GripVertical size={20} />
-        
       </div>
 
-      <div className="flex-1">
-        {block.type === "h2" && (
-           <HeadingBlock content={block.content} onUpdate={onUpdate}/>
+      <div className="flex-1 min-w-0">
+        {block.type === "layout" && (
+          <LayoutBlock
+            content={block.content}
+            metadata={block.metadata}
+            onUpdate={onUpdate}
+            onDelete={onDelete}
+          />
         )}
-         {block.type === "p" && (
-            <TextBlock content={block.content} onUpdate={onUpdate} />
+
+        {isHeading && (
+          <HeadingBlock
+            type={block.type as HeadingLevel}
+            content={block.content}
+            onUpdate={onUpdate}
+            onTypeChange={(lvl) => onTypeChange?.(lvl)}
+          />
         )}
-        {block.type === "code" && <CodeBlock content={block.content} metadata={block.metadata} onUpdate={onUpdate} />}
-        {block.type === "quote" && <QuoteBlock content={block.content} onUpdate={onUpdate} />}
-      {block.type ==="image" && <ImageBlock content={block.content} onUpdate={onUpdate}/>}
+        {isList && (
+          <ListBlock
+            type={block.type as "ul" | "ol"}
+            content={block.content}
+            onUpdate={onUpdate}
+            onTypeChange={(type) => onTypeChange?.(type)}
+          />
+        )}
+        {block.type === "p" && (
+          <TextBlock content={block.content} onUpdate={onUpdate} />
+        )}
+        {block.type === "code" && (
+          <CodeBlock
+            content={block.content}
+            metadata={block.metadata}
+            onUpdate={onUpdate}
+          />
+        )}
+        {block.type === "quote" && (
+          <QuoteBlock content={block.content} onUpdate={onUpdate} />
+        )}
+        {block.type === "image" && (
+          <ImageBlock content={block.content} onUpdate={onUpdate} />
+        )}
       </div>
 
-      <button onClick={onDelete} className="mt-4 opacity-0 group-hover:opacity-100 transition-all text-red-400 hover:text-red-600 p-1">
+      <button
+        type="button"
+        onClick={onDelete}
+        className="mt-4 opacity-0 group-hover:opacity-100 transition-all text-red-400 hover:text-red-600 p-1 shrink-0"
+        title="Delete block"
+      >
         <Trash2 size={18} />
       </button>
     </div>
