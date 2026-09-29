@@ -351,7 +351,7 @@ export default function Blogs() {
 
               <div className="rounded-3xl border border-foreground/10 bg-background p-3 shadow-sm">
                 <div className="mb-3 flex items-center px-2 pt-2">
-                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-foreground/40">
+                  <div className="flex items-center gap-2 text-[10px]  uppercase tracking-widest text-foreground/40">
                     <SlidersHorizontal size={12} /> Filter by topic
                   </div>
                 </div>
@@ -375,7 +375,7 @@ export default function Blogs() {
                           }`}
                         />
                         <span
-                          className={`font-bold ${
+                          className={` ${
                             activeCategory === cat.name
                               ? "translate-x-0"
                               : "-translate-x-2 group-hover:translate-x-0 transition-transform"
@@ -453,7 +453,7 @@ export default function Blogs() {
                 ))}
               </div>
             ) : (
-              <div className="rounded-[2rem] border border-dashed border-foreground/15 bg-foreground/[0.015] px-6 py-20 text-center">
+              <div className="rounded-4xl border border-dashed border-foreground/15 bg-foreground/1.5 px-6 py-20 text-center">
                 <Terminal size={40} className="mx-auto mb-6 text-foreground/10" />
                 <h3 className="text-xl font-bold tracking-tight">No articles found</h3>
                 <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-foreground/55">Try a broader search, or return to the full library to discover another topic.</p>
@@ -470,9 +470,10 @@ export default function Blogs() {
             <div className="lg:hidden">
               <ContributorWidget isMobile={true} />
             </div>
-          </div>
+          </div>   
         </div>
       </div>
     </main>
   );
 }
+   

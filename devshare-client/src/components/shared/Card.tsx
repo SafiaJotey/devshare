@@ -20,7 +20,7 @@ interface CardProps {
 export default function Card({ post }: CardProps) {
   return (
     <article className="group flex h-full cursor-pointer flex-col overflow-hidden rounded-3xl border border-foreground/10 bg-background shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/30 hover:shadow-xl hover:shadow-primary/10">
-      <div className="relative aspect-[16/10] shrink-0 overflow-hidden bg-foreground/10">
+      <div className="relative aspect-16/10 shrink-0 overflow-hidden bg-foreground/10">
         <Image
           src={post.image}
           alt={post.title}
@@ -29,7 +29,7 @@ export default function Card({ post }: CardProps) {
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
           unoptimized
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/10 to-transparent" />
         <span className="absolute left-4 top-4 rounded-full border border-white/20 bg-black/20 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-white backdrop-blur-sm">
           {post.tag}
         </span>
@@ -52,7 +52,7 @@ export default function Card({ post }: CardProps) {
           </span>
         </div>
 
-        <h3 className="mt-3 min-h-[3.1rem] text-lg font-extrabold leading-[1.25] tracking-tight text-foreground transition-colors duration-300 group-hover:text-primary line-clamp-2">
+        <h3 className="mt-3 min-h-[3.1rem] text-lg font-extrabold leading-tight tracking-tight text-foreground transition-colors duration-300 group-hover:text-primary line-clamp-2">
           {post.title}
         </h3>
 
@@ -85,7 +85,7 @@ export function CardSkeleton() {
   return (
     <div className="flex h-full flex-col overflow-hidden rounded-3xl border border-foreground/10 bg-background shadow-sm animate-pulse">
       {/* Media Skeleton */}
-      <div className="relative aspect-[16/10] shrink-0 bg-foreground/10">
+      <div className="relative aspect-16/10 shrink-0 bg-foreground/10">
         <div className="absolute left-4 top-4 h-5 w-20 rounded-full bg-foreground/15" />
       </div>
 
@@ -116,8 +116,8 @@ export function CardSkeleton() {
 
 export function LeadCardSkeleton() {
   return (
-    <div className="relative aspect-[4/5] md:aspect-video rounded-3xl overflow-hidden border border-foreground/10 bg-foreground/10 shadow-2xl animate-pulse">
-      <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/40 to-transparent" />
+    <div className="relative aspect-4/5 md:aspect-video rounded-3xl overflow-hidden border border-foreground/10 bg-foreground/10 shadow-2xl animate-pulse">
+      <div className="absolute inset-0 bg-linear-to-t from-background/95 via-background/40 to-transparent" />
       <div className="absolute bottom-0 left-0 p-6 md:p-10 w-full space-y-4 z-10">
         <div className="h-3.5 w-32 rounded-full bg-foreground/20" />
         <div className="space-y-2.5 max-w-xl">
