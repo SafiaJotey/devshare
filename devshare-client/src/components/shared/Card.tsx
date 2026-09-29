@@ -35,7 +35,7 @@ export default function Card({ post }: CardProps) {
         </span>
         <div className="absolute bottom-4 left-4 right-4 flex translate-y-2 items-center justify-between text-xs font-bold text-white opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
           <span>Read article</span>
-          <span className="flex size-8 items-center justify-center rounded-full bg-white text-foreground shadow-lg">
+          <span className="flex size-8 items-center justify-center rounded-full bg-white text-black dark:bg-accent shadow-lg">
             <ArrowUpRight size={15} aria-hidden="true" />
           </span>
         </div>
