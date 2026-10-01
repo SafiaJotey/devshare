@@ -28,7 +28,7 @@ const CATEGORY_NAMES = [
   "Frontend",
   "Backend",
   "DevOps",
-  "AI & Data",
+  "AI & ML",
   "Security",
 ];
 
@@ -155,8 +155,8 @@ function BlogsContent() {
       candidateList.length > 0
         ? candidateList
         : activeCategory !== "All"
-        ? dbBlogs
-        : allDbBlogs;
+          ? dbBlogs
+          : allDbBlogs;
 
     if (pool.length === 0) {
       if (dbBlogs.length > 0) return mapBlogToPost(dbBlogs[0]);
@@ -187,9 +187,8 @@ function BlogsContent() {
 
   const ContributorWidget = ({ isMobile = false }: { isMobile?: boolean }) => (
     <div
-      className={`p-6 rounded-3xl bg-foreground text-background relative overflow-hidden group ${
-        isMobile ? "mt-20" : "mt-16"
-      }`}
+      className={`p-6 rounded-3xl bg-foreground text-background relative overflow-hidden group ${isMobile ? "mt-20" : "mt-16"
+        }`}
     >
       <div className="absolute -top-6 -right-6 p-8 opacity-5 group-hover:rotate-12 transition-transform duration-700">
         <PenLine size={120} />
@@ -240,39 +239,39 @@ function BlogsContent() {
               {isInitialLoading ? (
                 <LeadCardSkeleton />
               ) : leadPost ? (
-               <Link href={`/blogs/${leadPost.id}`} className="group block">
-  <div className="relative aspect-4/5 md:aspect-video rounded-3xl overflow-hidden shadow-2xl bg-black">
-    {/* Background Image */}
-    <Image
-      src={leadPost.image}
-      alt={leadPost.title}
-      fill
-      className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
-      priority
-      unoptimized
-    />
+                <Link href={`/blogs/${leadPost.id}`} className="group block">
+                  <div className="relative aspect-4/5 md:aspect-video rounded-3xl overflow-hidden shadow-2xl bg-black">
+                    {/* Background Image */}
+                    <Image
+                      src={leadPost.image}
+                      alt={leadPost.title}
+                      fill
+                      className="object-cover opacity-60 grayscale group-hover:grayscale-0 transition-all duration-700 group-hover:scale-105"
+                      priority
+                      unoptimized
+                    />
 
-    {/* Guaranteed High-Contrast Dark Gradient Scrim */}
-    <div className="absolute inset-0 bg-linear-to-t from-black/95 via-black/60 to-black/20" />
+                    {/* Guaranteed High-Contrast Dark Gradient Scrim */}
+                    <div className="absolute inset-0 bg-linear-to-t from-black/95 via-black/60 to-black/20" />
 
-    {/* Text Content */}
-    <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-10 z-10">
-      <span className="text-[11px] font-mono uppercase tracking-[0.3em] text-accent font-semibold mb-3 drop-shadow-sm">
-        {activeCategory !== "All" ? `Top Read & Liked | ${leadPost.tag}` : `Featured | ${leadPost.tag}`}
-      </span>
-      
-      <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 tracking-tight leading-snug line-clamp-2 text-white drop-shadow-md">
-        {leadPost.title}
-      </h2>
+                    {/* Text Content */}
+                    <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-10 z-10">
+                      <span className="text-[11px] font-mono uppercase tracking-[0.3em] text-accent font-semibold mb-3 drop-shadow-sm">
+                        {activeCategory !== "All" ? `Top Read & Liked | ${leadPost.tag}` : `Featured | ${leadPost.tag}`}
+                      </span>
 
-      <div className="flex items-center gap-3 text-xs font-mono text-zinc-300">
-        <span className="font-medium">By {leadPost.author}</span>
-        <span className="text-zinc-500">•</span>
-        <span>{leadPost.readTime}</span>
-      </div>
-    </div>
-  </div>
-</Link>
+                      <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 tracking-tight leading-snug line-clamp-2 text-white drop-shadow-md">
+                        {leadPost.title}
+                      </h2>
+
+                      <div className="flex items-center gap-3 text-xs font-mono text-zinc-300">
+                        <span className="font-medium">By {leadPost.author}</span>
+                        <span className="text-zinc-500">•</span>
+                        <span>{leadPost.readTime}</span>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
               ) : (
                 <div className="relative aspect-4/5 md:aspect-video rounded-3xl overflow-hidden border border-dashed border-foreground/15 bg-foreground/[0.02] flex flex-col items-center justify-center p-8 text-center">
                   <div className="w-14 h-14 rounded-2xl bg-foreground/5 flex items-center justify-center mb-4 text-foreground/40">
@@ -351,11 +350,10 @@ function BlogsContent() {
                 <button
                   key={cat.name}
                   onClick={() => setActiveCategory(cat.name)}
-                  className={`whitespace-nowrap px-5 py-2 rounded-full text-xs font-bold transition-all ${
-                    activeCategory === cat.name
+                  className={`whitespace-nowrap px-5 py-2 rounded-full text-xs font-bold transition-all ${activeCategory === cat.name
                       ? "bg-primary text-primary-foreground"
                       : "bg-foreground/5 text-foreground/60"
-                  }`}
+                    }`}
                 >
                   {cat.name} <span className="opacity-40 ml-1">{cat.count}</span>
                 </button>
@@ -403,36 +401,32 @@ function BlogsContent() {
                     <button
                       key={cat.name}
                       onClick={() => setActiveCategory(cat.name)}
-                      className={`w-full group flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all duration-300 ${
-                        activeCategory === cat.name
+                      className={`w-full group flex items-center justify-between px-3 py-2.5 rounded-xl text-sm transition-all duration-300 ${activeCategory === cat.name
                           ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20"
                           : "text-foreground/60 hover:bg-foreground/5 hover:text-foreground"
-                      }`}
+                        }`}
                     >
                       <div className="flex items-center gap-3">
                         <div
-                          className={`w-1 h-4 rounded-full transition-all ${
-                            activeCategory === cat.name
+                          className={`w-1 h-4 rounded-full transition-all ${activeCategory === cat.name
                               ? "bg-accent scale-y-100"
                               : "bg-transparent scale-y-0"
-                          }`}
+                            }`}
                         />
                         <span
-                          className={` ${
-                            activeCategory === cat.name
+                          className={` ${activeCategory === cat.name
                               ? "translate-x-0"
                               : "-translate-x-2 group-hover:translate-x-0 transition-transform"
-                          }`}
+                            }`}
                         >
                           {cat.name}
                         </span>
                       </div>
                       <span
-                        className={`text-[10px] font-mono px-2 py-0.5 rounded-md ${
-                          activeCategory === cat.name
+                        className={`text-[10px] font-mono px-2 py-0.5 rounded-md ${activeCategory === cat.name
                             ? "bg-white/20 text-white"
                             : "bg-foreground/5 text-foreground/40"
-                        }`}
+                          }`}
                       >
                         {cat.count}
                       </span>
@@ -513,7 +507,7 @@ function BlogsContent() {
             <div className="lg:hidden">
               <ContributorWidget isMobile={true} />
             </div>
-          </div>   
+          </div>
         </div>
       </div>
     </main>
@@ -534,4 +528,3 @@ export default function Blogs() {
     </Suspense>
   );
 }
-   
