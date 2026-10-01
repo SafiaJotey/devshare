@@ -29,6 +29,8 @@ import WriteCTA from "@/components/shared/WriteCTA";
 import ReadyToContribute from "@/components/shared/ReadyToContribute";
 import Card, { Post } from "@/components/shared/Card";
 import Section from "@/components/shared/Section";
+import { RichTextContent } from "@/components/ui/RichTextContent";
+import { CodeViewer } from "@/components/ui/CodeViewer";
 import {
   getBlogByIdApi,
   IBlog,
@@ -701,12 +703,11 @@ export default function BlogDetails() {
 
                   case "p":
                     return (
-                      <p
+                      <RichTextContent
                         key={block.id}
-                        className="mb-6 leading-relaxed whitespace-pre-wrap break-words"
-                      >
-                        {block.content}
-                      </p>
+                        content={block.content}
+                        className="mb-6 leading-relaxed text-foreground/80 text-lg"
+                      />
                     );
 
                   case "ul":
@@ -761,24 +762,12 @@ export default function BlogDetails() {
 
                   case "code":
                     return (
-                      <div
+                      <CodeViewer
                         key={block.id}
-                        className="my-10 rounded-2xl overflow-hidden border border-foreground/10 bg-[#0d1117] shadow-xl"
-                      >
-                        <div className="bg-[#161b22] px-4 py-2 border-b border-white/5 flex justify-between items-center">
-                          <div className="flex gap-1.5">
-                            <div className="w-3 h-3 rounded-full bg-red-500/40" />
-                            <div className="w-3 h-3 rounded-full bg-amber-500/40" />
-                            <div className="w-3 h-3 rounded-full bg-green-500/40" />
-                          </div>
-                          <div className="flex items-center gap-2 text-[10px] text-white/40 font-mono">
-                            <Terminal size={12} /> {block.metadata || "snippet.ts"}
-                          </div>
-                        </div>
-                        <pre className="p-6 text-sm overflow-x-auto text-blue-300 font-mono leading-relaxed break-words whitespace-pre-wrap bg-transparent">
-                          <code>{block.content}</code>
-                        </pre>
-                      </div>
+                        content={block.content}
+                        metadata={block.metadata}
+                        className="my-10"
+                      />
                     );
 
                   case "image":
@@ -821,12 +810,11 @@ export default function BlogDetails() {
                                   switch (subBlock.type) {
                                     case "p":
                                       return (
-                                        <p
+                                        <RichTextContent
                                           key={subBlock.id}
-                                          className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap break-words"
-                                        >
-                                          {subBlock.content}
-                                        </p>
+                                          content={subBlock.content}
+                                          className="text-sm text-foreground/80 leading-relaxed"
+                                        />
                                       );
 
                                     case "h2":
@@ -925,12 +913,12 @@ export default function BlogDetails() {
 
                                     case "code":
                                       return (
-                                        <pre
+                                        <CodeViewer
                                           key={subBlock.id}
-                                          className="text-xs p-3 bg-[#0d1117] text-blue-300 rounded-lg overflow-x-auto font-mono"
-                                        >
-                                          <code>{subBlock.content}</code>
-                                        </pre>
+                                          content={subBlock.content}
+                                          metadata={subBlock.metadata}
+                                          className="my-2 text-xs"
+                                        />
                                       );
 
                                     case "image":

@@ -5,6 +5,8 @@ import Image from "next/image";
 import { Calendar, Clock, Terminal } from "lucide-react";
 import { Block } from "../type";
 import { useAuth } from "@/providers/auth-provider";
+import { RichTextContent } from "@/components/ui/RichTextContent";
+import { CodeViewer } from "@/components/ui/CodeViewer";
 
 interface PreviewModeProps {
   category: string;
@@ -107,9 +109,11 @@ export const PreviewMode = ({
 
       case "p":
         return (
-          <p key={block.id} className="mb-4 leading-relaxed whitespace-pre-wrap break-words">
-            {block.content}
-          </p>
+          <RichTextContent
+            key={block.id}
+            content={block.content}
+            className="mb-4 text-foreground/80 leading-relaxed text-sm"
+          />
         );
 
       case "quote":
@@ -121,16 +125,12 @@ export const PreviewMode = ({
 
       case "code":
         return (
-          <div key={block.id} className="my-6 rounded-xl overflow-hidden border border-foreground/10 bg-[#0d1117] shadow-xl">
-            <div className="bg-[#161b22] px-4 py-2 border-b border-white/5 flex justify-between items-center">
-              <span className="text-[10px] text-white/40 font-mono tracking-widest uppercase">
-                {block.metadata || "script.ts"}
-              </span>
-            </div>
-            <pre className="p-4 text-xs overflow-x-auto text-blue-300 font-mono leading-relaxed break-words whitespace-pre-wrap bg-transparent">
-              <code>{block.content}</code>
-            </pre>
-          </div>
+          <CodeViewer
+            key={block.id}
+            content={block.content}
+            metadata={block.metadata}
+            className="my-4 text-xs"
+          />
         );
 
       case "image":
@@ -270,9 +270,11 @@ export const PreviewMode = ({
 
             case "p":
               return (
-                <p key={block.id} className="mb-6 leading-relaxed whitespace-pre-wrap break-words">
-                  {block.content}
-                </p>
+                <RichTextContent
+                  key={block.id}
+                  content={block.content}
+                  className="mb-6 leading-relaxed text-foreground/80 text-lg"
+                />
               );
 
             case "quote":
@@ -284,21 +286,12 @@ export const PreviewMode = ({
 
             case "code":
               return (
-                <div key={block.id} className="my-10   rounded-2xl overflow-hidden border border-foreground/10 bg-[#0d1117] shadow-xl">
-                  <div className="bg-[#161b22] px-4 py-2 border-b border-white/5 flex justify-between items-center">
-                    <div className="flex gap-1.5">
-                      <div className="w-2.5 h-2.5 rounded-full bg-red-500/40" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-amber-500/40" />
-                      <div className="w-2.5 h-2.5 rounded-full bg-green-500/40" />
-                    </div>
-                    <div className="flex items-center gap-2 text-[10px] text-white/40 font-mono tracking-widest uppercase">
-                      <Terminal size={12} /> {block.metadata || "script.ts"}
-                    </div>
-                  </div>
-                  <pre className="p-6 text-sm overflow-x-auto text-blue-300 font-mono leading-relaxed break-words whitespace-pre-wrap bg-transparent">
-                    <code>{block.content}</code>
-                  </pre>
-                </div>
+                <CodeViewer
+                  key={block.id}
+                  content={block.content}
+                  metadata={block.metadata}
+                  className="my-10"
+                />
               );
 
             case "image":
