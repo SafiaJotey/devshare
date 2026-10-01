@@ -207,12 +207,28 @@ const getTopContributors = catchAsync(async (req: Request, res: Response) => {
 
 const getAuthorDetails = catchAsync(async (req: Request, res: Response) => {
   const authorId = req.params.authorId as string;
-  const result = await UserService.getAuthorDetails(authorId);
+  const currentUserId = req.user?.id;
+  const result = await UserService.getAuthorDetails(authorId, currentUserId);
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
     success: true,
     message: "Author details retrieved successfully",
+    data: result,
+  });
+});
+
+const toggleFollowAuthor = catchAsync(async (req: Request, res: Response) => {
+  const authorId = req.params.authorId as string;
+  const currentUserId = req.user!.id;
+  const result = await UserService.toggleFollowAuthor(currentUserId, authorId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: result.isFollowing
+      ? "You are now following this author"
+      : "You unfollowed this author",
     data: result,
   });
 });
@@ -231,6 +247,7 @@ export const UserController = {
   deleteAccount,
   getTopContributors,
   getAuthorDetails,
+  toggleFollowAuthor,
 };
 
 export default UserController;

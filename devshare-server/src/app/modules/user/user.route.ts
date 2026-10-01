@@ -1,7 +1,7 @@
 import { Router } from "express";
 import UserController from "./user.controller";
 import UserValidation from "./user.validation";
-import auth from "../../middlewares/auth";
+import auth, { optionalAuth } from "../../middlewares/auth";
 import validateRequest from "../../middlewares/validateRequest";
 
 // ─── Auth Routes (/api/v1/auth) ───────────────────────────────────────────────
@@ -38,7 +38,8 @@ const userRouter: Router = Router();
 
 // Public contributor routes
 userRouter.get("/contributors", UserController.getTopContributors);
-userRouter.get("/author/:authorId", UserController.getAuthorDetails);
+userRouter.get("/author/:authorId", optionalAuth(), UserController.getAuthorDetails);
+userRouter.post("/author/:authorId/follow", auth(), UserController.toggleFollowAuthor);
 
 userRouter.get("/me", auth(), UserController.getMe);
 

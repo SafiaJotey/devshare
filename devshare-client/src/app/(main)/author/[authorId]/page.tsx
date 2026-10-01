@@ -33,8 +33,10 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
+import { useAuth } from "@/providers/auth-provider";
 import {
   getAuthorDetailsApi,
+  toggleFollowAuthorApi,
   IAuthorDetailsResponse,
   IBlog,
 } from "@/lib/api";
@@ -81,6 +83,7 @@ export default function AuthorDetailsPage() {
   const params = useParams();
   const authorId = params?.authorId as string;
 
+  const { isLoggedIn, user: currentUser } = useAuth();
   const [author, setAuthor] = useState<IAuthorDetailsResponse["author"] | null>(null);
   const [stats, setStats] = useState<IAuthorDetailsResponse["stats"] | null>(null);
   const [articles, setArticles] = useState<IBlog[]>([]);
@@ -90,6 +93,7 @@ export default function AuthorDetailsPage() {
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isFollowLoading, setIsFollowLoading] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
   const [bookmarkedArticles, setBookmarkedArticles] = useState<string[]>([]);
   const [newsletterEmail, setNewsletterEmail] = useState("");
@@ -108,6 +112,9 @@ export default function AuthorDetailsPage() {
           setAuthor(res.data.author);
           setStats(res.data.stats);
           setArticles(res.data.articles || []);
+          if (res.data.isFollowing !== undefined) {
+            setIsFollowing(res.data.isFollowing);
+          }
         }
       } catch (err: any) {
         if (!isCancelled) {
@@ -125,6 +132,46 @@ export default function AuthorDetailsPage() {
       isCancelled = true;
     };
   }, [authorId]);
+
+  const handleToggleFollow = async () => {
+    if (!isLoggedIn) {
+      toast.info("Please sign in to follow authors", {
+        action: {
+          label: "Sign In",
+          onClick: () => {
+            window.location.href = "/auth";
+          },
+        },
+      });
+      return;
+    }
+
+    if (!author?._id) return;
+
+    if (currentUser?._id === author._id) {
+      toast.info("You cannot follow your own profile");
+      return;
+    }
+
+    try {
+      setIsFollowLoading(true);
+      const res = await toggleFollowAuthorApi(author._id);
+      if (res.success && res.data) {
+        setIsFollowing(res.data.isFollowing);
+        // Update follower count in stats immediately
+        setStats((prev) => (prev ? { ...prev, followers: res.data!.followers } : null));
+        toast.success(
+          res.data.isFollowing
+            ? `Following ${author.name}`
+            : `Unfollowed ${author.name}`
+        );
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to update follow status");
+    } finally {
+      setIsFollowLoading(false);
+    }
+  };
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
@@ -322,21 +369,20 @@ export default function AuthorDetailsPage() {
             </Button>
 
             <Button
-              onClick={() => {
-                setIsFollowing(!isFollowing);
-                toast.success(
-                  isFollowing
-                    ? `Unfollowed ${author.name}`
-                    : `Following ${author.name}`
-                );
-              }}
+              onClick={handleToggleFollow}
+              disabled={isFollowLoading}
               size="sm"
               className={`h-9 px-4 rounded-xl text-xs font-semibold cursor-pointer transition-all ${isFollowing
                   ? "bg-foreground/10 text-foreground hover:bg-foreground/15 border border-foreground/10"
                   : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
                 }`}
             >
-              {isFollowing ? (
+              {isFollowLoading ? (
+                <>
+                  <Loader2 size={14} className="mr-1.5 animate-spin" />
+                  <span>Updating...</span>
+                </>
+              ) : isFollowing ? (
                 <>
                   <UserCheck size={14} className="mr-1.5" />
                   <span>Following</span>

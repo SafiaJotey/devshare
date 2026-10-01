@@ -22,6 +22,7 @@ import {
   Loader2,
   Sparkles,
   Plus,
+  Bookmark,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/providers/auth-provider";
@@ -144,6 +145,17 @@ export default function DashboardOverview() {
                   className="h-10 px-3.5 rounded-xl border-foreground/10 bg-background/60 hover:bg-foreground/5 text-foreground/75 text-xs font-semibold cursor-pointer backdrop-blur-xs"
                 >
                   <span>Library ({blogs.length})</span>
+                </Button>
+              </Link>
+
+              <Link href="/dashboard/saved">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="h-10 px-3.5 rounded-xl border-foreground/10 bg-background/60 hover:bg-foreground/5 text-foreground/75 text-xs font-semibold cursor-pointer backdrop-blur-xs flex items-center gap-1.5"
+                >
+                  <Bookmark size={13} className="text-primary" />
+                  <span>Saved Articles</span>
                 </Button>
               </Link>
             </div>

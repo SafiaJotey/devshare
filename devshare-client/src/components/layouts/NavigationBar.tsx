@@ -25,6 +25,7 @@ import { LogoutIcon } from "../icons/LogoutIcon";
 import { DashboardIcon } from "../icons/DashboardIcon";
 import { SettingsIcon } from "../icons/SettingsIcon";
 import { useAuth } from "@/providers/auth-provider";
+import { NotificationMenu } from "../shared/NotificationMenu";
 
 export default function NavigationBar() {
   const pathname = usePathname();
@@ -116,7 +117,10 @@ export default function NavigationBar() {
             {isLoading ? (
               <div className="w-8 h-8 rounded-full bg-foreground/10 animate-pulse" />
             ) : isLoggedIn ? (
-              <UserAccountMenu />
+              <div className="flex items-center gap-1.5">
+                <NotificationMenu />
+                <UserAccountMenu />
+              </div>
             ) : (
               <Button
                 asChild
@@ -142,7 +146,10 @@ export default function NavigationBar() {
           {isLoading ? (
             <div className="w-8 h-8 rounded-full bg-foreground/10 animate-pulse" />
           ) : isLoggedIn ? (
-            <UserAccountMenu />
+            <div className="flex items-center gap-1">
+              <NotificationMenu />
+              <UserAccountMenu />
+            </div>
           ) : null}
 
           <Sheet open={isOpen} onOpenChange={setIsOpen}>

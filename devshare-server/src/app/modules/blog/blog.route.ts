@@ -20,6 +20,9 @@ router.get("/", BlogController.getAllBlogs);
 // Get current user's blogs (Protected - Dashboard)
 router.get("/my/blogs", auth(), BlogController.getMyBlogs);
 
+// Get current user's saved / bookmarked articles (Protected - Dashboard)
+router.get("/my/saved", auth(), BlogController.getMySavedBlogs);
+
 // Get one of the current user's articles for editing (does not increment views)
 router.get("/my/blogs/:id", auth(), BlogController.getMyBlogById);
 

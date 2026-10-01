@@ -72,4 +72,33 @@ export const auth = (...requiredRoles: Array<"user" | "admin">) => {
   };
 };
 
+/**
+ * optionalAuth() — Reads token if present, sets req.user, but does not block unauthenticated users.
+ */
+export const optionalAuth = () => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      let token: string | undefined;
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        token = authHeader.split(" ")[1];
+      }
+      if (!token && req.cookies?.accessToken) {
+        token = req.cookies.accessToken;
+      }
+      if (token) {
+        try {
+          const decoded = verifyAccessToken(token);
+          req.user = decoded;
+        } catch {
+          // Token invalid/expired, continue as unauthenticated
+        }
+      }
+      next();
+    } catch {
+      next();
+    }
+  };
+};
+
 export default auth;

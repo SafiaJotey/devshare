@@ -19,6 +19,7 @@ import {
   hashToken,
   verifyRefreshToken,
 } from "../../utils/jwt";
+import { NotificationService } from "../notification/notification.service";
 
 // Helper to strip password and refreshTokens from user object
 const sanitizeUser = (user: IUser): IUserResponse => {
@@ -650,7 +651,7 @@ const getTopContributors = async (limit: number = 8) => {
   return contributors.slice(0, limit);
 };
 
-const getAuthorDetails = async (authorId: string) => {
+const getAuthorDetails = async (authorId: string, currentUserId?: string) => {
   const userCollection = getUserCollection();
   const blogCollection = getBlogCollection();
 
@@ -700,6 +701,12 @@ const getAuthorDetails = async (authorId: string) => {
 
   // If user found in users collection
   if (user) {
+    const isFollowing = currentUserId
+      ? (user.followers || []).includes(currentUserId)
+      : false;
+    const realFollowers = user.followers?.length || 0;
+    const baseFollowers = Math.floor(totalLikes * 0.4) + 12;
+
     return {
       author: {
         _id: user._id!.toString(),
@@ -729,8 +736,9 @@ const getAuthorDetails = async (authorId: string) => {
         totalArticles: articles.length,
         totalViews,
         totalLikes,
-        followers: Math.floor(totalLikes * 0.4) + 12,
+        followers: baseFollowers + realFollowers,
       },
+      isFollowing,
       articles,
     };
   }
@@ -764,11 +772,111 @@ const getAuthorDetails = async (authorId: string) => {
         totalLikes,
         followers: Math.floor(totalLikes * 0.4) + 12,
       },
+      isFollowing: false,
       articles,
     };
   }
 
   throw new AppError(httpStatus.NOT_FOUND, "Contributor not found");
+};
+
+const toggleFollowAuthor = async (
+  currentUserId: string,
+  targetAuthorId: string
+): Promise<{ isFollowing: boolean; followers: number }> => {
+  const userCollection = getUserCollection();
+  const blogCollection = getBlogCollection();
+
+  let authorUser: IUser | null = null;
+  if (ObjectId.isValid(targetAuthorId)) {
+    authorUser = await userCollection.findOne({ _id: new ObjectId(targetAuthorId) });
+  }
+  if (!authorUser) {
+    const cleanName = decodeURIComponent(targetAuthorId).replace(/-/g, " ");
+    authorUser = await userCollection.findOne({
+      name: { $regex: new RegExp(`^${cleanName}$`, "i") },
+    });
+  }
+
+  if (!authorUser) {
+    throw new AppError(httpStatus.NOT_FOUND, "Author profile not found");
+  }
+
+  const authorIdStr = authorUser._id!.toString();
+  if (authorIdStr === currentUserId) {
+    throw new AppError(httpStatus.BAD_REQUEST, "You cannot follow yourself");
+  }
+
+  const currentUser = await userCollection.findOne({ _id: new ObjectId(currentUserId) });
+  if (!currentUser) {
+    throw new AppError(httpStatus.NOT_FOUND, "Authenticated user not found");
+  }
+
+  const alreadyFollowing = (authorUser.followers || []).includes(currentUserId);
+
+  // Compute author baseline stats
+  const authorArticles = await blogCollection
+    .find({
+      $or: [
+        { authorId: authorUser._id },
+        { "author.id": authorIdStr },
+        { "author.name": authorUser.name },
+      ],
+      status: "Published",
+    })
+    .toArray();
+  const totalLikes = authorArticles.reduce((acc, a) => acc + (a.likes || 0), 0);
+  const baseFollowers = Math.floor(totalLikes * 0.4) + 12;
+
+  if (alreadyFollowing) {
+    // Unfollow
+    await userCollection.updateOne(
+      { _id: authorUser._id },
+      { $pull: { followers: currentUserId } as any }
+    );
+    await userCollection.updateOne(
+      { _id: new ObjectId(currentUserId) },
+      { $pull: { following: authorIdStr } as any }
+    );
+
+    const updated = await userCollection.findOne({ _id: authorUser._id });
+    return {
+      isFollowing: false,
+      followers: baseFollowers + (updated?.followers?.length || 0),
+    };
+  } else {
+    // Follow
+    await userCollection.updateOne(
+      { _id: authorUser._id },
+      { $addToSet: { followers: currentUserId } as any }
+    );
+    await userCollection.updateOne(
+      { _id: new ObjectId(currentUserId) },
+      { $addToSet: { following: authorIdStr } as any }
+    );
+
+    // Send notification
+    try {
+      await NotificationService.createNotification({
+        userId: authorIdStr,
+        senderId: currentUserId,
+        senderName: currentUser.name,
+        senderAvatar: currentUser.avatar,
+        type: "follow",
+        title: "New Follower",
+        message: `${currentUser.name} started following your profile and publications`,
+        link: `/author/${currentUserId}`,
+      });
+    } catch (err) {
+      console.error("Failed to dispatch follow notification:", err);
+    }
+
+    const updated = await userCollection.findOne({ _id: authorUser._id });
+    return {
+      isFollowing: true,
+      followers: baseFollowers + (updated?.followers?.length || 0),
+    };
+  }
 };
 
 export const UserService = {
@@ -781,6 +889,7 @@ export const UserService = {
   deleteAccount,
   getTopContributors,
   getAuthorDetails,
+  toggleFollowAuthor,
   changePassword,
   getMe,
   updateProfile,

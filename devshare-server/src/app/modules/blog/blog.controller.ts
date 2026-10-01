@@ -28,7 +28,7 @@ const getAllBlogs = catchAsync(async (req: Request, res: Response) => {
 });
 
 const getBlogById = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
+  const id = req.params.id as string;
 
   // Track viewed articles in cookie to prevent duplicate view increments
   const viewedCookie = req.cookies?.devshare_viewed_articles;
@@ -43,11 +43,11 @@ const getBlogById = catchAsync(async (req: Request, res: Response) => {
   }
 
   const alreadyViewed = viewedList.includes(id);
-  const result = await BlogService.getBlogByIdOrSlug(id as string, !alreadyViewed);
+  const result = await BlogService.getBlogByIdOrSlug(id, !alreadyViewed);
 
   // If not previously viewed and blog found, update cookie with blog id and slug (24h window)
   if (!alreadyViewed && result) {
-    const idsToAdd = [id];
+    const idsToAdd: string[] = [id];
     if (result._id) idsToAdd.push(result._id.toString());
     if (result.slug) idsToAdd.push(result.slug);
 
@@ -230,12 +230,26 @@ const getCategoryStats = catchAsync(async (_req: Request, res: Response) => {
   });
 });
 
+const getMySavedBlogs = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user!.id;
+  const result = await BlogService.getMySavedBlogs(userId, req.query);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Saved articles retrieved successfully",
+    data: result.blogs,
+    meta: result.meta,
+  });
+});
+
 export const BlogController = {
   createBlog,
   getAllBlogs,
   getBlogById,
   getMyBlogs,
   getMyBlogById,
+  getMySavedBlogs,
   updateBlog,
   deleteBlog,
   toggleLike,

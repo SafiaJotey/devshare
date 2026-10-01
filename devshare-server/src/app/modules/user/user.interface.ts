@@ -30,6 +30,8 @@ export interface IUser {
   };
   preferences?: IContributorPreferences;
   provider?: string;
+  followers?: string[];
+  following?: string[];
   /** SHA-256 hashed refresh tokens — one entry per active device/session */
   refreshTokens: string[];
   /** Allows admins to suspend accounts without deletion */

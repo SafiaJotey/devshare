@@ -12,6 +12,7 @@ import {
   BlogCategory,
 } from "./blog.interface";
 import { IPaginationMeta } from "../../utils/response";
+import { NotificationService } from "../notification/notification.service";
 
 // Category default fallback hero images (high-resolution tech wallpapers)
 const DEFAULT_CATEGORY_COVERS: Record<BlogCategory, string> = {
@@ -442,6 +443,26 @@ const toggleLike = async (
       { $addToSet: { likesBy: userId }, $inc: { likes: 1 } },
       { returnDocument: "after" }
     );
+
+    // Trigger notification to article author
+    if (blog.authorId && blog.authorId.toString() !== userId) {
+      try {
+        const liker = await getUserCollection().findOne({ _id: new ObjectId(userId) });
+        await NotificationService.createNotification({
+          userId: blog.authorId.toString(),
+          senderId: userId,
+          senderName: liker?.name || "A developer",
+          senderAvatar: liker?.avatar,
+          type: "like",
+          title: "New Appreciation",
+          message: `${liker?.name || "A developer"} liked your article "${blog.title}"`,
+          link: `/blogs/${blog._id}`,
+        });
+      } catch (err) {
+        console.error("Failed to dispatch like notification:", err);
+      }
+    }
+
     return { liked: true, likes: updated?.likes ?? 0 };
   }
 };
@@ -476,6 +497,26 @@ const toggleSave = async (
       { _id: new ObjectId(blogId) },
       { $addToSet: { savedBy: userId } }
     );
+
+    // Trigger notification to article author
+    if (blog.authorId && blog.authorId.toString() !== userId) {
+      try {
+        const saver = await getUserCollection().findOne({ _id: new ObjectId(userId) });
+        await NotificationService.createNotification({
+          userId: blog.authorId.toString(),
+          senderId: userId,
+          senderName: saver?.name || "A developer",
+          senderAvatar: saver?.avatar,
+          type: "save",
+          title: "Article Saved",
+          message: `${saver?.name || "A developer"} bookmarked your article "${blog.title}"`,
+          link: `/blogs/${blog._id}`,
+        });
+      } catch (err) {
+        console.error("Failed to dispatch save notification:", err);
+      }
+    }
+
     return { saved: true };
   }
 };
@@ -518,6 +559,24 @@ const addComment = async (
 
   if (!updated) {
     throw new AppError(httpStatus.NOT_FOUND, "Article not found");
+  }
+
+  // Trigger notification to article author
+  if (updated.authorId && updated.authorId.toString() !== userId) {
+    try {
+      await NotificationService.createNotification({
+        userId: updated.authorId.toString(),
+        senderId: userId,
+        senderName: user.name,
+        senderAvatar: user.avatar,
+        type: "comment",
+        title: "New Discussion Comment",
+        message: `${user.name} commented on "${updated.title}"`,
+        link: `/blogs/${updated._id}#discussion`,
+      });
+    } catch (err) {
+      console.error("Failed to dispatch comment notification:", err);
+    }
   }
 
   return updated as IBlog;
@@ -637,12 +696,59 @@ const getCategoryStats = async (): Promise<Record<string, number>> => {
   return countMap;
 };
 
+const getMySavedBlogs = async (
+  userId: string,
+  query: Record<string, unknown> = {}
+) => {
+  const blogCollection = getBlogCollection();
+
+  const filter: any = {
+    savedBy: userId,
+  };
+
+  const { search, category, page = 1, limit = 12 } = query as any;
+
+  if (category && category !== "All") {
+    filter.category = category;
+  }
+
+  if (search) {
+    filter.$or = [
+      { title: { $regex: search, $options: "i" } },
+      { description: { $regex: search, $options: "i" } },
+    ];
+  }
+
+  const currentPage = Math.max(1, Number(page));
+  const pageLimit = Math.max(1, Math.min(50, Number(limit)));
+  const skip = (currentPage - 1) * pageLimit;
+
+  const total = await blogCollection.countDocuments(filter);
+  const blogs = await blogCollection
+    .find(filter)
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(pageLimit)
+    .toArray();
+
+  return {
+    meta: {
+      page: currentPage,
+      limit: pageLimit,
+      total,
+      totalPages: Math.ceil(total / pageLimit),
+    },
+    blogs,
+  };
+};
+
 export const BlogService = {
   createBlog,
   getAllBlogs,
   getBlogByIdOrSlug,
   getMyBlogs,
   getMyBlogById,
+  getMySavedBlogs,
   updateBlog,
   deleteBlog,
   toggleLike,

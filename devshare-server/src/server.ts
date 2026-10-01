@@ -4,6 +4,7 @@ import config from "./config";
 import { connectToDatabase, client } from "./config/db";
 import { initUserIndexes } from "./app/modules/user/user.model";
 import { initBlogIndexes } from "./app/modules/blog/blog.model";
+import { initializeNotificationIndexes } from "./app/modules/notification/notification.model";
 
 let server: Server;
 
@@ -12,9 +13,10 @@ async function bootstrap() {
     console.log("Connecting to MongoDB Atlas...");
     await connectToDatabase();
 
-    // Initialize database indexes (e.g., unique email, blog slug)
+    // Initialize database indexes (e.g., unique email, blog slug, notifications)
     await initUserIndexes();
     await initBlogIndexes();
+    await initializeNotificationIndexes();
 
     server = app.listen(config.port, () => {
       console.log(`========================================`);

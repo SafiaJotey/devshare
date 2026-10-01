@@ -35,6 +35,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ThemeToggle } from "@/components/layouts/ThemeToggle";
+import { NotificationMenu } from "@/components/shared/NotificationMenu";
+import { Bookmark } from "lucide-react";
 
 const menuItems = [
   {
@@ -46,6 +48,11 @@ const menuItems = [
     name: "My Blogs",
     href: "/dashboard/blogs",
     icon: FileText,
+  },
+  {
+    name: "Saved Articles",
+    href: "/dashboard/saved",
+    icon: Bookmark,
   },
   {
     name: "Write New",
@@ -258,14 +265,7 @@ export default function DashboardLayout({
           <div className="flex items-center gap-3">
             <ThemeToggle />
 
-            <button
-              aria-label="View notifications"
-              className="p-2 text-foreground/50 hover:text-foreground hover:bg-foreground/5 rounded-lg transition-colors relative cursor-pointer"
-              onClick={() => toast.info("No unread notifications")}
-            >
-              <Bell size={17} />
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-primary rounded-full" />
-            </button>
+            <NotificationMenu />
 
             {/* Profile Dropdown */}
             <DropdownMenu>
@@ -310,6 +310,15 @@ export default function DashboardLayout({
                   >
                     <FileText size={14} className="text-foreground/50" />
                     <span>My Publications</span>
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link
+                    href="/dashboard/saved"
+                    className="flex items-center gap-2.5 px-2.5 py-2 text-xs font-medium rounded-xl cursor-pointer"
+                  >
+                    <Bookmark size={14} className="text-foreground/50" />
+                    <span>Saved Articles</span>
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>

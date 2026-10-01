@@ -280,6 +280,7 @@ export interface IAuthorDetailsResponse {
     totalLikes: number;
     followers: number;
   };
+  isFollowing?: boolean;
   articles: IBlog[];
 }
 
@@ -298,6 +299,17 @@ export const getAuthorDetailsApi = async (
     `/users/author/${encodeURIComponent(authorId)}`,
     {
       method: "GET",
+    }
+  );
+};
+
+export const toggleFollowAuthorApi = async (
+  authorId: string
+): Promise<ApiResponse<{ isFollowing: boolean; followers: number }>> => {
+  return apiFetch<ApiResponse<{ isFollowing: boolean; followers: number }>>(
+    `/users/author/${encodeURIComponent(authorId)}/follow`,
+    {
+      method: "POST",
     }
   );
 };
@@ -550,8 +562,6 @@ export const deleteCommentApi = async (
   );
 };
 
-// ─── Related Blogs ─────────────────────────────────────────────────────────────
-
 export const getRelatedBlogsApi = async (
   blogId: string,
   category: string,
@@ -562,3 +572,73 @@ export const getRelatedBlogsApi = async (
     { method: "GET" }
   );
 };
+
+// ─── Saved Blogs ──────────────────────────────────────────────────────────────
+
+export const getMySavedBlogsApi = async (
+  params: Record<string, string | number | undefined> = {}
+): Promise<IBlogsListResponse> => {
+  const searchParams = new URLSearchParams();
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      searchParams.append(key, String(value));
+    }
+  });
+  const queryString = searchParams.toString();
+  const endpoint = queryString ? `/blogs/my/saved?${queryString}` : "/blogs/my/saved";
+  return apiFetch<IBlogsListResponse>(endpoint, {
+    method: "GET",
+  });
+};
+
+// ─── Notifications ────────────────────────────────────────────────────────────
+
+export type NotificationType = "like" | "comment" | "follow" | "save" | "system";
+
+export interface INotification {
+  _id: string;
+  userId: string;
+  senderId?: string;
+  senderName?: string;
+  senderAvatar?: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  link?: string;
+  read: boolean;
+  createdAt: string;
+}
+
+export interface INotificationsResponse {
+  notifications: INotification[];
+  unreadCount: number;
+}
+
+export const getMyNotificationsApi = async (): Promise<ApiResponse<INotificationsResponse>> => {
+  return apiFetch<ApiResponse<INotificationsResponse>>("/notifications", {
+    method: "GET",
+  });
+};
+
+export const markNotificationReadApi = async (
+  id: string
+): Promise<ApiResponse<null>> => {
+  return apiFetch<ApiResponse<null>>(`/notifications/${encodeURIComponent(id)}/read`, {
+    method: "PATCH",
+  });
+};
+
+export const markAllNotificationsReadApi = async (): Promise<ApiResponse<null>> => {
+  return apiFetch<ApiResponse<null>>("/notifications/read-all", {
+    method: "PATCH",
+  });
+};
+
+export const deleteNotificationApi = async (
+  id: string
+): Promise<ApiResponse<null>> => {
+  return apiFetch<ApiResponse<null>>(`/notifications/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });
+};
+
