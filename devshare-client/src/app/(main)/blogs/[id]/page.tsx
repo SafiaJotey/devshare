@@ -817,36 +817,137 @@ export default function BlogDetails() {
                               >
                                 {(col.blocks || []).map((subBlock: any) => {
                                   if (!subBlock.content?.trim()) return null;
-                                  if (subBlock.type === "p")
-                                    return (
-                                      <p
-                                        key={subBlock.id}
-                                        className="text-sm text-foreground/80 leading-relaxed"
-                                      >
-                                        {subBlock.content}
-                                      </p>
-                                    );
-                                  if (
-                                    ["h2", "h3", "h4"].includes(subBlock.type)
-                                  )
-                                    return (
-                                      <h3
-                                        key={subBlock.id}
-                                        className="font-bold text-foreground text-lg"
-                                      >
-                                        {subBlock.content}
-                                      </h3>
-                                    );
-                                  if (subBlock.type === "code")
-                                    return (
-                                      <pre
-                                        key={subBlock.id}
-                                        className="text-xs p-3 bg-[#0d1117] text-blue-300 rounded-lg overflow-x-auto font-mono"
-                                      >
-                                        <code>{subBlock.content}</code>
-                                      </pre>
-                                    );
-                                  return null;
+
+                                  switch (subBlock.type) {
+                                    case "p":
+                                      return (
+                                        <p
+                                          key={subBlock.id}
+                                          className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap break-words"
+                                        >
+                                          {subBlock.content}
+                                        </p>
+                                      );
+
+                                    case "h2":
+                                      return (
+                                        <h2
+                                          key={subBlock.id}
+                                          className="font-bold text-foreground text-xl"
+                                        >
+                                          {subBlock.content}
+                                        </h2>
+                                      );
+
+                                    case "h3":
+                                      return (
+                                        <h3
+                                          key={subBlock.id}
+                                          className="font-bold text-foreground text-lg"
+                                        >
+                                          {subBlock.content}
+                                        </h3>
+                                      );
+
+                                    case "h4":
+                                      return (
+                                        <h4
+                                          key={subBlock.id}
+                                          className="font-bold text-foreground text-base"
+                                        >
+                                          {subBlock.content}
+                                        </h4>
+                                      );
+
+                                    case "h5":
+                                      return (
+                                        <h5
+                                          key={subBlock.id}
+                                          className="font-semibold text-foreground text-sm"
+                                        >
+                                          {subBlock.content}
+                                        </h5>
+                                      );
+
+                                    case "h6":
+                                      return (
+                                        <h6
+                                          key={subBlock.id}
+                                          className="font-semibold uppercase tracking-wider text-foreground/75 text-xs"
+                                        >
+                                          {subBlock.content}
+                                        </h6>
+                                      );
+
+                                    case "ul":
+                                      return (
+                                        <ul
+                                          key={subBlock.id}
+                                          className="list-disc pl-5 space-y-1 text-sm text-foreground/80 leading-relaxed marker:text-primary"
+                                        >
+                                          {subBlock.content
+                                            .split("\n")
+                                            .filter((item: string) => item.trim().length > 0)
+                                            .map((item: string, idx: number) => (
+                                              <li key={idx} className="break-words">
+                                                {item}
+                                              </li>
+                                            ))}
+                                        </ul>
+                                      );
+
+                                    case "ol":
+                                      return (
+                                        <ol
+                                          key={subBlock.id}
+                                          className="list-decimal pl-5 space-y-1 text-sm text-foreground/80 leading-relaxed marker:text-primary marker:font-semibold"
+                                        >
+                                          {subBlock.content
+                                            .split("\n")
+                                            .filter((item: string) => item.trim().length > 0)
+                                            .map((item: string, idx: number) => (
+                                              <li key={idx} className="break-words">
+                                                {item}
+                                              </li>
+                                            ))}
+                                        </ol>
+                                      );
+
+                                    case "quote":
+                                      return (
+                                        <blockquote
+                                          key={subBlock.id}
+                                          className="border-l-3 border-accent pl-4 my-2 italic text-sm font-serif text-foreground/70 leading-relaxed bg-accent/5 py-3 rounded-r-lg break-words whitespace-pre-wrap"
+                                        >
+                                          &quot;{subBlock.content}&quot;
+                                        </blockquote>
+                                      );
+
+                                    case "code":
+                                      return (
+                                        <pre
+                                          key={subBlock.id}
+                                          className="text-xs p-3 bg-[#0d1117] text-blue-300 rounded-lg overflow-x-auto font-mono"
+                                        >
+                                          <code>{subBlock.content}</code>
+                                        </pre>
+                                      );
+
+                                    case "image":
+                                      return (
+                                        <div key={subBlock.id} className="my-2 rounded-xl overflow-hidden shadow-lg aspect-video relative">
+                                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                                          <img
+                                            src={subBlock.content}
+                                            className="w-full h-full object-cover"
+                                            alt="Column media"
+                                          />
+                                        </div>
+                                      );
+
+                                    default:
+                                      return null;
+                                  }
                                 })}
                               </div>
                             ))}

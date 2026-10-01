@@ -9,12 +9,15 @@ import {
   Plus,
   Trash2,
   Type,
+  Heading,
   Heading2,
   List,
+  ListOrdered,
   Terminal,
   Quote,
   ImageIcon,
   GripVertical,
+  ChevronRight,
 } from "lucide-react";
 import { BlockType, ColumnData, ColumnItem } from "../../type";
 import { TextBlock } from "./TextBlock";
@@ -147,6 +150,14 @@ const DroppableColumn = ({
     id: col.id,
   });
 
+  // Sub-menu state for heading levels and list types within the picker
+  const [expandedSubMenu, setExpandedSubMenu] = useState<"heading" | "list" | null>(null);
+
+  const handlePickerAdd = (type: BlockType) => {
+    handleAddSubBlock(colIdx, type);
+    setExpandedSubMenu(null);
+  };
+
   return (
     <div
       ref={setNodeRef}
@@ -183,54 +194,109 @@ const DroppableColumn = ({
 
       <div className="pt-2 border-t border-foreground/5">
         {activePickerCol === colIdx ? (
-          <div className="flex flex-wrap items-center gap-1 p-1 bg-foreground/5 rounded-xl animate-in fade-in zoom-in-95">
-            <button
-              type="button"
-              onClick={() => handleAddSubBlock(colIdx, "p")}
-              className="p-1.5 hover:bg-background rounded-lg text-foreground/70 hover:text-foreground text-xs font-medium flex items-center gap-1"
-            >
-              <Type size={13} /> Text
-            </button>
-            <button
-              type="button"
-              onClick={() => handleAddSubBlock(colIdx, "h2")}
-              className="p-1.5 hover:bg-background rounded-lg text-foreground/70 hover:text-foreground text-xs font-medium flex items-center gap-1"
-            >
-              <Heading2 size={13} /> Heading
-            </button>
-            <button
-              type="button"
-              onClick={() => handleAddSubBlock(colIdx, "ul")}
-              className="p-1.5 hover:bg-background rounded-lg text-foreground/70 hover:text-foreground text-xs font-medium flex items-center gap-1"
-            >
-              <List size={13} /> List
-            </button>
-            <button
-              type="button"
-              onClick={() => handleAddSubBlock(colIdx, "image")}
-              className="p-1.5 hover:bg-background rounded-lg text-foreground/70 hover:text-foreground text-xs font-medium flex items-center gap-1"
-            >
-              <ImageIcon size={13} /> Image
-            </button>
-            <button
-              type="button"
-              onClick={() => handleAddSubBlock(colIdx, "code")}
-              className="p-1.5 hover:bg-background rounded-lg text-foreground/70 hover:text-foreground text-xs font-medium flex items-center gap-1"
-            >
-              <Terminal size={13} /> Code
-            </button>
-            <button
-              type="button"
-              onClick={() => handleAddSubBlock(colIdx, "quote")}
-              className="p-1.5 hover:bg-background rounded-lg text-foreground/70 hover:text-foreground text-xs font-medium flex items-center gap-1"
-            >
-              <Quote size={13} /> Quote
-            </button>
+          <div className="space-y-1 p-1 bg-foreground/5 rounded-xl animate-in fade-in zoom-in-95">
+            <div className="flex flex-wrap items-center gap-1">
+              {/* Text */}
+              <button
+                type="button"
+                onClick={() => { handlePickerAdd("p"); }}
+                className="p-1.5 hover:bg-background rounded-lg text-foreground/70 hover:text-foreground text-xs font-medium flex items-center gap-1"
+              >
+                <Type size={13} /> Text
+              </button>
+
+              {/* Heading with sub-menu for h2-h6 */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setExpandedSubMenu(expandedSubMenu === "heading" ? null : "heading")}
+                  className={`p-1.5 hover:bg-background rounded-lg text-foreground/70 hover:text-foreground text-xs font-medium flex items-center gap-1 transition-colors ${
+                    expandedSubMenu === "heading" ? "bg-background text-foreground" : ""
+                  }`}
+                >
+                  <Heading size={13} /> Heading <ChevronRight size={10} className={`transition-transform ${expandedSubMenu === "heading" ? "rotate-90" : ""}`} />
+                </button>
+                {expandedSubMenu === "heading" && (
+                  <div className="absolute left-0 top-full mt-1 bg-foreground text-background p-1 rounded-lg shadow-xl border border-white/10 flex items-center gap-0.5 z-50 animate-in fade-in slide-in-from-top-1 duration-150 whitespace-nowrap">
+                    {(["h2", "h3", "h4", "h5", "h6"] as const).map((lvl) => (
+                      <button
+                        key={lvl}
+                        type="button"
+                        onClick={() => handlePickerAdd(lvl)}
+                        className="px-2 py-1 text-[10px] font-mono font-bold rounded-md hover:bg-background/20 text-background/80 hover:text-background transition-colors uppercase"
+                      >
+                        {lvl}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* List with sub-menu for bullet/numbered */}
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setExpandedSubMenu(expandedSubMenu === "list" ? null : "list")}
+                  className={`p-1.5 hover:bg-background rounded-lg text-foreground/70 hover:text-foreground text-xs font-medium flex items-center gap-1 transition-colors ${
+                    expandedSubMenu === "list" ? "bg-background text-foreground" : ""
+                  }`}
+                >
+                  <List size={13} /> List <ChevronRight size={10} className={`transition-transform ${expandedSubMenu === "list" ? "rotate-90" : ""}`} />
+                </button>
+                {expandedSubMenu === "list" && (
+                  <div className="absolute left-0 top-full mt-1 bg-foreground text-background p-1 rounded-lg shadow-xl border border-white/10 flex flex-col gap-0.5 min-w-[130px] z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                    <button
+                      type="button"
+                      onClick={() => handlePickerAdd("ul")}
+                      className="flex items-center gap-2 px-2.5 py-1.5 text-[11px] font-medium rounded-md hover:bg-background/20 text-left transition-colors text-background/85 hover:text-background"
+                    >
+                      <span className="w-3.5 text-center font-bold text-sm leading-none">•</span>
+                      <span>Bullet List</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handlePickerAdd("ol")}
+                      className="flex items-center gap-2 px-2.5 py-1.5 text-[11px] font-medium rounded-md hover:bg-background/20 text-left transition-colors text-background/85 hover:text-background"
+                    >
+                      <ListOrdered size={13} />
+                      <span>Numbered List</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Image */}
+              <button
+                type="button"
+                onClick={() => { handlePickerAdd("image"); }}
+                className="p-1.5 hover:bg-background rounded-lg text-foreground/70 hover:text-foreground text-xs font-medium flex items-center gap-1"
+              >
+                <ImageIcon size={13} /> Image
+              </button>
+
+              {/* Code */}
+              <button
+                type="button"
+                onClick={() => { handlePickerAdd("code"); }}
+                className="p-1.5 hover:bg-background rounded-lg text-foreground/70 hover:text-foreground text-xs font-medium flex items-center gap-1"
+              >
+                <Terminal size={13} /> Code
+              </button>
+
+              {/* Quote */}
+              <button
+                type="button"
+                onClick={() => { handlePickerAdd("quote"); }}
+                className="p-1.5 hover:bg-background rounded-lg text-foreground/70 hover:text-foreground text-xs font-medium flex items-center gap-1"
+              >
+                <Quote size={13} /> Quote
+              </button>
+            </div>
           </div>
         ) : (
           <button
             type="button"
-            onClick={() => setActivePickerCol(colIdx)}
+            onClick={() => { setActivePickerCol(colIdx); setExpandedSubMenu(null); }}
             className="flex items-center gap-1 text-[11px] font-mono text-foreground/40 hover:text-primary transition-colors py-1"
           >
             <Plus size={13} /> Add block

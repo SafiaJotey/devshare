@@ -264,9 +264,8 @@ export default function Home() {
               {/* Lead story */}
               <Link
                 href={`/blogs/${activeMainPost.id}`}
-                className={`group relative isolate flex min-h-110 overflow-hidden rounded-3xl bg-foreground text-background shadow-sm lg:min-h-135 ${
-                  activeSidePosts.length > 0 ? "lg:col-span-7" : "lg:col-span-12"
-                }`}
+                className={`group relative isolate flex min-h-110 overflow-hidden rounded-3xl bg-foreground text-background shadow-sm lg:min-h-135 ${activeSidePosts.length > 0 ? "lg:col-span-7" : "lg:col-span-12"
+                  }`}
               >
                 <Image
                   src={activeMainPost.image}
@@ -284,7 +283,7 @@ export default function Home() {
                     <span className="rounded-full bg-accent px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.18em] text-background">
                       {activeMainPost.category}
                     </span>
-                  
+
                   </div>
 
                   <div className="max-w-2xl pt-16">
@@ -298,7 +297,7 @@ export default function Home() {
                       {activeMainPost.description}
                     </p>
                   </div>
-                  
+
 
                   <div className="mt-8 flex flex-wrap items-center justify-between gap-4 border-t border-background/20 pt-5">
                     <div className="flex items-center gap-3">
@@ -356,7 +355,7 @@ export default function Home() {
                             <span className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.15em] text-primary">
                               {post.category}
                             </span>
-                          
+
                           </div>
                           <h4 className="max-w-[82%] text-xl font-bold leading-tight tracking-tight transition-colors group-hover:text-primary sm:text-2xl line-clamp-3">
                             {post.title}
@@ -423,39 +422,39 @@ export default function Home() {
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-primary/[0.08] to-transparent sm:w-20" />
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-primary/[0.08] to-transparent sm:w-20" />
             <div className="animate-marquee flex gap-4 px-2 py-3 sm:gap-5">
-            {[...categories, ...categories].map((cat, i) => {
-              const liveCount = categoryCounts[cat.name] !== undefined ? categoryCounts[cat.name] : cat.count;
-              return (
-                <Link
-                  key={`${cat.name}-${i}`}
-                  href={`/blogs?category=${encodeURIComponent(cat.name)}`}
-                  className="group relative flex h-[190px] w-[230px] shrink-0 flex-col overflow-hidden rounded-3xl border border-foreground/10 bg-background p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/25 hover:shadow-xl hover:shadow-primary/10"
-                >
-                  <span className="absolute right-5 top-5 font-mono text-[10px] font-bold tracking-widest text-foreground/30">
-                    0{(i % categories.length) + 1}
-                  </span>
-                  <div className="absolute -bottom-8 -right-8 h-24 w-24 rounded-full bg-primary/[0.05] transition-transform duration-500 group-hover:scale-150" />
+              {[...categories, ...categories].map((cat, i) => {
+                const liveCount = categoryCounts[cat.name] !== undefined ? categoryCounts[cat.name] : cat.count;
+                return (
+                  <Link
+                    key={`${cat.name}-${i}`}
+                    href={`/blogs?category=${encodeURIComponent(cat.name)}`}
+                    className="group relative flex h-[190px] w-[230px] shrink-0 flex-col overflow-hidden rounded-3xl border border-foreground/10 bg-background p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/25 hover:shadow-xl hover:shadow-primary/10"
+                  >
+                    <span className="absolute right-5 top-5 font-mono text-[10px] font-bold tracking-widest text-foreground/30">
+                      0{(i % categories.length) + 1}
+                    </span>
+                    <div className="absolute -bottom-8 -right-8 h-24 w-24 rounded-full bg-primary/[0.05] transition-transform duration-500 group-hover:scale-150" />
 
-                  <div className="relative flex flex-1 flex-col items-start">
-                    <div
-                      className={`mb-5 rounded-2xl p-3 transition-transform duration-300 group-hover:scale-110 ${cat.color}`}
-                    >
-                      {cat.icon}
+                    <div className="relative flex flex-1 flex-col items-start">
+                      <div
+                        className={`mb-5 rounded-2xl p-3 transition-transform duration-300 group-hover:scale-110 ${cat.color}`}
+                      >
+                        {cat.icon}
+                      </div>
+                      <h3 className="text-lg font-bold tracking-tight transition-colors group-hover:text-primary">
+                        {cat.name}
+                      </h3>
+                      <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.15em] text-foreground/45">
+                        {liveCount} {liveCount === 1 ? "article" : "articles"}
+                      </p>
                     </div>
-                    <h3 className="text-lg font-bold tracking-tight transition-colors group-hover:text-primary">
-                      {cat.name}
-                    </h3>
-                    <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.15em] text-foreground/45">
-                      {liveCount} {liveCount === 1 ? "article" : "articles"}
-                    </p>
-                  </div>
-                  <div className="relative flex items-center gap-1.5 text-xs font-bold text-foreground/55 transition-colors group-hover:text-accent">
-                    Explore topic
-                    <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
-                  </div>
-                </Link>
-              );
-            })}
+                    <div className="relative flex items-center gap-1.5 text-xs font-bold text-foreground/55 transition-colors group-hover:text-accent">
+                      Explore topic
+                      <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -480,8 +479,10 @@ export default function Home() {
             activeStreamPosts.map((post) => (
               <Link key={post.id} href={`/blogs/${post.id}`}>
                 <Card post={post} />
+
               </Link>
             ))
+
           ) : (
             <div className="col-span-full rounded-2xl border border-dashed border-foreground/15 p-10 text-center text-xs text-foreground/50">
               No recent stream articles found.
@@ -638,7 +639,7 @@ export default function Home() {
                       </span>
                     </div>
                     <span className="flex items-center gap-1.5 text-xs font-bold text-foreground/60 transition-colors group-hover:text-accent">
-                      Read insights
+                      Profile
                       <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                     </span>
                   </div>
