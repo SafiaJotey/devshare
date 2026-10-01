@@ -28,7 +28,7 @@ const CATEGORY_NAMES = [
   "Frontend",
   "Backend",
   "DevOps",
-  "AI & ML",
+  "AI/ML",
   "Security",
 ];
 
