@@ -59,5 +59,18 @@ userRouter.patch(
   UserController.changePassword
 );
 
+userRouter.post(
+  "/revoke-sessions",
+  auth(),
+  UserController.revokeOtherSessions
+);
+
+userRouter.delete(
+  "/account",
+  auth(),
+  validateRequest(UserValidation.deleteAccountValidationSchema),
+  UserController.deleteAccount
+);
+
 export const UserRoutes: Router = userRouter;
 export default UserRoutes;

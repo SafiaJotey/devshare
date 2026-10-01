@@ -58,7 +58,19 @@ const registerUser = async (
       )}`,
     title: payload.title || "Developer & Contributor",
     bio: payload.bio || "",
+    primaryDomain: "Frontend",
+    skills: [],
     socialLinks: {},
+    preferences: {
+      defaultCategory: "Frontend",
+      codeFont: "jetbrains",
+      autoSave: true,
+      emailOnComment: true,
+      emailOnLike: true,
+      weeklyDigest: true,
+      showInLeaderboard: true,
+      publicEmail: false,
+    },
     refreshTokens: [],
     isActive: true,
     lastLoginAt: new Date(),
@@ -213,7 +225,19 @@ const socialLoginUser = async (
         )}`,
       title: "Developer & Contributor",
       bio: "",
+      primaryDomain: "Frontend",
+      skills: [],
       socialLinks: {},
+      preferences: {
+        defaultCategory: "Frontend",
+        codeFont: "jetbrains",
+        autoSave: true,
+        emailOnComment: true,
+        emailOnLike: true,
+        weeklyDigest: true,
+        showInLeaderboard: true,
+        publicEmail: false,
+      },
       provider: payload.provider,
       refreshTokens: [],
       isActive: true,
@@ -473,12 +497,66 @@ const updateAvatar = async (userId: string, avatar: string): Promise<IUserRespon
   return sanitizeUser(result);
 };
 
+const revokeOtherSessions = async (
+  userId: string,
+  incomingRefreshToken?: string
+): Promise<void> => {
+  if (!ObjectId.isValid(userId)) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid user identifier");
+  }
+
+  const collection = getUserCollection();
+  if (incomingRefreshToken) {
+    const hashed = hashToken(incomingRefreshToken);
+    // Keep only the current session token
+    await collection.updateOne(
+      { _id: new ObjectId(userId) },
+      { $set: { refreshTokens: [hashed], updatedAt: new Date() } }
+    );
+  } else {
+    // If no incoming token provided, keep the most recent token
+    const user = await collection.findOne({ _id: new ObjectId(userId) });
+    const lastToken = user?.refreshTokens?.[user.refreshTokens.length - 1];
+    await collection.updateOne(
+      { _id: new ObjectId(userId) },
+      { $set: { refreshTokens: lastToken ? [lastToken] : [], updatedAt: new Date() } }
+    );
+  }
+};
+
+const deleteAccount = async (userId: string, password?: string): Promise<void> => {
+  if (!ObjectId.isValid(userId)) {
+    throw new AppError(httpStatus.BAD_REQUEST, "Invalid user identifier");
+  }
+
+  const collection = getUserCollection();
+  const user = await collection.findOne({ _id: new ObjectId(userId) });
+
+  if (!user) {
+    throw new AppError(httpStatus.NOT_FOUND, "User profile not found");
+  }
+
+  if (user.password && password) {
+    const isMatch = await comparePassword(password, user.password);
+    if (!isMatch) {
+      throw new AppError(
+        httpStatus.BAD_REQUEST,
+        "Incorrect password provided for account deletion"
+      );
+    }
+  }
+
+  await collection.deleteOne({ _id: new ObjectId(userId) });
+};
+
 export const UserService = {
   registerUser,
   loginUser,
   socialLoginUser,
   refreshAccessToken,
   logoutUser,
+  revokeOtherSessions,
+  deleteAccount,
   changePassword,
   getMe,
   updateProfile,

@@ -164,6 +164,35 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const revokeOtherSessions = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user!.id;
+  const incomingRefreshToken = req.cookies?.refreshToken;
+  await UserService.revokeOtherSessions(userId, incomingRefreshToken);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Signed out of all other active sessions.",
+  });
+});
+
+const deleteAccount = catchAsync(async (req: Request, res: Response) => {
+  const userId = req.user!.id;
+  const password = req.body?.password;
+  await UserService.deleteAccount(userId, password);
+
+  // Clear auth cookies
+  res.clearCookie("accessToken", clearCookieOptions);
+  res.clearCookie("refreshToken", clearCookieOptions);
+  res.clearCookie("token", clearCookieOptions);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Your account and contributor profile have been permanently deleted.",
+  });
+});
+
 export const UserController = {
   register,
   login,
@@ -174,6 +203,8 @@ export const UserController = {
   updateProfile,
   updateAvatar,
   changePassword,
+  revokeOtherSessions,
+  deleteAccount,
 };
 
 export default UserController;

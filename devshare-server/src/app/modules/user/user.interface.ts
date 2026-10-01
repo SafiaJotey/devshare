@@ -1,5 +1,16 @@
 import { ObjectId } from "mongodb";
 
+export interface IContributorPreferences {
+  defaultCategory?: "Frontend" | "Backend" | "DevOps" | "AI & Data" | "Security" | string;
+  codeFont?: "jetbrains" | "fira" | "mono" | string;
+  autoSave?: boolean;
+  emailOnComment?: boolean;
+  emailOnLike?: boolean;
+  weeklyDigest?: boolean;
+  showInLeaderboard?: boolean;
+  publicEmail?: boolean;
+}
+
 export interface IUser {
   _id?: ObjectId;
   name: string;
@@ -9,11 +20,15 @@ export interface IUser {
   avatar?: string;
   title?: string;
   bio?: string;
+  primaryDomain?: string;
+  skills?: string[];
   socialLinks?: {
     github?: string;
     twitter?: string;
     website?: string;
+    linkedin?: string;
   };
+  preferences?: IContributorPreferences;
   provider?: string;
   /** SHA-256 hashed refresh tokens — one entry per active device/session */
   refreshTokens: string[];

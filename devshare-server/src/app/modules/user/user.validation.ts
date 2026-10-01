@@ -63,27 +63,41 @@ const socialLoginValidationSchema = z.object({
 // ─── Update Profile ───────────────────────────────────────────────────────────
 
 const updateProfileValidationSchema = z.object({
-  name: z.string().trim().min(2).max(50).optional(),
+  name: z.string().trim().min(2, "Name must be at least 2 characters").max(50).optional(),
   title: z.string().trim().max(100).optional(),
   bio: z.string().trim().max(500).optional(),
-  avatar: z.string().url("Avatar must be a valid URL").optional(),
+  primaryDomain: z.string().trim().max(50).optional(),
+  skills: z.array(z.string().trim().max(30)).max(20).optional(),
+  avatar: z
+    .string()
+    .trim()
+    .refine(
+      (val) =>
+        !val ||
+        val.startsWith("http://") ||
+        val.startsWith("https://") ||
+        val.startsWith("data:image/"),
+      { message: "Avatar must be a valid image URL or base64 string" }
+    )
+    .optional(),
   socialLinks: z
     .object({
-      github: z
-        .string()
-        .url("GitHub link must be a valid URL")
-        .optional()
-        .or(z.literal("")),
-      twitter: z
-        .string()
-        .url("Twitter link must be a valid URL")
-        .optional()
-        .or(z.literal("")),
-      website: z
-        .string()
-        .url("Website link must be a valid URL")
-        .optional()
-        .or(z.literal("")),
+      github: z.string().trim().optional(),
+      twitter: z.string().trim().optional(),
+      linkedin: z.string().trim().optional(),
+      website: z.string().trim().optional(),
+    })
+    .optional(),
+  preferences: z
+    .object({
+      defaultCategory: z.string().trim().optional(),
+      codeFont: z.string().trim().optional(),
+      autoSave: z.boolean().optional(),
+      emailOnComment: z.boolean().optional(),
+      emailOnLike: z.boolean().optional(),
+      weeklyDigest: z.boolean().optional(),
+      showInLeaderboard: z.boolean().optional(),
+      publicEmail: z.boolean().optional(),
     })
     .optional(),
 });
@@ -91,10 +105,10 @@ const updateProfileValidationSchema = z.object({
 const avatarUploadValidationSchema = z.object({
   avatar: z
     .string({ error: "Profile image is required" })
-    .max(1_500_000, "Profile image must be 1 MB or smaller")
-    .regex(
-      /^data:image\/(png|jpe?g|webp|gif);base64,[a-zA-Z0-9+/=]+$/,
-      "Upload a PNG, JPG, WebP, or GIF image"
+    .max(3_500_000, "Profile image must be 3 MB or smaller")
+    .refine(
+      (val) => val.startsWith("data:image/") || val.startsWith("http://") || val.startsWith("https://"),
+      { message: "Upload a valid image" }
     ),
 });
 
@@ -107,6 +121,10 @@ const changePasswordValidationSchema = z.object({
   newPassword: passwordValidator,
 });
 
+const deleteAccountValidationSchema = z.object({
+  password: z.string().optional(),
+});
+
 // ─── Exports ──────────────────────────────────────────────────────────────────
 
 export const UserValidation = {
@@ -116,6 +134,7 @@ export const UserValidation = {
   updateProfileValidationSchema,
   avatarUploadValidationSchema,
   changePasswordValidationSchema,
+  deleteAccountValidationSchema,
 };
 
 export default UserValidation;

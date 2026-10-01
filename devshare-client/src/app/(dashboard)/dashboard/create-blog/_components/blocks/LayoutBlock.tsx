@@ -16,7 +16,7 @@ import {
   ImageIcon,
   GripVertical,
 } from "lucide-react";
-import { BlockType, ColumnData, ColumnItem } from "../type";
+import { BlockType, ColumnData, ColumnItem } from "../../type";
 import { TextBlock } from "./TextBlock";
 import { HeadingBlock, HeadingLevel } from "./HeadingBlock";
 import { ListBlock } from "./ListBlock";

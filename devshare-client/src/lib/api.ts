@@ -1,6 +1,17 @@
 export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
 
+export interface IContributorPreferences {
+  defaultCategory?: "Frontend" | "Backend" | "DevOps" | "AI & Data" | "Security" | string;
+  codeFont?: "jetbrains" | "fira" | "mono" | string;
+  autoSave?: boolean;
+  emailOnComment?: boolean;
+  emailOnLike?: boolean;
+  weeklyDigest?: boolean;
+  showInLeaderboard?: boolean;
+  publicEmail?: boolean;
+}
+
 export interface IUser {
   _id?: string;
   name: string;
@@ -9,11 +20,18 @@ export interface IUser {
   avatar?: string;
   title?: string;
   bio?: string;
+  primaryDomain?: string;
+  skills?: string[];
   socialLinks?: {
     github?: string;
     twitter?: string;
     website?: string;
+    linkedin?: string;
   };
+  preferences?: IContributorPreferences;
+  provider?: string;
+  lastLoginAt?: string;
+  createdAt?: string;
 }
 
 export interface IErrorSource {
@@ -206,6 +224,21 @@ export const changePasswordApi = async (payload: {
   });
 };
 
+export const revokeOtherSessionsApi = async (): Promise<ApiResponse<null>> => {
+  return apiFetch<ApiResponse<null>>("/users/revoke-sessions", {
+    method: "POST",
+  });
+};
+
+export const deleteAccountApi = async (payload?: {
+  password?: string;
+}): Promise<ApiResponse<null>> => {
+  return apiFetch<ApiResponse<null>>("/users/account", {
+    method: "DELETE",
+    body: payload ? JSON.stringify(payload) : undefined,
+  });
+};
+
 // ─── Blog Types & API Endpoints ───────────────────────────────────────────────
 
 export type BlogCategory =
@@ -215,7 +248,19 @@ export type BlogCategory =
   | "AI & Data"
   | "Security";
 
-export type BlogBlockType = "h2" | "p" | "code" | "quote" | "image";
+export type BlogBlockType =
+  | "p"
+  | "h2"
+  | "h3"
+  | "h4"
+  | "h5"
+  | "h6"
+  | "ul"
+  | "ol"
+  | "code"
+  | "quote"
+  | "image"
+  | "layout";
 
 export interface IBlogBlock {
   id: string;

@@ -1,15 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import { User, Shield, Terminal } from "lucide-react";
+import { User, Shield, Sliders } from "lucide-react";
 import ProfileSettings from "./_components/ProfileSettings";
 import AccountSettings from "./_components/AccountSettings";
-import DevSettings from "./_components/DevSettings";
+import PreferencesSettings from "./_components/PreferencesSettings";
 
 const TABS = [
   { id: "profile", label: "Profile", icon: User },
   { id: "account", label: "Security", icon: Shield },
-  { id: "dev", label: "Developer", icon: Terminal },
+  { id: "preferences", label: "Preferences", icon: Sliders },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -19,7 +19,7 @@ export default function SettingsPage() {
 
   return (
     <div className="min-h-screen bg-background text-foreground antialiased selection:bg-foreground selection:text-background">
-      <div className="max-w-8xl mx-auto p-4 sm:p-6 lg:p-8  py-10 sm:py-14 space-y-8">
+      <div className="max-w-8xl mx-auto p-4 sm:p-6 lg:p-8 py-10 sm:py-14 space-y-8">
         
         {/* Page Header */}
         <div className="space-y-1">
@@ -27,12 +27,12 @@ export default function SettingsPage() {
             Settings
           </h1>
           <p className="text-sm text-muted-foreground font-normal">
-            Manage your personal profile details, authentication keys, and editor behavior.
+            Manage your contributor identity, security credentials, and publishing preferences.
           </p>
         </div>
 
         {/* Tab Switcher (Linear / Raycast Style) */}
-        <div className="border-b border-foreground/10  ">
+        <div className="border-b border-foreground/10">
           <nav className="flex gap-6 -mb-px overflow-x-auto scrollbar-none" aria-label="Settings tabs">
             {TABS.map((tab) => {
               const Icon = tab.icon;
@@ -65,7 +65,7 @@ export default function SettingsPage() {
         <div className="pt-2">
           {activeTab === "profile" && <ProfileSettings />}
           {activeTab === "account" && <AccountSettings />}
-          {activeTab === "dev" && <DevSettings />}
+          {activeTab === "preferences" && <PreferencesSettings />}
         </div>
       </div>
     </div>
