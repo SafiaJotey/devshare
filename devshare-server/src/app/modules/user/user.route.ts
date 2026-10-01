@@ -36,6 +36,10 @@ export const AuthRoutes: Router = authRouter;
 
 const userRouter: Router = Router();
 
+// Public contributor routes
+userRouter.get("/contributors", UserController.getTopContributors);
+userRouter.get("/author/:authorId", UserController.getAuthorDetails);
+
 userRouter.get("/me", auth(), UserController.getMe);
 
 userRouter.patch(

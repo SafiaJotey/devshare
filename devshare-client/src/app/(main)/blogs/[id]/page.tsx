@@ -318,6 +318,8 @@ export default function BlogDetails() {
   // Comments
   const [comments, setComments] = useState<IBlogComment[]>([]);
 
+  const fetchedIdRef = useRef<string | null>(null);
+
   // ─── Fetch blog ─────────────────────────────────────────────────────────────
   useEffect(() => {
     const fetchBlog = async () => {
@@ -327,6 +329,9 @@ export default function BlogDetails() {
         setIsLoading(false);
         return;
       }
+
+      if (fetchedIdRef.current === id) return;
+      fetchedIdRef.current = id;
 
       try {
         const response = await getBlogByIdApi(id);

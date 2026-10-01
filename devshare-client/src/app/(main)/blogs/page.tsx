@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import Card, {
   Post,
   CardSkeleton,
@@ -47,8 +48,23 @@ const mapBlogToPost = (b: IBlog): Post => ({
     )}`,
 });
 
-export default function Blogs() {
-  const [activeCategory, setActiveCategory] = useState("All");
+function BlogsContent() {
+  const searchParams = useSearchParams();
+  const categoryParam = searchParams?.get("category");
+
+  const [activeCategory, setActiveCategory] = useState<string>(() => {
+    if (categoryParam && CATEGORY_NAMES.includes(categoryParam)) {
+      return categoryParam;
+    }
+    return "All";
+  });
+
+  // Sync if URL category parameter changes
+  useEffect(() => {
+    if (categoryParam && CATEGORY_NAMES.includes(categoryParam)) {
+      setActiveCategory(categoryParam);
+    }
+  }, [categoryParam]);
   const [searchQuery, setSearchQuery] = useState("");
   const [dbBlogs, setDbBlogs] = useState<IBlog[]>([]);
   const [allDbBlogs, setAllDbBlogs] = useState<IBlog[]>([]);
@@ -128,12 +144,39 @@ export default function Blogs() {
     });
   }, [allDbBlogs]);
 
-  // Lead article: latest published article from DB
+  // Lead article: most read and liked post category-wise (tiebreaker: newest)
   const leadPost = useMemo(() => {
-    if (allDbBlogs.length > 0) return mapBlogToPost(allDbBlogs[0]);
-    if (dbBlogs.length > 0) return mapBlogToPost(dbBlogs[0]);
-    return null;
-  }, [allDbBlogs, dbBlogs]);
+    const candidateList =
+      activeCategory !== "All"
+        ? allDbBlogs.filter((b) => b.category === activeCategory)
+        : allDbBlogs;
+
+    const pool =
+      candidateList.length > 0
+        ? candidateList
+        : activeCategory !== "All"
+        ? dbBlogs
+        : allDbBlogs;
+
+    if (pool.length === 0) {
+      if (dbBlogs.length > 0) return mapBlogToPost(dbBlogs[0]);
+      return null;
+    }
+
+    const sorted = [...pool].sort((a, b) => {
+      const viewsA = a.views ?? 0;
+      const viewsB = b.views ?? 0;
+      if (viewsB !== viewsA) return viewsB - viewsA;
+
+      const likesA = a.likes ?? 0;
+      const likesB = b.likes ?? 0;
+      if (likesB !== likesA) return likesB - likesA;
+
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
+
+    return mapBlogToPost(sorted[0]);
+  }, [allDbBlogs, activeCategory, dbBlogs]);
 
   const hasActiveFilters = activeCategory !== "All" || searchQuery.trim().length > 0;
 
@@ -215,7 +258,7 @@ export default function Blogs() {
     {/* Text Content */}
     <div className="absolute inset-0 flex flex-col justify-end p-6 md:p-10 z-10">
       <span className="text-[11px] font-mono uppercase tracking-[0.3em] text-accent font-semibold mb-3 drop-shadow-sm">
-        Lead Article | {leadPost.tag}
+        {activeCategory !== "All" ? `Top Read & Liked | ${leadPost.tag}` : `Featured | ${leadPost.tag}`}
       </span>
       
       <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-3 tracking-tight leading-snug line-clamp-2 text-white drop-shadow-md">
@@ -474,6 +517,21 @@ export default function Blogs() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function Blogs() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen py-32 flex flex-col items-center justify-center gap-3">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-xs text-muted-foreground font-mono">Loading publications...</p>
+        </div>
+      }
+    >
+      <BlogsContent />
+    </Suspense>
   );
 }
    

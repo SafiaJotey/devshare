@@ -239,6 +239,75 @@ export const deleteAccountApi = async (payload?: {
   });
 };
 
+export interface IContributor {
+  _id: string;
+  name: string;
+  avatar?: string;
+  title?: string;
+  bio?: string;
+  primaryDomain?: string;
+  skills?: string[];
+  socialLinks?: IUser["socialLinks"];
+  totalArticles: number;
+  totalViews: number;
+  totalLikes: number;
+  email?: string;
+}
+
+export interface IAuthorDetailsResponse {
+  author: {
+    _id: string;
+    name: string;
+    username: string;
+    title: string;
+    avatar: string;
+    bio: string;
+    primaryDomain: string;
+    skills: string[];
+    socialLinks: {
+      github?: string;
+      twitter?: string;
+      linkedin?: string;
+      website?: string;
+    };
+    location: string;
+    joinedDate: string;
+    email?: string;
+  };
+  stats: {
+    totalArticles: number;
+    totalViews: number;
+    totalLikes: number;
+    followers: number;
+  };
+  articles: IBlog[];
+}
+
+export const getContributorsApi = async (
+  limit: number = 8
+): Promise<ApiResponse<IContributor[]>> => {
+  return apiFetch<ApiResponse<IContributor[]>>(`/users/contributors?limit=${limit}`, {
+    method: "GET",
+  });
+};
+
+export const getAuthorDetailsApi = async (
+  authorId: string
+): Promise<ApiResponse<IAuthorDetailsResponse>> => {
+  return apiFetch<ApiResponse<IAuthorDetailsResponse>>(
+    `/users/author/${encodeURIComponent(authorId)}`,
+    {
+      method: "GET",
+    }
+  );
+};
+
+export const getCategoryStatsApi = async (): Promise<ApiResponse<Record<string, number>>> => {
+  return apiFetch<ApiResponse<Record<string, number>>>("/blogs/categories/stats", {
+    method: "GET",
+  });
+};
+
 // ─── Blog Types & API Endpoints ───────────────────────────────────────────────
 
 export type BlogCategory =

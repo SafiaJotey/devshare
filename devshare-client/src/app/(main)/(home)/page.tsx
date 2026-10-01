@@ -9,7 +9,13 @@ import Section from "@/components/shared/Section";
 import Card, { Post, CardSkeleton } from "@/components/shared/Card";
 import WriteCTA from "@/components/shared/WriteCTA";
 import HeroSection from "./_components/HeroSection";
-import { getBlogsApi, IBlog } from "@/lib/api";
+import {
+  getBlogsApi,
+  getContributorsApi,
+  getCategoryStatsApi,
+  IBlog,
+  IContributor,
+} from "@/lib/api";
 
 import {
   benefits,
@@ -81,20 +87,61 @@ function FeaturedSideSkeleton() {
 
 export default function Home() {
   const [blogs, setBlogs] = useState<IBlog[]>([]);
+  const [featuredBlogs, setFeaturedBlogs] = useState<IBlog[]>([]);
+  const [contributors, setContributors] = useState<IContributor[]>([]);
+  const [categoryCounts, setCategoryCounts] = useState<Record<string, number>>({});
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
   useEffect(() => {
     let isCancelled = false;
-    const fetchHomeBlogs = async () => {
+    const fetchHomeData = async () => {
       setIsLoading(true);
       try {
-        const res = await getBlogsApi({ limit: 12 });
-        if (!isCancelled && res.success && res.data) {
-          setBlogs(res.data);
+        const [featuredRes, blogsRes, contribRes, catRes] = await Promise.allSettled([
+          getBlogsApi({ sortBy: "featured", limit: 3 }),
+          getBlogsApi({ sortBy: "createdAt", limit: 8 }),
+          getContributorsApi(8),
+          getCategoryStatsApi(),
+        ]);
+
+        if (
+          !isCancelled &&
+          featuredRes.status === "fulfilled" &&
+          featuredRes.value.success &&
+          featuredRes.value.data
+        ) {
+          setFeaturedBlogs(featuredRes.value.data);
+        }
+
+        if (
+          !isCancelled &&
+          blogsRes.status === "fulfilled" &&
+          blogsRes.value.success &&
+          blogsRes.value.data
+        ) {
+          setBlogs(blogsRes.value.data);
+        }
+
+        if (
+          !isCancelled &&
+          contribRes.status === "fulfilled" &&
+          contribRes.value.success &&
+          contribRes.value.data
+        ) {
+          setContributors(contribRes.value.data);
+        }
+
+        if (
+          !isCancelled &&
+          catRes.status === "fulfilled" &&
+          catRes.value.success &&
+          catRes.value.data
+        ) {
+          setCategoryCounts(catRes.value.data);
         }
       } catch (err) {
         if (!isCancelled) {
-          console.warn("Could not fetch home blogs from API:", err);
+          console.warn("Could not fetch home data from API:", err);
         }
       } finally {
         if (!isCancelled) {
@@ -103,16 +150,17 @@ export default function Home() {
       }
     };
 
-    fetchHomeBlogs();
+    fetchHomeData();
     return () => {
       isCancelled = true;
     };
   }, []);
 
-  // Main Lead Featured Post: first blog in DB
+  // Main Lead Featured Post: most read and liked blog from backend
   const activeMainPost = useMemo(() => {
-    if (blogs.length > 0) {
-      const b = blogs[0];
+    const pool = featuredBlogs.length > 0 ? featuredBlogs : blogs;
+    if (pool.length > 0) {
+      const b = pool[0];
       return {
         id: b._id,
         category: b.category,
@@ -136,12 +184,13 @@ export default function Home() {
       };
     }
     return null;
-  }, [blogs]);
+  }, [featuredBlogs, blogs]);
 
-  // Side Featured Posts: blogs 2 & 3
+  // Side Featured Posts: companion top read/liked blogs
   const activeSidePosts = useMemo(() => {
-    if (blogs.length > 1) {
-      return blogs.slice(1, 3).map((b) => ({
+    const pool = featuredBlogs.length > 1 ? featuredBlogs : blogs;
+    if (pool.length > 1) {
+      return pool.slice(1, 3).map((b) => ({
         id: b._id,
         category: b.category,
         title: b.title,
@@ -163,7 +212,7 @@ export default function Home() {
       }));
     }
     return [];
-  }, [blogs]);
+  }, [featuredBlogs, blogs]);
 
   // The Insight Stream posts
   const activeStreamPosts: Post[] = useMemo(() => {
@@ -374,36 +423,39 @@ export default function Home() {
             <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-10 bg-gradient-to-r from-primary/[0.08] to-transparent sm:w-20" />
             <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-10 bg-gradient-to-l from-primary/[0.08] to-transparent sm:w-20" />
             <div className="animate-marquee flex gap-4 px-2 py-3 sm:gap-5">
-            {[...categories, ...categories].map((cat, i) => (
-              <Link
-                key={`${cat.name}-${i}`}
-                href="/blogs"
-                className="group relative flex h-[190px] w-[230px] shrink-0 flex-col overflow-hidden rounded-3xl border border-foreground/10 bg-background p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/25 hover:shadow-xl hover:shadow-primary/10"
-              >
-                <span className="absolute right-5 top-5 font-mono text-[10px] font-bold tracking-widest text-foreground/30">
-                  0{(i % categories.length) + 1}
-                </span>
-                <div className="absolute -bottom-8 -right-8 h-24 w-24 rounded-full bg-primary/[0.05] transition-transform duration-500 group-hover:scale-150" />
+            {[...categories, ...categories].map((cat, i) => {
+              const liveCount = categoryCounts[cat.name] !== undefined ? categoryCounts[cat.name] : cat.count;
+              return (
+                <Link
+                  key={`${cat.name}-${i}`}
+                  href={`/blogs?category=${encodeURIComponent(cat.name)}`}
+                  className="group relative flex h-[190px] w-[230px] shrink-0 flex-col overflow-hidden rounded-3xl border border-foreground/10 bg-background p-5 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/25 hover:shadow-xl hover:shadow-primary/10"
+                >
+                  <span className="absolute right-5 top-5 font-mono text-[10px] font-bold tracking-widest text-foreground/30">
+                    0{(i % categories.length) + 1}
+                  </span>
+                  <div className="absolute -bottom-8 -right-8 h-24 w-24 rounded-full bg-primary/[0.05] transition-transform duration-500 group-hover:scale-150" />
 
-                <div className="relative flex flex-1 flex-col items-start">
-                  <div
-                    className={`mb-5 rounded-2xl p-3 transition-transform duration-300 group-hover:scale-110 ${cat.color}`}
-                  >
-                    {cat.icon}
+                  <div className="relative flex flex-1 flex-col items-start">
+                    <div
+                      className={`mb-5 rounded-2xl p-3 transition-transform duration-300 group-hover:scale-110 ${cat.color}`}
+                    >
+                      {cat.icon}
+                    </div>
+                    <h3 className="text-lg font-bold tracking-tight transition-colors group-hover:text-primary">
+                      {cat.name}
+                    </h3>
+                    <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.15em] text-foreground/45">
+                      {liveCount} {liveCount === 1 ? "article" : "articles"}
+                    </p>
                   </div>
-                  <h3 className="text-lg font-bold tracking-tight transition-colors group-hover:text-primary">
-                    {cat.name}
-                  </h3>
-                  <p className="mt-1 text-[10px] font-bold uppercase tracking-[0.15em] text-foreground/45">
-                    {cat.count} articles
-                  </p>
-                </div>
-                <div className="relative flex items-center gap-1.5 text-xs font-bold text-foreground/55 transition-colors group-hover:text-accent">
-                  Explore topic
-                  <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
-                </div>
-              </Link>
-            ))}
+                  <div className="relative flex items-center gap-1.5 text-xs font-bold text-foreground/55 transition-colors group-hover:text-accent">
+                    Explore topic
+                    <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                  </div>
+                </Link>
+              );
+            })}
             </div>
           </div>
         </div>
@@ -532,55 +584,67 @@ export default function Home() {
           <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-linear-to-r from-primary/6 to-transparent sm:w-32" />
           <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-linear-to-l from-primary/6 to-transparent sm:w-32" />
           <div className="animate-marquee flex gap-5 px-4 py-4 sm:gap-6">
-            {[...authors, ...authors].map((author, i) => (
-              <Link
-                key={`${author.name}-${i}`}
-                href={`/author/${author.name}-${i}`}
-                className="group relative flex w-[290px] shrink-0 flex-col overflow-hidden rounded-3xl border border-foreground/10 bg-background p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/25 hover:shadow-xl hover:shadow-primary/10 sm:w-[320px]"
-              >
-                <div className="absolute right-0 top-0 h-24 w-24 rounded-bl-[4rem] bg-primary/[0.08] transition-colors group-hover:bg-accent/15" />
-                <div className="relative flex items-start justify-between">
-                  <div className="relative h-16 w-16 overflow-hidden rounded-2xl ring-4 ring-primary/10 transition-transform duration-300 group-hover:scale-105">
-                    <Image
-                      src={author.img}
-                      alt={author.name}
-                      fill
-                      sizes="64px"
-                      className="object-cover"
-                      unoptimized
-                    />
-                  </div>
-                  <span className="font-mono text-[10px] font-bold tracking-widest text-foreground/35">
-                    0{(i % authors.length) + 1}
-                  </span>
-                </div>
+            {(contributors.length > 0 ? [...contributors, ...contributors] : [...authors, ...authors]).map((author: any, i) => {
+              const authorId = author._id || author.name;
+              const authorAvatar =
+                author.avatar ||
+                author.img ||
+                `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(author.name)}`;
+              const authorTitle = author.title || author.role || "Technical Contributor";
+              const articlesCount = author.totalArticles !== undefined ? author.totalArticles : author.posts || 0;
+              const domain = author.primaryDomain || "Contributor";
+              const totalCount = contributors.length > 0 ? contributors.length : authors.length;
 
-                <div className="mt-7">
-                  <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-accent">
-                    Top contributor
-                  </p>
-                  <h4 className="mt-2 text-xl font-bold tracking-tight transition-colors group-hover:text-primary">
-                    {author.name}
-                  </h4>
-                  <p className="mt-1 text-sm text-foreground/55">{author.role}</p>
-                </div>
-
-                <div className="mt-7 flex items-end justify-between border-t border-foreground/10 pt-4">
-                  <div>
-                    <span className="block text-2xl font-extrabold leading-none text-primary">
-                      {author.posts}
-                    </span>
-                    <span className="mt-1 block text-[10px] font-bold uppercase tracking-[0.14em] text-foreground/45">
-                      Articles shared
+              return (
+                <Link
+                  key={`${authorId}-${i}`}
+                  href={`/author/${authorId}`}
+                  className="group relative flex w-[290px] shrink-0 flex-col overflow-hidden rounded-3xl border border-foreground/10 bg-background p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/25 hover:shadow-xl hover:shadow-primary/10 sm:w-[320px]"
+                >
+                  <div className="absolute right-0 top-0 h-24 w-24 rounded-bl-[4rem] bg-primary/[0.08] transition-colors group-hover:bg-accent/15" />
+                  <div className="relative flex items-start justify-between">
+                    <div className="relative h-16 w-16 overflow-hidden rounded-2xl ring-4 ring-primary/10 transition-transform duration-300 group-hover:scale-105">
+                      <Image
+                        src={authorAvatar}
+                        alt={author.name}
+                        fill
+                        sizes="64px"
+                        className="object-cover"
+                        unoptimized
+                      />
+                    </div>
+                    <span className="font-mono text-[10px] font-bold tracking-widest text-foreground/35">
+                      0{(i % totalCount) + 1}
                     </span>
                   </div>
-                  <span className="flex items-center gap-1.5 text-xs font-bold text-foreground/60 transition-colors group-hover:text-accent">
-                    Read insights
-                    <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
-                  </span>
-                </div>
-              </Link>
-            ))}
+
+                  <div className="mt-7">
+                    <p className="font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-accent">
+                      {domain}
+                    </p>
+                    <h4 className="mt-2 text-xl font-bold tracking-tight transition-colors group-hover:text-primary">
+                      {author.name}
+                    </h4>
+                    <p className="mt-1 text-sm text-foreground/55 line-clamp-1">{authorTitle}</p>
+                  </div>
+
+                  <div className="mt-7 flex items-end justify-between border-t border-foreground/10 pt-4">
+                    <div>
+                      <span className="block text-2xl font-extrabold leading-none text-primary">
+                        {articlesCount}
+                      </span>
+                      <span className="mt-1 block text-[10px] font-bold uppercase tracking-[0.14em] text-foreground/45">
+                        {articlesCount === 1 ? "Article shared" : "Articles shared"}
+                      </span>
+                    </div>
+                    <span className="flex items-center gap-1.5 text-xs font-bold text-foreground/60 transition-colors group-hover:text-accent">
+                      Read insights
+                      <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                    </span>
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       </section>

@@ -2,6 +2,7 @@ import { ObjectId } from "mongodb";
 import httpStatus from "http-status";
 import AppError from "../../errors/AppError";
 import { getUserCollection } from "./user.model";
+import { getBlogCollection } from "../blog/blog.model";
 import {
   IChangePasswordPayload,
   ILoginUserPayload,
@@ -549,6 +550,227 @@ const deleteAccount = async (userId: string, password?: string): Promise<void> =
   await collection.deleteOne({ _id: new ObjectId(userId) });
 };
 
+const getTopContributors = async (limit: number = 8) => {
+  const userCollection = getUserCollection();
+  const blogCollection = getBlogCollection();
+
+  // Find active users
+  const users = await userCollection
+    .find({
+      isActive: true,
+      "preferences.showInLeaderboard": { $ne: false },
+    })
+    .project({
+      password: 0,
+      refreshTokens: 0,
+    })
+    .toArray();
+
+  // Aggregate published blogs per author
+  const blogCounts = await blogCollection
+    .aggregate([
+      { $match: { status: "Published" } },
+      {
+        $group: {
+          _id: "$authorId",
+          authorName: { $first: "$author.name" },
+          authorAvatar: { $first: "$author.avatar" },
+          authorTitle: { $first: "$author.title" },
+          totalArticles: { $sum: 1 },
+          totalViews: { $sum: "$views" },
+          totalLikes: { $sum: "$likes" },
+        },
+      },
+      { $sort: { totalArticles: -1, totalViews: -1 } },
+    ])
+    .toArray();
+
+  const blogStatsMap = new Map<string, any>();
+  for (const b of blogCounts) {
+    if (b._id) {
+      blogStatsMap.set(b._id.toString(), b);
+    }
+  }
+
+  // Combine user info with blog stats
+  const contributors: any[] = users.map((u) => {
+    const stats = blogStatsMap.get(u._id!.toString());
+    return {
+      _id: u._id!.toString(),
+      name: u.name,
+      avatar:
+        u.avatar ||
+        `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(u.name)}`,
+      title: u.title || "Developer & Contributor",
+      bio: u.bio || "",
+      primaryDomain: u.primaryDomain || "Frontend",
+      skills: u.skills || [],
+      socialLinks: u.socialLinks || {},
+      totalArticles: stats ? stats.totalArticles : 0,
+      totalViews: stats ? stats.totalViews : 0,
+      totalLikes: stats ? stats.totalLikes : 0,
+      email: u.preferences?.publicEmail ? u.email : undefined,
+    };
+  });
+
+  // Also include any author from blogs who might not have a direct user profile
+  for (const b of blogCounts) {
+    const exists = contributors.some(
+      (c) =>
+        c._id === b._id?.toString() ||
+        c.name.toLowerCase() === b.authorName?.toLowerCase()
+    );
+    if (!exists && b.authorName) {
+      contributors.push({
+        _id: b._id ? b._id.toString() : b.authorName.toLowerCase().replace(/\s+/g, "-"),
+        name: b.authorName,
+        avatar:
+          b.authorAvatar ||
+          `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
+            b.authorName
+          )}`,
+        title: b.authorTitle || "Technical Author",
+        bio: "Writing and building in public on DevShare.",
+        primaryDomain: "Frontend",
+        skills: ["Software Engineering"],
+        socialLinks: {},
+        totalArticles: b.totalArticles,
+        totalViews: b.totalViews,
+        totalLikes: b.totalLikes,
+        email: undefined,
+      });
+    }
+  }
+
+  // Sort: highest article count first, then by views
+  contributors.sort(
+    (a, b) => b.totalArticles - a.totalArticles || b.totalViews - a.totalViews
+  );
+
+  return contributors.slice(0, limit);
+};
+
+const getAuthorDetails = async (authorId: string) => {
+  const userCollection = getUserCollection();
+  const blogCollection = getBlogCollection();
+
+  let user: IUser | null = null;
+  if (ObjectId.isValid(authorId)) {
+    user = await userCollection.findOne({ _id: new ObjectId(authorId) });
+  }
+
+  // If not found by ObjectId, try searching by name or username
+  if (!user) {
+    const cleanName = decodeURIComponent(authorId).replace(/-/g, " ");
+    user = await userCollection.findOne({
+      name: { $regex: new RegExp(`^${cleanName}$`, "i") },
+    });
+  }
+
+  // Query published articles by this author
+  const blogQueryConditions: any[] = [];
+  if (user?._id) {
+    blogQueryConditions.push({ authorId: user._id });
+    blogQueryConditions.push({ "author.id": user._id.toString() });
+  }
+  if (ObjectId.isValid(authorId)) {
+    blogQueryConditions.push({ authorId: new ObjectId(authorId) });
+    blogQueryConditions.push({ "author.id": authorId });
+  }
+  const cleanName = decodeURIComponent(authorId).replace(/-/g, " ");
+  blogQueryConditions.push({
+    "author.name": { $regex: new RegExp(`^${cleanName}$`, "i") },
+  });
+  if (user?.name) {
+    blogQueryConditions.push({
+      "author.name": { $regex: new RegExp(`^${user.name}$`, "i") },
+    });
+  }
+
+  const articles = await blogCollection
+    .find({
+      $or: blogQueryConditions,
+      status: "Published",
+    })
+    .sort({ createdAt: -1 })
+    .toArray();
+
+  const totalViews = articles.reduce((acc, a) => acc + (a.views || 0), 0);
+  const totalLikes = articles.reduce((acc, a) => acc + (a.likes || 0), 0);
+
+  // If user found in users collection
+  if (user) {
+    return {
+      author: {
+        _id: user._id!.toString(),
+        name: user.name,
+        username: user.email.split("@")[0],
+        title: user.title || "Developer & Contributor",
+        avatar:
+          user.avatar ||
+          `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name)}`,
+        bio: user.bio || "Sharing technical insights and architectures on DevShare.",
+        primaryDomain: user.primaryDomain || "Frontend",
+        skills:
+          user.skills && user.skills.length > 0
+            ? user.skills
+            : ["Software Engineering", "Full-Stack"],
+        socialLinks: user.socialLinks || {},
+        location: "Global / Remote",
+        joinedDate: user.createdAt
+          ? `Member since ${new Date(user.createdAt).toLocaleDateString("en-US", {
+              month: "short",
+              year: "numeric",
+            })}`
+          : "DevShare Contributor",
+        email: user.preferences?.publicEmail ? user.email : undefined,
+      },
+      stats: {
+        totalArticles: articles.length,
+        totalViews,
+        totalLikes,
+        followers: Math.floor(totalLikes * 0.4) + 12,
+      },
+      articles,
+    };
+  }
+
+  // If user not in users collection, check if articles exist with this author name
+  if (articles.length > 0) {
+    const firstArt = articles[0];
+    const authorName = firstArt.author?.name || cleanName;
+    return {
+      author: {
+        _id: authorId,
+        name: authorName,
+        username: authorName.toLowerCase().replace(/\s+/g, ""),
+        title: firstArt.author?.title || "Technical Author",
+        avatar:
+          firstArt.author?.avatar ||
+          `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(
+            authorName
+          )}`,
+        bio: "Writing in-depth engineering breakdowns and technical tutorials on DevShare.",
+        primaryDomain: firstArt.category || "Frontend",
+        skills: ["Architecture", "Engineering", firstArt.category],
+        socialLinks: {},
+        location: "Global / Remote",
+        joinedDate: "DevShare Contributor",
+        email: undefined,
+      },
+      stats: {
+        totalArticles: articles.length,
+        totalViews,
+        totalLikes,
+        followers: Math.floor(totalLikes * 0.4) + 12,
+      },
+      articles,
+    };
+  }
+
+  throw new AppError(httpStatus.NOT_FOUND, "Contributor not found");
+};
+
 export const UserService = {
   registerUser,
   loginUser,
@@ -557,6 +779,8 @@ export const UserService = {
   logoutUser,
   revokeOtherSessions,
   deleteAccount,
+  getTopContributors,
+  getAuthorDetails,
   changePassword,
   getMe,
   updateProfile,

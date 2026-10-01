@@ -29,7 +29,35 @@ const getAllBlogs = catchAsync(async (req: Request, res: Response) => {
 
 const getBlogById = catchAsync(async (req: Request, res: Response) => {
   const { id } = req.params;
-  const result = await BlogService.getBlogByIdOrSlug(id as string);
+
+  // Track viewed articles in cookie to prevent duplicate view increments
+  const viewedCookie = req.cookies?.devshare_viewed_articles;
+  let viewedList: string[] = [];
+  if (viewedCookie) {
+    try {
+      viewedList = typeof viewedCookie === "string" ? JSON.parse(viewedCookie) : viewedCookie;
+      if (!Array.isArray(viewedList)) viewedList = [];
+    } catch {
+      viewedList = typeof viewedCookie === "string" ? viewedCookie.split(",") : [];
+    }
+  }
+
+  const alreadyViewed = viewedList.includes(id);
+  const result = await BlogService.getBlogByIdOrSlug(id as string, !alreadyViewed);
+
+  // If not previously viewed and blog found, update cookie with blog id and slug (24h window)
+  if (!alreadyViewed && result) {
+    const idsToAdd = [id];
+    if (result._id) idsToAdd.push(result._id.toString());
+    if (result.slug) idsToAdd.push(result.slug);
+
+    const updatedViewed = Array.from(new Set([...viewedList, ...idsToAdd])).slice(-100);
+    res.cookie("devshare_viewed_articles", JSON.stringify(updatedViewed), {
+      maxAge: 24 * 60 * 60 * 1000,
+      httpOnly: true,
+      sameSite: "lax",
+    });
+  }
 
   sendResponse(res, {
     statusCode: httpStatus.OK,
@@ -191,6 +219,17 @@ const getBlogInteractionState = catchAsync(async (req: Request, res: Response) =
   });
 });
 
+const getCategoryStats = catchAsync(async (_req: Request, res: Response) => {
+  const result = await BlogService.getCategoryStats();
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Category counts retrieved successfully",
+    data: result,
+  });
+});
+
 export const BlogController = {
   createBlog,
   getAllBlogs,
@@ -205,6 +244,7 @@ export const BlogController = {
   deleteComment,
   getRelatedBlogs,
   getBlogInteractionState,
+  getCategoryStats,
 };
 
 export default BlogController;

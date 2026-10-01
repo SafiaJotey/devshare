@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import { useParams } from "next/navigation";
 import {
   Eye,
   Heart,
@@ -26,133 +27,17 @@ import {
   Mail,
   UserPlus,
   UserCheck,
+  Loader2,
+  ArrowLeft,
+  BookOpen,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-// ─── TYPES ───────────────────────────────────────────────────────────
-interface IAuthor {
-  name: string;
-  username: string;
-  title: string;
-  company: string;
-  avatar: string;
-  bio: string;
-  location: string;
-  joinedDate: string;
-  website: string;
-  socials: {
-    github?: string;
-    twitter?: string;
-    linkedin?: string;
-  };
-  skills: string[];
-  stats: {
-    totalArticles: number;
-    totalViews: number;
-    totalLikes: number;
-    followers: number;
-  };
-}
-
-interface IAuthorArticle {
-  id: string;
-  title: string;
-  description: string;
-  slug: string;
-  publishedAt: string;
-  readTime: string;
-  category: "Frontend" | "Backend" | "DevOps" | "AI & Data" | "Security";
-  views: number;
-  likes: number;
-  featured?: boolean;
-}
-
-// ─── MOCK DATA ───────────────────────────────────────────────────────
-const MOCK_AUTHOR: IAuthor = {
-  name: "Alex Sterling",
-  username: "asterling",
-  title: "Principal Distributed Systems Engineer",
-  company: "CloudNative Labs",
-  avatar:
-    "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80",
-  bio: "Writing about resilient backend microservices, high-throughput message brokers, and distributed caching in Go and Rust. Advocate for open telemetry and zero-trust infrastructure.",
-  location: "San Francisco, CA (Remote)",
-  joinedDate: "Member since Jan 2024",
-  website: "https://asterling.dev",
-  socials: {
-    github: "https://github.com",
-    twitter: "https://x.com",
-    linkedin: "https://linkedin.com",
-  },
-  skills: [
-    "Distributed Systems",
-    "Go",
-    "Rust",
-    "Kubernetes",
-    "Kafka",
-    "PostgreSQL",
-    "Next.js 15",
-    "Zero-Trust",
-  ],
-  stats: {
-    totalArticles: 24,
-    totalViews: 384500,
-    totalLikes: 14200,
-    followers: 3890,
-  },
-};
-
-const MOCK_ARTICLES: IAuthorArticle[] = [
-  {
-    id: "1",
-    title: "Architecting a Multi-Region Distributed Cache with Raft Consensus",
-    description:
-      "A deep dive into partition tolerance, consensus leader elections, and minimizing replication lag across transatlantic AWS regions.",
-    slug: "architecting-multi-region-distributed-cache",
-    publishedAt: "Oct 12, 2025",
-    readTime: "9 min read",
-    category: "Backend",
-    views: 84200,
-    likes: 3100,
-    featured: true,
-  },
-  {
-    id: "2",
-    title: "Zero-Allocation JSON Parsing in High-Throughput Go Microservices",
-    description:
-      "How to avoid garbage collector latency spikes by leveraging buffer pooling and unsafe pointer memory manipulation under heavy load.",
-    slug: "zero-allocation-json-parsing-go",
-    publishedAt: "Sep 28, 2025",
-    readTime: "6 min read",
-    category: "Backend",
-    views: 42100,
-    likes: 1840,
-  },
-  {
-    id: "3",
-    title: "Building Deterministic State Machines for Edge IoT Devices in Rust",
-    description:
-      "Handling sporadic disconnects and unreliable sensory inputs without running out of constrained SRAM allocations.",
-    slug: "deterministic-state-machines-edge-rust",
-    publishedAt: "Aug 15, 2025",
-    readTime: "11 min read",
-    category: "DevOps",
-    views: 31800,
-    likes: 1240,
-  },
-  {
-    id: "4",
-    title: "Modern Next.js 15 Partial Prerendering (PPR) Architecture Patterns",
-    description:
-      "A practical case study combining static shell CDN distribution with streaming dynamic islands for authenticated developer portals.",
-    slug: "nextjs-15-ppr-architecture-patterns",
-    publishedAt: "Jul 02, 2025",
-    readTime: "7 min read",
-    category: "Frontend",
-    views: 65400,
-    likes: 2980,
-  },
-];
+import { toast } from "sonner";
+import {
+  getAuthorDetailsApi,
+  IAuthorDetailsResponse,
+  IBlog,
+} from "@/lib/api";
 
 const CATEGORY_MAP: Record<
   string,
@@ -190,9 +75,18 @@ const CATEGORY_MAP: Record<
   },
 };
 
+const CATEGORIES = ["All", "Frontend", "Backend", "DevOps", "AI & Data", "Security"];
+
 export default function AuthorDetailsPage() {
-  const [author] = useState<IAuthor>(MOCK_AUTHOR);
-  const [articles] = useState<IAuthorArticle[]>(MOCK_ARTICLES);
+  const params = useParams();
+  const authorId = params?.authorId as string;
+
+  const [author, setAuthor] = useState<IAuthorDetailsResponse["author"] | null>(null);
+  const [stats, setStats] = useState<IAuthorDetailsResponse["stats"] | null>(null);
+  const [articles, setArticles] = useState<IBlog[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [isFollowing, setIsFollowing] = useState(false);
@@ -200,6 +94,37 @@ export default function AuthorDetailsPage() {
   const [bookmarkedArticles, setBookmarkedArticles] = useState<string[]>([]);
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [isSubscribed, setIsSubscribed] = useState(false);
+
+  useEffect(() => {
+    if (!authorId) return;
+
+    let isCancelled = false;
+    const fetchAuthor = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const res = await getAuthorDetailsApi(authorId);
+        if (!isCancelled && res.success && res.data) {
+          setAuthor(res.data.author);
+          setStats(res.data.stats);
+          setArticles(res.data.articles || []);
+        }
+      } catch (err: any) {
+        if (!isCancelled) {
+          setError(err.message || "Failed to load author profile.");
+        }
+      } finally {
+        if (!isCancelled) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    fetchAuthor();
+    return () => {
+      isCancelled = true;
+    };
+  }, [authorId]);
 
   const formatNumber = (num: number) => {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + "M";
@@ -211,6 +136,7 @@ export default function AuthorDetailsPage() {
     if (typeof window !== "undefined") {
       navigator.clipboard.writeText(window.location.href);
       setCopiedLink(true);
+      toast.success("Profile link copied to clipboard");
       setTimeout(() => setCopiedLink(false), 2000);
     }
   };
@@ -227,6 +153,7 @@ export default function AuthorDetailsPage() {
     e.preventDefault();
     if (!newsletterEmail) return;
     setIsSubscribed(true);
+    toast.success(`Subscribed to ${author?.name || "author"}'s publications!`);
     setTimeout(() => {
       setNewsletterEmail("");
     }, 2000);
@@ -244,13 +171,78 @@ export default function AuthorDetailsPage() {
     });
   }, [articles, selectedCategory, searchQuery]);
 
-  const categories = ["All", "Backend", "Frontend", "DevOps", "AI & Data"];
+  // Featured top article by views
+  const featuredArticle = useMemo(() => {
+    if (articles.length === 0) return null;
+    return [...articles].sort((a, b) => (b.views || 0) - (a.views || 0))[0];
+  }, [articles]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen pb-20">
+        <div className="h-48 sm:h-64 w-full bg-muted/40 animate-pulse" />
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
+          <div className="relative -mt-16 sm:-mt-20 mb-8 flex items-end gap-5">
+            <div className="h-28 w-28 sm:h-32 sm:w-32 rounded-3xl bg-muted animate-pulse" />
+            <div className="space-y-2 pb-2">
+              <div className="h-7 w-48 bg-muted rounded-lg animate-pulse" />
+              <div className="h-4 w-72 bg-muted/60 rounded animate-pulse" />
+            </div>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 pt-4">
+            <div className="lg:col-span-2 space-y-4">
+              <div className="h-24 bg-muted/40 rounded-2xl animate-pulse" />
+              <div className="h-40 bg-muted/30 rounded-2xl animate-pulse" />
+            </div>
+            <div className="space-y-4">
+              <div className="h-40 bg-muted/40 rounded-2xl animate-pulse" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !author) {
+    return (
+      <div className="min-h-[70vh] flex flex-col items-center justify-center px-4 text-center">
+        <div className="w-16 h-16 rounded-full bg-destructive/10 text-destructive flex items-center justify-center mb-4">
+          <BookOpen size={28} />
+        </div>
+        <h2 className="text-2xl font-bold text-foreground">Contributor Not Found</h2>
+        <p className="text-sm text-muted-foreground max-w-md mt-2 mb-6">
+          {error || "We couldn't find an author profile matching this ID or username."}
+        </p>
+        <div className="flex items-center gap-3">
+          <Link href="/">
+            <Button variant="outline" size="sm" className="gap-2">
+              <ArrowLeft size={14} />
+              Return Home
+            </Button>
+          </Link>
+          <Link href="/blogs">
+            <Button size="sm" className="gap-2">
+              Browse Articles
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  const cleanDomain = author.primaryDomain || "Frontend";
+  const domainConfig = CATEGORY_MAP[cleanDomain] || {
+    icon: Layers,
+    color: "text-primary",
+    bg: "bg-primary/10",
+    border: "border-primary/20",
+  };
+  const DomainIcon = domainConfig.icon;
 
   return (
     <div className="min-h-screen pb-20">
       {/* ─── 1. AMBIENT HERO BANNER ────────────────────────────────────────── */}
       <div className="relative h-48 sm:h-64 w-full overflow-hidden border-b border-foreground/[0.08] bg-gradient-to-r from-primary/15 via-primary/5 to-transparent">
-        {/* Generative tech grid with radial mask fade */}
         <div
           className="absolute inset-0 opacity-[0.04] dark:opacity-[0.06] [mask-image:linear-gradient(to_bottom,black_60%,transparent_100%)] pointer-events-none"
           style={{
@@ -258,48 +250,52 @@ export default function AuthorDetailsPage() {
             backgroundSize: "24px 24px",
           }}
         />
-        {/* Ambient glow flares */}
         <div className="pointer-events-none absolute -right-16 -top-16 h-96 w-96 rounded-full bg-primary/20 blur-3xl" />
         <div className="pointer-events-none absolute -left-16 bottom-0 h-64 w-64 rounded-full bg-emerald-500/10 blur-3xl" />
       </div>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6">
-        {/* ─── 2. AUTHOR IDENTITY BAR (OVERLAPPING BANNER) ─────────────────── */}
+        {/* ─── 2. AUTHOR IDENTITY BAR ─────────────────────────────────────── */}
         <div className="relative -mt-16 sm:-mt-20 mb-8 z-10 flex flex-col sm:flex-row sm:items-end justify-between gap-5 pb-6 border-b border-foreground/[0.08]">
           <div className="flex flex-col sm:flex-row sm:items-end gap-5">
             {/* Avatar with Verified Ring */}
             <div className="relative shrink-0">
-              <div className="h-28 w-28 sm:h-32 sm:w-32 rounded-3xl p-1 bg-background border-2 border-foreground/10 shadow-xl overflow-hidden">
-                <img
-                  src={author.avatar}
-                  alt={author.name}
-                  className="h-full w-full object-cover rounded-[22px]"
-                />
+              <div className="h-28 w-28 sm:h-32 sm:w-32 rounded-3xl p-1 bg-background border-2 border-foreground/10 shadow-xl overflow-hidden flex items-center justify-center">
+                {author.avatar ? (
+                  <img
+                    src={author.avatar}
+                    alt={author.name}
+                    className="h-full w-full object-cover rounded-[22px]"
+                  />
+                ) : (
+                  <span className="text-3xl font-mono font-bold text-muted-foreground uppercase">
+                    {author.name.slice(0, 2)}
+                  </span>
+                )}
               </div>
               <div
                 className="absolute -bottom-1 -right-1 h-7 w-7 rounded-full bg-primary text-primary-foreground border-2 border-background flex items-center justify-center shadow-md"
-                title="Verified Technical Contributor"
+                title="Verified Contributor"
               >
                 <CheckCircle2 size={15} strokeWidth={2.5} />
               </div>
             </div>
 
-            {/* Author Name & Handle */}
+            {/* Author Name & Byline */}
             <div className="space-y-1">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-wrap items-center gap-2">
                 <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
                   {author.name}
                 </h1>
-                <span className="text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-                  Staff Author
+                <span
+                  className={`inline-flex items-center gap-1 text-[11px] font-mono font-semibold px-2.5 py-0.5 rounded-full border ${domainConfig.bg} ${domainConfig.color} ${domainConfig.border}`}
+                >
+                  <DomainIcon size={12} />
+                  {cleanDomain} Contributor
                 </span>
               </div>
-              <p className="text-xs sm:text-sm font-mono text-foreground/50">
-                @{author.username} &bull;{" "}
-                <span className="text-foreground/80">{author.title}</span> at{" "}
-                <span className="font-semibold text-foreground">
-                  {author.company}
-                </span>
+              <p className="text-xs sm:text-sm font-medium text-foreground/70">
+                {author.title || "Technical Contributor"}
               </p>
             </div>
           </div>
@@ -326,7 +322,14 @@ export default function AuthorDetailsPage() {
             </Button>
 
             <Button
-              onClick={() => setIsFollowing(!isFollowing)}
+              onClick={() => {
+                setIsFollowing(!isFollowing);
+                toast.success(
+                  isFollowing
+                    ? `Unfollowed ${author.name}`
+                    : `Following ${author.name}`
+                );
+              }}
               size="sm"
               className={`h-9 px-4 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
                 isFollowing
@@ -353,46 +356,113 @@ export default function AuthorDetailsPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
           <div className="lg:col-span-2 space-y-4">
             <p className="text-sm sm:text-base leading-relaxed text-foreground/80 font-normal">
-              {author.bio}
+              {author.bio ||
+                "Technical contributor on DevShare, publishing articles and engineering insights."}
             </p>
 
             {/* Author Meta Details */}
             <div className="flex flex-wrap items-center gap-y-2 gap-x-5 text-xs text-foreground/50 font-mono">
               <span className="flex items-center gap-1.5">
                 <MapPin size={13} className="text-foreground/40" />
-                {author.location}
+                {author.location || "Global"}
               </span>
               <span className="flex items-center gap-1.5">
                 <Calendar size={13} className="text-foreground/40" />
                 {author.joinedDate}
               </span>
-              <a
-                href={author.website}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-1.5 text-primary hover:underline"
-              >
-                <Globe size={13} />
-                {author.website.replace("https://", "")}
-              </a>
+              {author.socialLinks?.website && (
+                <a
+                  href={
+                    author.socialLinks.website.startsWith("http")
+                      ? author.socialLinks.website
+                      : `https://${author.socialLinks.website}`
+                  }
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-1.5 text-primary hover:underline"
+                >
+                  <Globe size={13} />
+                  {author.socialLinks.website.replace(/^https?:\/\//, "")}
+                </a>
+              )}
+            </div>
+
+            {/* Social Links Row */}
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-xs">
+              {author.socialLinks?.github && (
+                <a
+                  href={
+                    author.socialLinks.github.startsWith("http")
+                      ? author.socialLinks.github
+                      : `https://github.com/${author.socialLinks.github.replace(/^@/, "")}`
+                  }
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-2.5 py-1 rounded-lg border border-foreground/10 bg-muted/40 hover:border-foreground/30 text-foreground transition-colors flex items-center gap-1.5"
+                >
+                  <span className="font-medium">GitHub</span>
+                  <ArrowUpRight size={11} className="opacity-50" />
+                </a>
+              )}
+              {author.socialLinks?.twitter && (
+                <a
+                  href={
+                    author.socialLinks.twitter.startsWith("http")
+                      ? author.socialLinks.twitter
+                      : `https://x.com/${author.socialLinks.twitter.replace(/^@/, "")}`
+                  }
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-2.5 py-1 rounded-lg border border-foreground/10 bg-muted/40 hover:border-foreground/30 text-foreground transition-colors flex items-center gap-1.5"
+                >
+                  <span className="font-medium">X / Twitter</span>
+                  <ArrowUpRight size={11} className="opacity-50" />
+                </a>
+              )}
+              {author.socialLinks?.linkedin && (
+                <a
+                  href={
+                    author.socialLinks.linkedin.startsWith("http")
+                      ? author.socialLinks.linkedin
+                      : `https://linkedin.com/in/${author.socialLinks.linkedin}`
+                  }
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-2.5 py-1 rounded-lg border border-foreground/10 bg-muted/40 hover:border-foreground/30 text-foreground transition-colors flex items-center gap-1.5"
+                >
+                  <span className="font-medium">LinkedIn</span>
+                  <ArrowUpRight size={11} className="opacity-50" />
+                </a>
+              )}
+              {author.email && (
+                <a
+                  href={`mailto:${author.email}`}
+                  className="px-2.5 py-1 rounded-lg border border-foreground/10 bg-muted/40 hover:border-foreground/30 text-foreground transition-colors flex items-center gap-1.5"
+                >
+                  <Mail size={12} className="opacity-70" />
+                  <span className="font-medium">Contact</span>
+                </a>
+              )}
             </div>
 
             {/* Core Tech Stack Badges */}
-            <div className="pt-2">
-              <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-foreground/40 block mb-2">
-                Specialized Domains & Stacks
-              </span>
-              <div className="flex flex-wrap gap-1.5">
-                {author.skills.map((skill) => (
-                  <span
-                    key={skill}
-                    className="px-2.5 py-1 rounded-lg border border-foreground/[0.08] bg-foreground/[0.02] hover:border-foreground/20 text-xs font-mono font-medium text-foreground/70 transition-colors"
-                  >
-                    #{skill}
-                  </span>
-                ))}
+            {author.skills && author.skills.length > 0 && (
+              <div className="pt-2">
+                <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-foreground/40 block mb-2">
+                  Specialized Stack & Technical Tags
+                </span>
+                <div className="flex flex-wrap gap-1.5">
+                  {author.skills.map((skill) => (
+                    <span
+                      key={skill}
+                      className="px-2.5 py-1 rounded-lg border border-foreground/[0.08] bg-foreground/[0.02] hover:border-foreground/20 text-xs font-mono font-medium text-foreground/70 transition-colors"
+                    >
+                      #{skill}
+                    </span>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
           {/* Quick Metrics Bar */}
@@ -403,9 +473,9 @@ export default function AuthorDetailsPage() {
               </span>
               <div className="flex items-baseline gap-1 mt-1">
                 <h4 className="font-mono text-2xl font-black text-foreground tabular-nums">
-                  {author.stats.totalArticles}
+                  {stats?.totalArticles ?? 0}
                 </h4>
-                <span className="text-[11px] text-foreground/40 font-mono">live</span>
+                <span className="text-[11px] text-foreground/40 font-mono">shared</span>
               </div>
             </div>
 
@@ -415,7 +485,7 @@ export default function AuthorDetailsPage() {
               </span>
               <div className="flex items-baseline gap-1 mt-1">
                 <h4 className="font-mono text-2xl font-black text-foreground tabular-nums">
-                  {formatNumber(author.stats.totalViews)}
+                  {formatNumber(stats?.totalViews ?? 0)}
                 </h4>
               </div>
             </div>
@@ -426,7 +496,7 @@ export default function AuthorDetailsPage() {
               </span>
               <div className="flex items-baseline gap-1 mt-1">
                 <h4 className="font-mono text-2xl font-black text-foreground tabular-nums">
-                  {formatNumber(author.stats.totalLikes)}
+                  {formatNumber(stats?.totalLikes ?? 0)}
                 </h4>
                 <span className="text-[11px] text-red-500 font-mono">likes</span>
               </div>
@@ -438,7 +508,7 @@ export default function AuthorDetailsPage() {
               </span>
               <div className="flex items-baseline gap-1 mt-1">
                 <h4 className="font-mono text-2xl font-black text-foreground tabular-nums">
-                  {formatNumber(author.stats.followers)}
+                  {formatNumber(stats?.followers ?? 12)}
                 </h4>
                 <span className="text-[11px] text-foreground/40 font-mono">peers</span>
               </div>
@@ -454,7 +524,7 @@ export default function AuthorDetailsPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2 border-b border-foreground/[0.08]">
               {/* Category Pills */}
               <div className="flex flex-wrap items-center gap-1.5">
-                {categories.map((cat) => (
+                {CATEGORIES.map((cat) => (
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
@@ -497,11 +567,19 @@ export default function AuthorDetailsPage() {
                       border: "border-foreground/10",
                     };
                   const CategoryIcon = CategoryConfig.icon;
-                  const isSaved = bookmarkedArticles.includes(article.id);
+                  const isSaved = bookmarkedArticles.includes(article._id);
+                  const publishedDate = new Date(article.createdAt).toLocaleDateString(
+                    "en-US",
+                    {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    }
+                  );
 
                   return (
                     <article
-                      key={article.id}
+                      key={article._id}
                       className="group relative p-5 sm:p-6 rounded-2xl border border-foreground/[0.08] bg-foreground/[0.02] hover:bg-foreground/[0.03] hover:border-primary/30 transition-all duration-200 shadow-xs"
                     >
                       <div className="flex items-center justify-between gap-2 mb-2">
@@ -515,17 +593,17 @@ export default function AuthorDetailsPage() {
 
                           <span className="text-[11px] font-mono text-foreground/40 flex items-center gap-1">
                             <Clock size={11} />
-                            {article.readTime}
+                            {article.readTime || "5 min read"}
                           </span>
 
                           <span className="text-[11px] font-mono text-foreground/30">
-                            &bull; {article.publishedAt}
+                            &bull; {publishedDate}
                           </span>
                         </div>
 
                         {/* Interactive Bookmark Button */}
                         <button
-                          onClick={(e) => toggleBookmark(article.id, e)}
+                          onClick={(e) => toggleBookmark(article._id, e)}
                           className="text-foreground/30 hover:text-foreground p-1 transition-colors cursor-pointer"
                           title={isSaved ? "Saved" : "Save article"}
                         >
@@ -538,7 +616,7 @@ export default function AuthorDetailsPage() {
                         </button>
                       </div>
 
-                      <Link href={`/blogs/${article.slug}`}>
+                      <Link href={`/blogs/${article.slug || article._id}`}>
                         <h3 className="text-base sm:text-lg font-bold text-foreground group-hover:text-primary transition-colors tracking-tight line-clamp-2 mb-1.5">
                           {article.title}
                         </h3>
@@ -553,19 +631,19 @@ export default function AuthorDetailsPage() {
                         <div className="flex items-center gap-4">
                           <span className="flex items-center gap-1.5">
                             <Eye size={13} className="text-blue-500" />
-                            {formatNumber(article.views)}
+                            {formatNumber(article.views || 0)}
                           </span>
                           <span className="flex items-center gap-1.5">
                             <Heart size={13} className="text-red-500" />
-                            {formatNumber(article.likes)}
+                            {formatNumber(article.likes || 0)}
                           </span>
                         </div>
 
                         <Link
-                          href={`/blogs/${article.slug}`}
+                          href={`/blogs/${article.slug || article._id}`}
                           className="inline-flex items-center gap-1 text-xs font-semibold text-primary group-hover:underline"
                         >
-                          <span>Read Deep-Dive</span>
+                          <span>Read Article</span>
                           <ArrowUpRight size={13} />
                         </Link>
                       </div>
@@ -579,40 +657,42 @@ export default function AuthorDetailsPage() {
                   No matching publications found
                 </p>
                 <p className="text-xs text-foreground/40 mt-1">
-                  Try adjusting your search keyword or selected category tab.
+                  Try selecting another category or clearing your search term.
                 </p>
               </div>
             )}
           </div>
 
-          {/* RIGHT 1 COLUMN: SIDEBAR (Credentials, Newsletter, Pinned) */}
+          {/* RIGHT 1 COLUMN: SIDEBAR */}
           <div className="space-y-6">
             {/* Pinned Top-Read Story */}
-            <div className="p-5 rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/10 via-card to-card relative overflow-hidden">
-              <div className="flex items-center gap-1.5 text-primary text-xs font-mono font-semibold mb-2">
-                <Sparkles size={13} />
-                <span>Featured Masterpiece</span>
+            {featuredArticle && (
+              <div className="p-5 rounded-2xl border border-primary/25 bg-gradient-to-br from-primary/10 via-card to-card relative overflow-hidden">
+                <div className="flex items-center gap-1.5 text-primary text-xs font-mono font-semibold mb-2">
+                  <Sparkles size={13} />
+                  <span>Top Read Publication</span>
+                </div>
+                <h4 className="font-bold text-sm text-foreground mb-1.5 line-clamp-2">
+                  {featuredArticle.title}
+                </h4>
+                <p className="text-xs text-foreground/60 line-clamp-2 mb-3">
+                  {featuredArticle.description}
+                </p>
+                <Link
+                  href={`/blogs/${featuredArticle.slug || featuredArticle._id}`}
+                  className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
+                >
+                  <span>Read Publication</span>
+                  <ArrowUpRight size={13} />
+                </Link>
               </div>
-              <h4 className="font-bold text-sm text-foreground mb-1.5 line-clamp-2">
-                Architecting a Multi-Region Distributed Cache with Raft Consensus
-              </h4>
-              <p className="text-xs text-foreground/60 line-clamp-2 mb-3">
-                Over 84k engineers read this breakdown on partition tolerance.
-              </p>
-              <Link
-                href="/blogs/architecting-multi-region-distributed-cache"
-                className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
-              >
-                <span>Read Reference Guide</span>
-                <ArrowUpRight size={13} />
-              </Link>
-            </div>
+            )}
 
             {/* Author Verified Credentials */}
             <div className="p-5 rounded-2xl border border-foreground/[0.08] bg-foreground/[0.02]">
               <h4 className="text-xs font-mono font-bold uppercase tracking-wider text-foreground/40 mb-3 flex items-center gap-1.5">
                 <Award size={14} className="text-primary" />
-                <span>Community Accolades</span>
+                <span>Contributor Recognition</span>
               </h4>
 
               <div className="space-y-3">
@@ -620,10 +700,10 @@ export default function AuthorDetailsPage() {
                   <div className="w-2 h-2 rounded-full bg-emerald-500 mt-1.5 shrink-0" />
                   <div>
                     <h5 className="text-xs font-bold text-foreground">
-                      Top 1% Distributed Systems Author
+                      Verified {cleanDomain} Contributor
                     </h5>
                     <p className="text-[11px] text-foreground/50">
-                      Ranked by dev community bookmarks and algorithmic impact.
+                      Authoring verified technical guides on DevShare.
                     </p>
                   </div>
                 </div>
@@ -632,10 +712,10 @@ export default function AuthorDetailsPage() {
                   <div className="w-2 h-2 rounded-full bg-blue-500 mt-1.5 shrink-0" />
                   <div>
                     <h5 className="text-xs font-bold text-foreground">
-                      Peer Reviewer & Code Mentor
+                      Open Knowledge Sharing
                     </h5>
                     <p className="text-[11px] text-foreground/50">
-                      Authored 15+ community architectural blueprints.
+                      Active contributor sharing production patterns and code architectures.
                     </p>
                   </div>
                 </div>
@@ -647,25 +727,25 @@ export default function AuthorDetailsPage() {
               <div className="flex items-center gap-2">
                 <Mail size={16} className="text-primary" />
                 <h4 className="text-sm font-bold text-foreground">
-                  Subscribe to {author.name}&apos;s Dispatches
+                  Stay Updated with {author.name}
                 </h4>
               </div>
 
               <p className="text-xs text-foreground/60 leading-relaxed">
-                Receive notifications whenever Alex publishes a new architecture breakdown or code walkthrough.
+                Receive notifications when {author.name} publishes new engineering breakdowns or tutorials.
               </p>
 
               {isSubscribed ? (
                 <div className="p-3 rounded-xl bg-primary/10 border border-primary/20 text-primary text-xs font-semibold flex items-center gap-2">
                   <CheckCircle2 size={15} />
-                  <span>Subscribed! You&apos;ll receive new publications.</span>
+                  <span>Subscribed! You&apos;ll receive updates.</span>
                 </div>
               ) : (
                 <form onSubmit={handleSubscribe} className="space-y-2">
                   <input
                     type="email"
                     required
-                    placeholder="engineer@company.com"
+                    placeholder="developer@domain.com"
                     value={newsletterEmail}
                     onChange={(e) => setNewsletterEmail(e.target.value)}
                     className="w-full h-9 px-3 rounded-xl bg-background border border-foreground/10 text-xs text-foreground placeholder:text-foreground/40 focus:border-primary/40 focus:outline-none"
@@ -674,7 +754,7 @@ export default function AuthorDetailsPage() {
                     type="submit"
                     className="w-full h-9 rounded-xl bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-semibold cursor-pointer"
                   >
-                    Join 3.8k Subscribers
+                    Subscribe to Updates
                   </Button>
                 </form>
               )}

@@ -171,13 +171,24 @@ const getAllBlogs = async (
     filter.$or = [{ title: searchRegex }, { description: searchRegex }];
   }
 
-  const sortField = query.sortBy || "createdAt";
-  const sortDirection = query.sortOrder === "asc" ? 1 : -1;
+  let sortCriteria: any = { createdAt: -1 };
+  if (query.sortBy === "featured" || query.sortBy === "popular") {
+    // Most read (views desc), most liked (likes desc), tiebreaker newest (createdAt desc)
+    sortCriteria = { views: -1, likes: -1, createdAt: -1 };
+  } else if (query.sortBy === "views") {
+    sortCriteria = { views: query.sortOrder === "asc" ? 1 : -1, likes: -1, createdAt: -1 };
+  } else if (query.sortBy === "likes") {
+    sortCriteria = { likes: query.sortOrder === "asc" ? 1 : -1, views: -1, createdAt: -1 };
+  } else if (query.sortBy) {
+    const sortField = query.sortBy;
+    const sortDirection = query.sortOrder === "asc" ? 1 : -1;
+    sortCriteria = { [sortField]: sortDirection, createdAt: -1 };
+  }
 
   const [blogs, total] = await Promise.all([
     blogCollection
       .find(filter)
-      .sort({ [sortField]: sortDirection })
+      .sort(sortCriteria)
       .skip(skip)
       .limit(limit)
       .toArray(),
@@ -199,7 +210,10 @@ const getAllBlogs = async (
 
 // ─── Get Single Blog by ID or Slug ───────────────────────────────────────────
 
-const getBlogByIdOrSlug = async (idOrSlug: string): Promise<IBlog> => {
+const getBlogByIdOrSlug = async (
+  idOrSlug: string,
+  incrementView: boolean = true
+): Promise<IBlog> => {
   const blogCollection = getBlogCollection();
 
   let filter: Filter<IBlog>;
@@ -210,12 +224,17 @@ const getBlogByIdOrSlug = async (idOrSlug: string): Promise<IBlog> => {
     filter = { slug: idOrSlug, status: "Published" };
   }
 
-  // Atomically increment views on read
-  const blog = await blogCollection.findOneAndUpdate(
-    filter,
-    { $inc: { views: 1 } },
-    { returnDocument: "after" }
-  );
+  let blog: IBlog | null = null;
+  if (incrementView) {
+    // Atomically increment views on read
+    blog = (await blogCollection.findOneAndUpdate(
+      filter,
+      { $inc: { views: 1 } },
+      { returnDocument: "after" }
+    )) as IBlog | null;
+  } else {
+    blog = (await blogCollection.findOne(filter)) as IBlog | null;
+  }
 
   if (!blog) {
     throw new AppError(httpStatus.NOT_FOUND, "Article not found");
@@ -592,6 +611,32 @@ const getBlogInteractionState = async (
   };
 };
 
+const getCategoryStats = async (): Promise<Record<string, number>> => {
+  const collection = getBlogCollection();
+  const counts = await collection
+    .aggregate<{ _id: string; count: number }>([
+      { $match: { status: "Published" } },
+      { $group: { _id: "$category", count: { $sum: 1 } } },
+    ])
+    .toArray();
+
+  const countMap: Record<string, number> = {
+    Frontend: 0,
+    Backend: 0,
+    DevOps: 0,
+    "AI & Data": 0,
+    Security: 0,
+  };
+
+  for (const item of counts) {
+    if (item._id) {
+      countMap[item._id] = item.count;
+    }
+  }
+
+  return countMap;
+};
+
 export const BlogService = {
   createBlog,
   getAllBlogs,
@@ -606,6 +651,7 @@ export const BlogService = {
   deleteComment,
   getRelatedBlogs,
   getBlogInteractionState,
+  getCategoryStats,
 };
 
 export default BlogService;

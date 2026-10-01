@@ -23,6 +23,9 @@ router.get("/my/blogs", auth(), BlogController.getMyBlogs);
 // Get one of the current user's articles for editing (does not increment views)
 router.get("/my/blogs/:id", auth(), BlogController.getMyBlogById);
 
+// Get category statistics (Public)
+router.get("/categories/stats", BlogController.getCategoryStats);
+
 // Get related blogs by category (Public)
 router.get("/:id/related", BlogController.getRelatedBlogs);
 

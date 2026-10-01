@@ -82,6 +82,6 @@ export interface IBlogFilterQuery {
   search?: string;
   page?: number;
   limit?: number;
-  sortBy?: "createdAt" | "views" | "likes";
+  sortBy?: "createdAt" | "views" | "likes" | "featured" | "popular" | string;
   sortOrder?: "asc" | "desc";
 }

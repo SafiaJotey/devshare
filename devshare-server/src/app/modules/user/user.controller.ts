@@ -193,6 +193,30 @@ const deleteAccount = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getTopContributors = catchAsync(async (req: Request, res: Response) => {
+  const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 8;
+  const result = await UserService.getTopContributors(limit);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Top contributors retrieved successfully",
+    data: result,
+  });
+});
+
+const getAuthorDetails = catchAsync(async (req: Request, res: Response) => {
+  const authorId = req.params.authorId as string;
+  const result = await UserService.getAuthorDetails(authorId);
+
+  sendResponse(res, {
+    statusCode: httpStatus.OK,
+    success: true,
+    message: "Author details retrieved successfully",
+    data: result,
+  });
+});
+
 export const UserController = {
   register,
   login,
@@ -205,6 +229,8 @@ export const UserController = {
   changePassword,
   revokeOtherSessions,
   deleteAccount,
+  getTopContributors,
+  getAuthorDetails,
 };
 
 export default UserController;
