@@ -9,7 +9,7 @@ const blogCategoryEnum = z.enum([
   "Frontend",
   "Backend",
   "DevOps",
-  "AI & Data",
+  "AI/ML",
   "Security",
 ]);
 const blogStatusEnum = z.enum(["Draft", "Published", "Archived"]);

@@ -1,4 +1,4 @@
-export type Category = "Frontend" | "Backend" | "DevOps" | "AI & Data" | "Security";
+export type Category = "Frontend" | "Backend" | "DevOps" | "AI/ML" | "Security";
 
 
 export type BlockType =
@@ -13,7 +13,7 @@ export type BlockType =
   | "code"
   | "quote"
   | "image"
-    | "layout";
+  | "layout";
 
 export interface ColumnItem {
   id: string;

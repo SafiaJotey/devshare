@@ -4,7 +4,7 @@ export type BlogCategory =
   | "Frontend"
   | "Backend"
   | "DevOps"
-  | "AI & Data"
+  | "AI/ML"
   | "Security";
 
 export type BlogStatus = "Draft" | "Published" | "Archived";

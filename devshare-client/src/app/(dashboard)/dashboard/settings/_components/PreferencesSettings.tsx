@@ -20,7 +20,7 @@ const CATEGORIES: BlogCategory[] = [
   "Frontend",
   "Backend",
   "DevOps",
-  "AI & Data",
+  "AI/ML",
   "Security",
 ];
 
@@ -132,11 +132,10 @@ export default function PreferencesSettings() {
                     key={cat}
                     type="button"
                     onClick={() => setDefaultCategory(cat)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer border ${
-                      isSelected
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer border ${isSelected
                         ? "bg-primary text-primary-foreground border-primary shadow-xs"
                         : "bg-muted/50 text-muted-foreground border-foreground/10 hover:border-foreground/20 hover:text-foreground"
-                    }`}
+                      }`}
                   >
                     {isSelected && <Check size={12} className="inline mr-1.5" />}
                     {cat}
@@ -164,11 +163,10 @@ export default function PreferencesSettings() {
                   <div
                     key={font.id}
                     onClick={() => setCodeFont(font.id)}
-                    className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
-                      isSelected
+                    className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${isSelected
                         ? "border-primary bg-primary/5 shadow-xs"
                         : "border-foreground/10 hover:border-foreground/20 bg-muted/20"
-                    }`}
+                      }`}
                   >
                     <div className="flex items-center justify-between">
                       <span className="text-xs font-semibold text-foreground">

@@ -4,18 +4,18 @@ import { useState } from "react";
 import ReadyToContribute from "@/components/shared/ReadyToContribute";
 import Section from "@/components/shared/Section";
 import WriteCTA from "@/components/shared/WriteCTA";
-import { 
-  Code2, 
-  Share2, 
-  Lightbulb, 
-  CheckCircle2, 
-  Rocket, 
-  Users, 
-  Zap, 
-  Globe, 
-  Terminal, 
-  Cpu, 
-  Lock, 
+import {
+  Code2,
+  Share2,
+  Lightbulb,
+  CheckCircle2,
+  Rocket,
+  Users,
+  Zap,
+  Globe,
+  Terminal,
+  Cpu,
+  Lock,
   Layers,
   ArrowRight
 } from "lucide-react";
@@ -43,8 +43,8 @@ const ecosystemFields = [
   },
   {
     icon: Cpu,
-    title: "AI & Data",
-    shortTitle: "AI & Data",
+    title: "AI/ML",
+    shortTitle: "AI/ML",
     desc: "Integrating LLMs, machine learning pipelines, and data engineering.",
     load: "91.6%",
     domains: ["Python", "LLMs", "Vector DBs", "Pipelines", "Analytics", "MLOps"],
@@ -70,7 +70,7 @@ const About = () => {
 
   return (
     <div className="space-y-32 pb-20 overflow-hidden">
-   
+
       <section className="pt-20 px-4 text-center relative">
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,var(--accent)_0%,transparent_70%)] opacity-[0.03] pointer-events-none" />
         <div className="max-w-4xl mx-auto relative z-10">
@@ -84,7 +84,7 @@ const About = () => {
         </div>
       </section>
 
- 
+
       <Section
         tag="Our Pillars"
         title="Built for the modern engineer"
@@ -123,29 +123,29 @@ const About = () => {
 
           <div className="p-8 rounded-3xl bg-primary text-primary-foreground md:col-span-2 shadow-xl shadow-primary/10">
             <div className="flex flex-col md:flex-row gap-8 items-center">
-               <div className="text-center md:text-left">
-                  <h3 className="text-3xl font-black mb-2 italic tracking-tighter text-primary-foreground">NO FLUFF.</h3>
-                  <p className="opacity-80">Just high-signal engineering documentation for the curious mind.</p>
-               </div>
-               <div className="h-px w-full md:w-px md:h-20 bg-primary-foreground/20" />
-               <div className="flex gap-8">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold tracking-tighter">12k+</div>
-                    <div className="text-[10px] uppercase tracking-[0.2em] opacity-60">Readers</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-3xl font-bold tracking-tighter">800+</div>
-                    <div className="text-[10px] uppercase tracking-[0.2em] opacity-60">Articles</div>
-                  </div>
-               </div>
+              <div className="text-center md:text-left">
+                <h3 className="text-3xl font-black mb-2 italic tracking-tighter text-primary-foreground">NO FLUFF.</h3>
+                <p className="opacity-80">Just high-signal engineering documentation for the curious mind.</p>
+              </div>
+              <div className="h-px w-full md:w-px md:h-20 bg-primary-foreground/20" />
+              <div className="flex gap-8">
+                <div className="text-center">
+                  <div className="text-3xl font-bold tracking-tighter">12k+</div>
+                  <div className="text-[10px] uppercase tracking-[0.2em] opacity-60">Readers</div>
+                </div>
+                <div className="text-center">
+                  <div className="text-3xl font-bold tracking-tighter">800+</div>
+                  <div className="text-[10px] uppercase tracking-[0.2em] opacity-60">Articles</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </Section>
 
-   
-      <Section 
-        headerComponent={<></>} 
+
+      <Section
+        headerComponent={<></>}
         className="py-10"
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
@@ -155,7 +155,7 @@ const About = () => {
             <h2 className="text-4xl md:text-5xl font-bold mt-4 mb-8 leading-tight">
               Spanning the full stack of <span className="text-primary italic">modern engineering.</span>
             </h2>
-            
+
             <p className="text-foreground/70 mb-10 text-lg leading-relaxed">
               Dev Share isn’t limited to syntax. We host deep-dives across the entire development spectrum, ensuring every contributor brings &quot;production-ready&quot; perspective to the table.
             </p>
@@ -164,7 +164,7 @@ const About = () => {
               {/*
                 { icon: <Globe className="text-primary" size={20} />, title: "Frontend Mastery", desc: "Beyond UI—focusing on performance, accessibility, and state management." },
                 { icon: <Terminal className="text-primary" size={20} />, title: "Backend & Systems", desc: "Scalable architecture, API design, and database optimization strategies." },
-                { icon: <Cpu className="text-primary" size={20} />, title: "AI & Data", desc: "Integrating LLMs, machine learning pipelines, and data engineering." },
+                { icon: <Cpu className="text-primary" size={20} />, title: "AI/ML", desc: "Integrating LLMs, machine learning pipelines, and data engineering." },
                 { icon: <Lock className="text-primary" size={20} />, title: "DevOps & Security", desc: "CI/CD automation, cloud infrastructure, and hardening your code." }
               ].map((field, i) => (
                 <div key={i} className="group">
@@ -185,11 +185,10 @@ const About = () => {
                     type="button"
                     onClick={() => setActiveEcosystem(i)}
                     aria-pressed={isActive}
-                    className={`group rounded-2xl border p-4 text-left transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${
-                      isActive
+                    className={`group rounded-2xl border p-4 text-left transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${isActive
                         ? "border-primary/35 bg-primary/[0.07] shadow-lg shadow-primary/5"
                         : "border-transparent hover:border-foreground/10 hover:bg-foreground/[0.03]"
-                    }`}
+                      }`}
                   >
                     <div className="mb-3 flex items-center gap-3">
                       <span className={`flex h-9 w-9 items-center justify-center rounded-xl transition-colors ${isActive ? "bg-primary text-primary-foreground" : "bg-primary/10 text-primary"}`}>
@@ -207,8 +206,8 @@ const About = () => {
                 );
               })}
             </div>
-            
- 
+
+
             <div className="mt-12 p-6 rounded-2xl bg-foreground/5 border border-foreground/10 flex items-start gap-4">
               <CheckCircle2 className="text-accent shrink-0" size={24} />
               <div>
@@ -218,11 +217,11 @@ const About = () => {
             </div>
           </div>
 
-    
+
           <div className="order-1 lg:order-2 relative">
             <div className="absolute -top-10 -right-10 w-64 h-64 bg-primary/10 rounded-full blur-3xl" />
             <div className="absolute -bottom-10 -left-10 w-64 h-64 bg-accent/10 rounded-full blur-3xl" />
-            
+
             <div key={activeField.title} aria-live="polite" className="relative glass-card animate-in fade-in slide-in-from-bottom-2 duration-300 rounded-[2.5rem] border border-foreground/10 overflow-hidden shadow-2xl bg-background/50 backdrop-blur-md">
               <div className="bg-foreground/5 px-6 py-4 border-b border-foreground/10 flex justify-between items-center">
                 <div className="flex gap-2">
@@ -234,52 +233,52 @@ const About = () => {
               </div>
 
               <div className="p-8 space-y-8 font-mono">
-                  <div className="flex items-start gap-4 border-b border-foreground/10 pb-6">
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/15">
-                        <ActiveFieldIcon size={20} />
-                      </div>
-                      <div>
-                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent">Selected discipline</p>
-                        <h3 className="mt-1 font-sans text-xl font-bold tracking-tight text-foreground">{activeField.title}</h3>
-                        <p className="mt-2 font-sans text-xs leading-relaxed text-foreground/60">{activeField.desc}</p>
-                      </div>
+                <div className="flex items-start gap-4 border-b border-foreground/10 pb-6">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/15">
+                    <ActiveFieldIcon size={20} />
                   </div>
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent">Selected discipline</p>
+                    <h3 className="mt-1 font-sans text-xl font-bold tracking-tight text-foreground">{activeField.title}</h3>
+                    <p className="mt-2 font-sans text-xs leading-relaxed text-foreground/60">{activeField.desc}</p>
+                  </div>
+                </div>
 
-                  <div className="space-y-3">
-                      <div className="flex justify-between text-[10px] opacity-50 uppercase tracking-tighter">
-                          <span>Active Domains</span>
-                          <span>Load: {activeField.load}</span>
-                      </div>
-                      <div className="flex flex-wrap gap-2">
-                          {activeField.domains.map((tag) => (
-                              <span key={tag} className="px-3 py-1 rounded-full border border-foreground/10 text-[11px] bg-background">
-                                  {tag}
-                              </span>
-                          ))}
-                      </div>
+                <div className="space-y-3">
+                  <div className="flex justify-between text-[10px] opacity-50 uppercase tracking-tighter">
+                    <span>Active Domains</span>
+                    <span>Load: {activeField.load}</span>
                   </div>
+                  <div className="flex flex-wrap gap-2">
+                    {activeField.domains.map((tag) => (
+                      <span key={tag} className="px-3 py-1 rounded-full border border-foreground/10 text-[11px] bg-background">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
 
-                  <div className="space-y-4">
-                      <div className="h-px bg-gradient-to-r from-transparent via-foreground/10 to-transparent" />
-                      <div className="flex items-center gap-4 py-2">
-                          <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
-                          <span className="text-xs">{activeField.events[0]}</span>
-                      </div>
-                      <div className="flex items-center gap-4 py-2">
-                          <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                          <span className="text-xs">{activeField.events[1]}</span>
-                      </div>
+                <div className="space-y-4">
+                  <div className="h-px bg-gradient-to-r from-transparent via-foreground/10 to-transparent" />
+                  <div className="flex items-center gap-4 py-2">
+                    <div className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+                    <span className="text-xs">{activeField.events[0]}</span>
                   </div>
+                  <div className="flex items-center gap-4 py-2">
+                    <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                    <span className="text-xs">{activeField.events[1]}</span>
+                  </div>
+                </div>
 
-                  <div className="mt-4 bg-primary/5 rounded-xl p-4 border border-primary/20  group-hover:rotate-0 transition-transform duration-500">
-                      <div className="flex gap-2 mb-2">
-                          <Layers size={14} className="text-primary" />
-                          <span className="text-[10px] font-bold text-primary uppercase">Architecture Pattern</span>
-                      </div>
-                      <p className="text-[12px] leading-tight text-foreground/80">
-                          {activeField.pattern}
-                      </p>
+                <div className="mt-4 bg-primary/5 rounded-xl p-4 border border-primary/20  group-hover:rotate-0 transition-transform duration-500">
+                  <div className="flex gap-2 mb-2">
+                    <Layers size={14} className="text-primary" />
+                    <span className="text-[10px] font-bold text-primary uppercase">Architecture Pattern</span>
                   </div>
+                  <p className="text-[12px] leading-tight text-foreground/80">
+                    {activeField.pattern}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
@@ -354,7 +353,7 @@ const About = () => {
             </article>
           </div>
 
-          
+
         </div>
       </section>
 

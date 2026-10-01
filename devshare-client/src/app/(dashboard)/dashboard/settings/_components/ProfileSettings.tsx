@@ -27,7 +27,7 @@ const DOMAINS: BlogCategory[] = [
   "Frontend",
   "Backend",
   "DevOps",
-  "AI & Data",
+  "AI/ML",
   "Security",
 ];
 
@@ -362,11 +362,10 @@ export default function ProfileSettings() {
                     key={domain}
                     type="button"
                     onClick={() => setPrimaryDomain(domain)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer border ${
-                      isSelected
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all cursor-pointer border ${isSelected
                         ? "bg-primary text-primary-foreground border-primary shadow-xs"
                         : "bg-muted/50 text-muted-foreground border-foreground/10 hover:border-foreground/20 hover:text-foreground"
-                    }`}
+                      }`}
                   >
                     {isSelected && <Check size={12} className="inline mr-1" />}
                     {domain}

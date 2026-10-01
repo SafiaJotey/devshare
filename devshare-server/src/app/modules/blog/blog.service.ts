@@ -21,7 +21,7 @@ const DEFAULT_CATEGORY_COVERS: Record<BlogCategory, string> = {
     "https://images.unsplash.com/photo-1558494949-ef010cbdcc51?q=80&w=2026",
   DevOps:
     "https://images.unsplash.com/photo-1667372393119-3d4c48d07fc9?q=80&w=2070",
-  "AI & Data":
+  "AI/ML":
     "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2070",
   Security:
     "https://images.unsplash.com/photo-1563986768609-322da13575f3?q=80&w=2070",
@@ -624,7 +624,7 @@ const getCategoryStats = async (): Promise<Record<string, number>> => {
     Frontend: 0,
     Backend: 0,
     DevOps: 0,
-    "AI & Data": 0,
+    "AI/ML": 0,
     Security: 0,
   };
 

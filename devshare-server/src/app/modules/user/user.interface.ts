@@ -1,7 +1,7 @@
 import { ObjectId } from "mongodb";
 
 export interface IContributorPreferences {
-  defaultCategory?: "Frontend" | "Backend" | "DevOps" | "AI & Data" | "Security" | string;
+  defaultCategory?: "Frontend" | "Backend" | "DevOps" | "AI/ML" | "Security" | string;
   codeFont?: "jetbrains" | "fira" | "mono" | string;
   autoSave?: boolean;
   emailOnComment?: boolean;

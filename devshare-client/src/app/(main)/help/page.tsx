@@ -2,31 +2,31 @@
 
 import React, { useState, useMemo } from "react";
 import Link from "next/link";
-import { 
-  BookOpen, 
-  PenLine, 
-  Search, 
-  CheckCircle2, 
-  HelpCircle, 
-  ArrowRight, 
-  MessageSquare, 
-  Sparkles, 
-  FileText, 
-  Image as ImageIcon, 
-  Code, 
-  Compass, 
-  Bookmark, 
-  Share2, 
-  ThumbsUp, 
+import {
+  BookOpen,
+  PenLine,
+  Search,
+  CheckCircle2,
+  HelpCircle,
+  ArrowRight,
+  MessageSquare,
+  Sparkles,
+  FileText,
+  Image as ImageIcon,
+  Code,
+  Compass,
+  Bookmark,
+  Share2,
+  ThumbsUp,
   ShieldCheck,
   Send,
   Layers
 } from "lucide-react";
-import { 
-  Accordion, 
-  AccordionContent, 
-  AccordionItem, 
-  AccordionTrigger 
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger
 } from "@/components/ui/accordion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -42,62 +42,62 @@ const TOPIC_FILTERS = [
 ];
 
 const READER_FAQS = [
-  { 
+  {
     id: "r1",
     tag: "Reading & Bookmarks",
-    q: "Is all content on DevShare free to read?", 
-    a: "Yes! DevShare is built on the philosophy of open, accessible knowledge sharing. Every technical article, deep dive, and tutorial across Frontend, Backend, DevOps, AI & Data, and Security is 100% free without paywalls or reading limits." 
+    q: "Is all content on DevShare free to read?",
+    a: "Yes! DevShare is built on the philosophy of open, accessible knowledge sharing. Every technical article, deep dive, and tutorial across Frontend, Backend, DevOps, AI/ML, and Security is 100% free without paywalls or reading limits."
   },
-  { 
+  {
     id: "r2",
     tag: "Reading & Bookmarks",
-    q: "How can I save articles to read later?", 
-    a: "Once you sign in to your DevShare account, you can bookmark any article directly. All your saved insights appear neatly organized under your personal dashboard so you can reference them whenever you need." 
+    q: "How can I save articles to read later?",
+    a: "Once you sign in to your DevShare account, you can bookmark any article directly. All your saved insights appear neatly organized under your personal dashboard so you can reference them whenever you need."
   },
-  { 
+  {
     id: "r3",
     tag: "Reading & Bookmarks",
-    q: "How do category filters and estimated read times work?", 
-    a: "Every article is categorized under a core technology track (Frontend, Backend, DevOps, AI & Data, Security). Our platform calculates reading time automatically so you know whether a piece is a 3-minute quick tip or a 15-minute comprehensive architectural breakdown." 
+    q: "How do category filters and estimated read times work?",
+    a: "Every article is categorized under a core technology track (Frontend, Backend, DevOps, AI/ML, Security). Our platform calculates reading time automatically so you know whether a piece is a 3-minute quick tip or a 15-minute comprehensive architectural breakdown."
   },
-  { 
+  {
     id: "r4",
     tag: "Profile & Account",
-    q: "How do I follow or support my favorite authors?", 
-    a: "At the end of every article, you will find the author's card with their bio, GitHub, and Twitter links. You can explore their other published writings or connect with them across the developer community." 
+    q: "How do I follow or support my favorite authors?",
+    a: "At the end of every article, you will find the author's card with their bio, GitHub, and Twitter links. You can explore their other published writings or connect with them across the developer community."
   }
 ];
 
 const CONTRIBUTOR_FAQS = [
-  { 
+  {
     id: "c1",
     tag: "Writing with Blocks",
-    q: "How do I create an article using the Block Editor?", 
-    a: "Head over to your Dashboard and click 'Create Blog'. Our editor works with modular blocks—you can easily insert headings, write text, paste formatted code, add quotes, and rearrange sections simply by dragging and dropping them." 
+    q: "How do I create an article using the Block Editor?",
+    a: "Head over to your Dashboard and click 'Create Blog'. Our editor works with modular blocks—you can easily insert headings, write text, paste formatted code, add quotes, and rearrange sections simply by dragging and dropping them."
   },
-  { 
+  {
     id: "c2",
     tag: "Picture & Code Uploads",
-    q: "How do I upload diagrams and photos into my posts?", 
-    a: "Select the 'Image Block' inside the editor and upload any JPG, PNG, or WebP diagram (up to 2.5MB). Our platform optimizes the image for lightning-fast loading and stores it safely alongside your article." 
+    q: "How do I upload diagrams and photos into my posts?",
+    a: "Select the 'Image Block' inside the editor and upload any JPG, PNG, or WebP diagram (up to 2.5MB). Our platform optimizes the image for lightning-fast loading and stores it safely alongside your article."
   },
-  { 
+  {
     id: "c3",
     tag: "Publishing & Guidelines",
-    q: "What is the difference between a Draft and a Published post?", 
-    a: "Drafts are completely private to you. You can save your work, return to it anytime, and preview how it looks for readers. Once you hit 'Publish', your article is reviewed and goes live on the public feed for the community to discover." 
+    q: "What is the difference between a Draft and a Published post?",
+    a: "Drafts are completely private to you. You can save your work, return to it anytime, and preview how it looks for readers. Once you hit 'Publish', your article is reviewed and goes live on the public feed for the community to discover."
   },
-  { 
+  {
     id: "c4",
     tag: "Publishing & Guidelines",
-    q: "Can I cross-post an article from my personal website or Substack?", 
-    a: "Yes! We welcome cross-posting as long as you are the original author. You maintain full ownership of your content and can include a canonical link or note back to your personal portfolio." 
+    q: "Can I cross-post an article from my personal website or Substack?",
+    a: "Yes! We welcome cross-posting as long as you are the original author. You maintain full ownership of your content and can include a canonical link or note back to your personal portfolio."
   },
-  { 
+  {
     id: "c5",
     tag: "Writing with Blocks",
-    q: "What languages are supported in code snippets?", 
-    a: "The code block automatically formats and highlights popular languages including JavaScript, TypeScript, Python, Go, Rust, HTML/CSS, Bash, and SQL." 
+    q: "What languages are supported in code snippets?",
+    a: "The code block automatically formats and highlights popular languages including JavaScript, TypeScript, Python, Go, Rust, HTML/CSS, Bash, and SQL."
   }
 ];
 
@@ -108,13 +108,13 @@ export default function HelpCenter() {
 
   const filterList = (list: typeof READER_FAQS) => {
     return list.filter((faq) => {
-      const matchesSearch = 
+      const matchesSearch =
         faq.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
         faq.a.toLowerCase().includes(searchQuery.toLowerCase()) ||
         faq.tag.toLowerCase().includes(searchQuery.toLowerCase());
 
-      const matchesFilter = 
-        activeFilter === "All Topics" || 
+      const matchesFilter =
+        activeFilter === "All Topics" ||
         faq.tag.toLowerCase() === activeFilter.toLowerCase();
 
       return matchesSearch && matchesFilter;
@@ -126,7 +126,7 @@ export default function HelpCenter() {
 
   return (
     <main className="min-h-screen bg-background text-foreground pb-24 selection:bg-primary selection:text-white">
-      
+
       {/* 1. WELCOME HERO */}
       <section className="relative pt-24 pb-16 md:pt-32 md:pb-24 border-b border-foreground/10 overflow-hidden bg-gradient-to-b from-primary/[0.04] via-transparent to-transparent">
         {/* Soft Ambient Glow */}
@@ -175,11 +175,10 @@ export default function HelpCenter() {
               <button
                 key={topic}
                 onClick={() => setActiveFilter(topic)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${
-                  activeFilter === topic
+                className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer ${activeFilter === topic
                     ? "bg-foreground text-background font-bold shadow-sm"
                     : "bg-foreground/[0.04] text-foreground/60 hover:text-foreground hover:bg-foreground/10 border border-foreground/5"
-                }`}
+                  }`}
               >
                 {topic}
               </button>
@@ -194,25 +193,22 @@ export default function HelpCenter() {
           <div className="inline-flex p-1.5 rounded-2xl bg-foreground/[0.05] border border-foreground/10">
             <button
               onClick={() => setActivePersona("all")}
-              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                activePersona === "all" ? "bg-background text-foreground shadow-sm" : "text-foreground/60 hover:text-foreground"
-              }`}
+              className={`px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${activePersona === "all" ? "bg-background text-foreground shadow-sm" : "text-foreground/60 hover:text-foreground"
+                }`}
             >
               All Questions
             </button>
             <button
               onClick={() => setActivePersona("readers")}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                activePersona === "readers" ? "bg-background text-primary shadow-sm" : "text-foreground/60 hover:text-foreground"
-              }`}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${activePersona === "readers" ? "bg-background text-primary shadow-sm" : "text-foreground/60 hover:text-foreground"
+                }`}
             >
               <BookOpen size={15} /> For Readers
             </button>
             <button
               onClick={() => setActivePersona("contributors")}
-              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                activePersona === "contributors" ? "bg-background text-primary shadow-sm" : "text-foreground/60 hover:text-foreground"
-              }`}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${activePersona === "contributors" ? "bg-background text-primary shadow-sm" : "text-foreground/60 hover:text-foreground"
+                }`}
             >
               <PenLine size={15} /> For Writers & Authors
             </button>
@@ -381,8 +377,8 @@ export default function HelpCenter() {
               ) : (
                 <Accordion type="single" collapsible className="w-full space-y-3">
                   {filteredReaderFaqs.map((faq) => (
-                    <AccordionItem 
-                      key={faq.id} 
+                    <AccordionItem
+                      key={faq.id}
                       value={faq.id}
                       className="border border-foreground/10 rounded-2xl px-5 bg-foreground/[0.015] hover:border-foreground/20 transition-all"
                     >
@@ -426,8 +422,8 @@ export default function HelpCenter() {
               ) : (
                 <Accordion type="single" collapsible className="w-full space-y-3">
                   {filteredContributorFaqs.map((faq) => (
-                    <AccordionItem 
-                      key={faq.id} 
+                    <AccordionItem
+                      key={faq.id}
                       value={faq.id}
                       className="border border-foreground/10 rounded-2xl px-5 bg-foreground/[0.015] hover:border-foreground/20 transition-all"
                     >
@@ -468,16 +464,16 @@ export default function HelpCenter() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-              <Button 
+              <Button
                 onClick={() => window.location.href = "mailto:support@devshare.io"}
                 className="bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl h-12 px-8 font-semibold text-xs uppercase tracking-wider transition-all shadow-md cursor-pointer flex items-center justify-center gap-2"
               >
                 <MessageSquare size={16} /> Contact Support
               </Button>
 
-              <Button 
+              <Button
                 asChild
-                variant="outline" 
+                variant="outline"
                 className="rounded-xl h-12 px-8 font-semibold text-xs uppercase tracking-wider border-background/20 text-background hover:bg-background/10 cursor-pointer"
               >
                 <Link href="/blogs">

@@ -57,7 +57,7 @@ import {
   updateBlogStatusApi,
 } from "@/lib/api";
 
-const categories = ["All", "Frontend", "Backend", "DevOps", "AI & Data", "Security"];
+const categories = ["All", "Frontend", "Backend", "DevOps", "AI/ML", "Security"];
 const statuses = ["All", "Published", "Draft", "Archived"] as const;
 const statusStyle: Record<IBlog["status"], string> = {
   Published: "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",

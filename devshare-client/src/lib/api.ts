@@ -2,7 +2,7 @@ export const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/v1";
 
 export interface IContributorPreferences {
-  defaultCategory?: "Frontend" | "Backend" | "DevOps" | "AI & Data" | "Security" | string;
+  defaultCategory?: "Frontend" | "Backend" | "DevOps" | "AI/ML" | "Security" | string;
   codeFont?: "jetbrains" | "fira" | "mono" | string;
   autoSave?: boolean;
   emailOnComment?: boolean;
@@ -314,7 +314,7 @@ export type BlogCategory =
   | "Frontend"
   | "Backend"
   | "DevOps"
-  | "AI & Data"
+  | "AI/ML"
   | "Security";
 
 export type BlogBlockType =

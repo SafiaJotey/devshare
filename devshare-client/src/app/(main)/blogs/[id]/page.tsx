@@ -360,7 +360,7 @@ export default function BlogDetails() {
                   );
                 }
               })
-              .catch(() => {});
+              .catch(() => { });
           }
         }
       } catch (err) {
@@ -384,7 +384,7 @@ export default function BlogDetails() {
           setLikesCount(res.data.likes);
         }
       })
-      .catch(() => {});
+      .catch(() => { });
   }, [isLoggedIn, id]);
 
   // ─── Build TOC from blocks ───────────────────────────────────────────────────
@@ -544,10 +544,10 @@ export default function BlogDetails() {
   const readTime = blog ? blog.readTime : FALLBACK_POST.readTime;
   const dateFormatted = blog?.createdAt
     ? new Date(blog.createdAt).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      })
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    })
     : FALLBACK_POST.date;
 
   if (isLoading) {
@@ -629,11 +629,10 @@ export default function BlogDetails() {
             <div className="h-8 w-px bg-foreground/10" />
             <button
               onClick={handleLike}
-              className={`flex items-center gap-1.5 text-sm transition-all ${
-                liked
+              className={`flex items-center gap-1.5 text-sm transition-all ${liked
                   ? "text-red-500"
                   : "text-foreground/40 hover:text-red-500"
-              }`}
+                }`}
             >
               <Heart
                 size={15}
@@ -806,11 +805,10 @@ export default function BlogDetails() {
                         return (
                           <div
                             key={block.id}
-                            className={`my-8 grid gap-6 ${
-                              cols.length === 3
+                            className={`my-8 grid gap-6 ${cols.length === 3
                                 ? "grid-cols-1 md:grid-cols-3"
                                 : "grid-cols-1 md:grid-cols-2"
-                            }`}
+                              }`}
                           >
                             {cols.map((col: any) => (
                               <div
@@ -855,7 +853,7 @@ export default function BlogDetails() {
                           </div>
                         );
                       }
-                    } catch {}
+                    } catch { }
                     return null;
 
                   default:
@@ -947,11 +945,10 @@ export default function BlogDetails() {
                 <button
                   onClick={handleSave}
                   disabled={isSaving}
-                  className={`flex items-center justify-center gap-3 text-sm font-bold py-4 px-6 rounded-xl transition-all active:scale-95 shadow-lg disabled:opacity-60 ${
-                    saved
+                  className={`flex items-center justify-center gap-3 text-sm font-bold py-4 px-6 rounded-xl transition-all active:scale-95 shadow-lg disabled:opacity-60 ${saved
                       ? "bg-primary text-primary-foreground shadow-primary/20"
                       : "bg-foreground text-background hover:bg-primary hover:text-primary-foreground hover:shadow-primary/20"
-                  }`}
+                    }`}
                 >
                   {isSaving ? (
                     <Loader2 size={18} className="animate-spin" />
@@ -969,11 +966,10 @@ export default function BlogDetails() {
                   <button
                     onClick={handleLike}
                     disabled={isLiking}
-                    className={`flex-1 flex items-center justify-center gap-1.5 border py-3 rounded-xl transition-all font-mono text-xs font-bold ${
-                      liked
+                    className={`flex-1 flex items-center justify-center gap-1.5 border py-3 rounded-xl transition-all font-mono text-xs font-bold ${liked
                         ? "border-red-500/30 text-red-500 bg-red-500/5"
                         : "border-foreground/10 text-foreground/60 hover:border-red-500/30 hover:text-red-500 hover:bg-red-500/5"
-                    }`}
+                      }`}
                     title="Like this article"
                   >
                     {isLiking ? (
@@ -1008,11 +1004,10 @@ export default function BlogDetails() {
                   {/* Copy link */}
                   <button
                     onClick={handleCopyLink}
-                    className={`flex-1 flex items-center justify-center border py-3 rounded-xl transition-all ${
-                      copied
+                    className={`flex-1 flex items-center justify-center border py-3 rounded-xl transition-all ${copied
                         ? "border-green-500/30 text-green-500 bg-green-500/5"
                         : "border-foreground/10 hover:bg-foreground/5 text-foreground/60"
-                    }`}
+                      }`}
                     title="Copy article link"
                   >
                     {copied ? <Check size={16} /> : <Copy size={16} />}
@@ -1042,13 +1037,11 @@ export default function BlogDetails() {
                                 });
                               }
                             }}
-                            className={`block text-sm py-1 transition-all border-l-2 ${
-                              item.level === "h3" ? "pl-4" : "pl-3"
-                            } ${
-                              activeSection === item.id
+                            className={`block text-sm py-1 transition-all border-l-2 ${item.level === "h3" ? "pl-4" : "pl-3"
+                              } ${activeSection === item.id
                                 ? "border-accent text-foreground font-semibold"
                                 : "border-transparent text-foreground/50 hover:text-foreground hover:border-foreground/20"
-                            }`}
+                              }`}
                           >
                             {item.text}
                           </a>
@@ -1102,38 +1095,38 @@ export default function BlogDetails() {
           {(relatedPosts.length > 0
             ? relatedPosts
             : [
-                {
-                  id: 2,
-                  title: "Building Scalable Microservices with Go and gRPC",
-                  author: "Sarah Chen",
-                  tag: "Backend",
-                  readTime: "12 min",
-                  image:
-                    "https://images.unsplash.com/photo-1558494949-ef010cbdcc51?q=80&w=2026",
-                  avatar: "https://i.pravatar.cc/150?u=sarah",
-                },
-                {
-                  id: 4,
-                  title:
-                    "Implementing Vector Search in PostgreSQL for AI Apps",
-                  author: "Elena Rodriguez",
-                  tag: "AI & Data",
-                  readTime: "15 min",
-                  image:
-                    "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2070",
-                  avatar: "https://i.pravatar.cc/150?u=elena",
-                },
-                {
-                  id: 5,
-                  title: "Mastering CSS Grid: Building Complex Layouts",
-                  author: "James Wilson",
-                  tag: "Frontend",
-                  readTime: "6 min",
-                  image:
-                    "https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?q=80&w=2070",
-                  avatar: "https://i.pravatar.cc/150?u=james",
-                },
-              ]
+              {
+                id: 2,
+                title: "Building Scalable Microservices with Go and gRPC",
+                author: "Sarah Chen",
+                tag: "Backend",
+                readTime: "12 min",
+                image:
+                  "https://images.unsplash.com/photo-1558494949-ef010cbdcc51?q=80&w=2026",
+                avatar: "https://i.pravatar.cc/150?u=sarah",
+              },
+              {
+                id: 4,
+                title:
+                  "Implementing Vector Search in PostgreSQL for AI Apps",
+                author: "Elena Rodriguez",
+                tag: "AI/ML",
+                readTime: "15 min",
+                image:
+                  "https://images.unsplash.com/photo-1677442136019-21780ecad995?q=80&w=2070",
+                avatar: "https://i.pravatar.cc/150?u=elena",
+              },
+              {
+                id: 5,
+                title: "Mastering CSS Grid: Building Complex Layouts",
+                author: "James Wilson",
+                tag: "Frontend",
+                readTime: "6 min",
+                image:
+                  "https://images.unsplash.com/photo-1507721999472-8ed4421c4af2?q=80&w=2070",
+                avatar: "https://i.pravatar.cc/150?u=james",
+              },
+            ]
           ).map((post) => (
             <Link
               key={post.id}

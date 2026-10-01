@@ -31,7 +31,7 @@ const CATEGORY_MAP: Record<string, { icon: React.ElementType; color: string; bg:
   Frontend: { icon: Monitor, color: "text-blue-500", bg: "bg-blue-500/10" },
   Backend: { icon: Server, color: "text-emerald-500", bg: "bg-emerald-500/10" },
   DevOps: { icon: Zap, color: "text-purple-500", bg: "bg-purple-500/10" },
-  "AI & Data": { icon: Cpu, color: "text-amber-500", bg: "bg-amber-500/10" },
+  "AI/ML": { icon: Cpu, color: "text-amber-500", bg: "bg-amber-500/10" },
   Security: { icon: Shield, color: "text-red-500", bg: "bg-red-500/10" },
 };
 
@@ -40,7 +40,7 @@ const POPULAR_TAGS = [
   { name: "Next.js 15", category: "Frontend" },
   { name: "Distributed Cache", category: "DevOps" },
   { name: "Serwist PWA", category: "Frontend" },
-  { name: "LLM Fine-Tuning", category: "AI & Data" },
+  { name: "LLM Fine-Tuning", category: "AI/ML" },
   { name: "Microservices", category: "Backend" },
 ];
 
@@ -187,7 +187,7 @@ export default function DashboardOverview() {
               {/* High-Performance Monitor */}
               <rect x="130" y="90" width="140" height="96" rx="8" fill="currentColor" className="text-card stroke-foreground/15" strokeWidth="2" />
               <rect x="136" y="96" width="128" height="84" rx="4" fill="url(#screenGrad)" />
-              
+
               {/* Code lines on screen */}
               <rect x="144" y="108" width="40" height="4" rx="2" fill="#10B981" />
               <rect x="188" y="108" width="24" height="4" rx="2" fill="#3B82F6" />
@@ -433,11 +433,10 @@ export default function DashboardOverview() {
                             {blog.category}
                           </span>
                           <span
-                            className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
-                              blog.status === "Published"
+                            className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${blog.status === "Published"
                                 ? "bg-emerald-500/10 text-emerald-600"
                                 : "bg-amber-500/10 text-amber-600"
-                            }`}
+                              }`}
                           >
                             {blog.status}
                           </span>

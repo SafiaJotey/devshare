@@ -64,7 +64,7 @@ export const FixedHeader = ({
             <SelectItem value="Frontend">Frontend</SelectItem>
             <SelectItem value="Backend">Backend</SelectItem>
             <SelectItem value="DevOps">DevOps</SelectItem>
-            <SelectItem value="AI & Data">AI & Data</SelectItem>
+            <SelectItem value="AI/ML">AI/ML</SelectItem>
             <SelectItem value="Security">Security</SelectItem>
           </SelectContent>
         </Select>

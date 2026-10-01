@@ -61,7 +61,7 @@ const CATEGORY_MAP: Record<
     bg: "bg-purple-500/10",
     border: "border-purple-500/20",
   },
-  "AI & Data": {
+  "AI/ML": {
     icon: Cpu,
     color: "text-amber-500",
     bg: "bg-amber-500/10",
@@ -75,7 +75,7 @@ const CATEGORY_MAP: Record<
   },
 };
 
-const CATEGORIES = ["All", "Frontend", "Backend", "DevOps", "AI & Data", "Security"];
+const CATEGORIES = ["All", "Frontend", "Backend", "DevOps", "AI/ML", "Security"];
 
 export default function AuthorDetailsPage() {
   const params = useParams();
@@ -331,11 +331,10 @@ export default function AuthorDetailsPage() {
                 );
               }}
               size="sm"
-              className={`h-9 px-4 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
-                isFollowing
+              className={`h-9 px-4 rounded-xl text-xs font-semibold cursor-pointer transition-all ${isFollowing
                   ? "bg-foreground/10 text-foreground hover:bg-foreground/15 border border-foreground/10"
                   : "bg-primary text-primary-foreground hover:bg-primary/90 shadow-sm"
-              }`}
+                }`}
             >
               {isFollowing ? (
                 <>
@@ -528,11 +527,10 @@ export default function AuthorDetailsPage() {
                   <button
                     key={cat}
                     onClick={() => setSelectedCategory(cat)}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold font-mono transition-all cursor-pointer ${
-                      selectedCategory === cat
+                    className={`px-3 py-1.5 rounded-xl text-xs font-semibold font-mono transition-all cursor-pointer ${selectedCategory === cat
                         ? "bg-primary text-primary-foreground shadow-xs"
                         : "bg-foreground/[0.03] text-foreground/60 hover:bg-foreground/[0.06] hover:text-foreground"
-                    }`}
+                      }`}
                   >
                     {cat}
                   </button>
